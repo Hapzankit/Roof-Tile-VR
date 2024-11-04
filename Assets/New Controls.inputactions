@@ -1,0 +1,54 @@
+{
+    "name": "New Controls",
+    "maps": [
+        {
+            "name": "Additional action map",
+            "id": "621b938c-bb31-456c-bde1-81156ab976f0",
+            "actions": [
+                {
+                    "name": "primary button",
+                    "type": "Button",
+                    "id": "d937c21f-c063-4d1d-bcbb-d03c4e2500dd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "secondary buttpn pressed",
+                    "type": "Button",
+                    "id": "b897c134-7aad-46e4-b601-44834415b8b1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9fc1eb68-2faa-4e6a-b48b-316b1d758e17",
+                    "path": "<XRController>/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "primary button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3ea17cf1-c77f-4a62-ae5f-d60a558207b8",
+                    "path": "<XRController>{LeftHand}/{PrimaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "secondary buttpn pressed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
