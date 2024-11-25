@@ -25,8 +25,15 @@ namespace RoofTileVR
         [Header("Edge points")] 
         [SerializeField] private Transform sideEdgeRight;
         [SerializeField] private Transform sideEdgeLeft;
+        [SerializeField] private Transform sideEdgeBottom;
+        [SerializeField] private Transform sideEdgeTop;
 
-        private Vector3 effectSideEdgeScale = new Vector3(0.1f, 1.20f, 1f);
+        [SerializeField] private Vector3 effectSideEdgeScale = new Vector3(0.1f, 1.20f, 1f);
+        [SerializeField] private Vector3 canvasOffset;
+        public Vector3 OffsetUI => canvasOffset;
+        public Transform ConfirmTileUIRoot;
+        public Transform BottomOverhangLogUIRoot;
+        
         public Vector3 EffectSideEdgeScale
         {
             get
@@ -43,11 +50,14 @@ namespace RoofTileVR
         {
             get => sideEdgeLeft;
         }
+
+        public Transform SideEdgeBottom => sideEdgeBottom;
+        public Transform SideEdgeTop => sideEdgeTop;
         
         private void Start()
         {
             spawner = FindObjectOfType<TileCasting>();
-            YesButton.onClick.AddListener(YesButtonPressed);
+            YesButton?.onClick.AddListener(YesButtonPressed);
             //tileCanvasUI.gameObject.SetActive(false);
         }
 
@@ -89,9 +99,28 @@ namespace RoofTileVR
         public void OnTileDropped()
         {
             //ShowPlacementPrompt();
-            spawner.ShowPlacementPrompt();
             spawner.TileSelectText("Tile Dropped");
-            DisableInteraction();
+            spawner.OnTileDropped();
+            //spawner.ShowPlacementPrompt();
+            //DisableInteraction();
+        }
+
+        public bool isTileAbove = false;
+        public void SetTileAboveRoof(bool isAbove)
+        {
+            isTileAbove = isAbove;
+        }
+
+        private bool isTileOnRightSide = false;
+        private bool isTileOnLeftSide = false;
+        private bool isTileOnBottom = false;
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.TryGetComponent(out CollisionCheck edge))
+            {
+                
+            }
         }
     }
 }

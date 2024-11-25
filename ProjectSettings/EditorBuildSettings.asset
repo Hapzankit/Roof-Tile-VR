@@ -24,10 +24,10 @@ EditorBuildSettings:
     path: Assets/Samples/XR Interaction Toolkit/3.0.3/Hands Interaction Demo/HandsDemoScene
       temp.unity
     guid: b57fc28c4f1a7d046a088756c2c031a5
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/BasicScene-HANDs 2.unity
     guid: 4c6f6be8af8aec14fbb8d72f5e312270
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/BasicScene-HANDs 3.unity
     guid: 242e819033a3d8d41b739c28906ec531
   m_configObjects:

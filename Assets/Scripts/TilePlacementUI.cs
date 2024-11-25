@@ -23,13 +23,17 @@ namespace RoofTileVR.UI
             passGraphics.SetActive(false);
         }
 
-        public void ShowTilePassUI(Transform target)
+        public void ShowTilePassUI(Transform target, Vector3? newOffset = null)
         {
             //Vector3 offsetPos = panel.transform.localPosition;
             
             panel.transform.SetParent(target);
             promptLabel.text = passRemark;
+            if (newOffset != null)
+                offsetPos = (Vector3)newOffset;
+            
             panel.transform.localPosition = Vector3.zero + offsetPos;
+                
             Vector3 oldScale = panel.transform.localScale;
             
             panel.transform.localScale = Vector3.zero;
@@ -42,12 +46,15 @@ namespace RoofTileVR.UI
             
         }
         
-        public void ShowTileFailUI(Transform target)
+        public void ShowTileFailUI(Transform target, Vector3? newOffset = null)
         {
             //Vector3 offsetPos = panel.transform.localPosition;
             
             panel.transform.SetParent(target);
             promptLabel.text = failRemark;
+            if (newOffset != null)
+                offsetPos = (Vector3)newOffset;
+            
             panel.transform.localPosition = Vector3.zero + offsetPos;
             Vector3 oldScale = panel.transform.localScale;
             

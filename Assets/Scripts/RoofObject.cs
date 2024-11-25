@@ -12,7 +12,8 @@ namespace RoofTileVR
         public Transform LeftRoofPoint => leftEdge;
         public Transform RightRoofPoint => rightEdge;
         public Transform BottomRoofPoint => bottomEdge;
-        
-        
+
+        public GameObject SideOverhangEffect;
+        public GameObject BottomOverhangEffect;
     }
 }
