@@ -27,7 +27,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/BasicScene-HANDs 2.unity
     guid: 4c6f6be8af8aec14fbb8d72f5e312270
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/BasicScene-HANDs 3.unity
     guid: 242e819033a3d8d41b739c28906ec531
   m_configObjects:

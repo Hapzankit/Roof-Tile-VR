@@ -6,6 +6,7 @@ using DG.Tweening;
 using RoofTileVR.UI;
 using TMPro;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ namespace RoofTileVR
         public GameObject prefabToPlace; // The prefab to place when the trigger is pressed
         public float boxCastSize = 0.1f; // Size of the box cast
         public LayerMask layerMask; // Layer mask to define what to hit
-        
+
         [SerializeField] private GameObject currentPlaceholder;
         [SerializeField] private TextMeshProUGUI logTMP;
         [SerializeField] private GameObject triggerTMP;
@@ -30,29 +31,33 @@ namespace RoofTileVR
         private Vector3 prevPos;
         private Vector3 prevRot;
         [SerializeField] private RoofObject m_RoofObject;
-        
+
         [SerializeField] private float thresholdDistance;
         public bool isCastingActive = false;
 
         public static Action<string> tilePlacedMsg;
-        
+        public GameObject starterColliderHolder;
+
+        public List<BoxCollider> starterColliders;
+
         private void OnEnable()
         {
             //RightTriggerAction += TriggerPressed();
             RightTriggerRef.action.performed += RightTriggerPressed;
             RightTriggerRef.action.Enable();
-            
+
             PrimaryButtonRef.action.performed += OnPrimaryButtonPressed;
             PrimaryButtonRef.action.Enable();
-            
+
+
         }
 
-        
+
         private void OnDisable()
         {
             RightTriggerRef.action.performed -= RightTriggerPressed;
             RightTriggerRef.action.Disable();
-            
+
             PrimaryButtonRef.action.performed -= OnPrimaryButtonPressed;
             PrimaryButtonRef.action.Disable();
         }
@@ -81,6 +86,14 @@ namespace RoofTileVR
         // Start is called before the first frame update
         void Start()
         {
+
+            foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
+            {
+                starterColliders.Add(coll);
+
+                coll.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+            }
+            starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
             //currentPlaceholder = Instantiate(placeholderPrefab);
             currentPlaceholder.SetActive(false);
             triggerTMP.SetActive(false);
@@ -88,7 +101,7 @@ namespace RoofTileVR
             {
                 TryGetComponent(out m_RoofObject);
             }
-            
+
             UpdateToggleUI();
             SubToggleUIs();
         }
@@ -114,22 +127,22 @@ namespace RoofTileVR
         [SerializeField] private Transform tileOffset;
         [SerializeField] private GameObject solidTile;
 
-        [SerializeField] private TileObject currentTilePrefab;
+        [SerializeField] public TileObject currentTilePrefab;
         private TileObject prevTilePrefab;
         [SerializeField] private TileObject[] TileObjects;
         private int currentTileIndex;
-        
+
         public void PlaceTileInFront(int tileIndex = 0)
         {
             currentTileIndex = tileIndex;
             distanceLog.transform.parent.gameObject.SetActive(false);
-            
+
             m_TileSelectPanelUI.BGColorReset();
             Vector3 pos = tileOffset.position;
             //pos.y = 1f;
             GameObject placedObject =
                 Instantiate(TileObjects[currentTileIndex].gameObject, pos, tileOffset.localRotation);
-            
+
             if (prevTilePrefab)
             {
                 prevTilePrefab = currentTilePrefab;
@@ -137,7 +150,7 @@ namespace RoofTileVR
             }
             currentTilePrefab = placedObject.GetComponent<TileObject>();
             tileState = -1;
-            
+
         }
 
         public TextMeshProUGUI tileStatusPrompt;
@@ -159,12 +172,12 @@ namespace RoofTileVR
         public void SetActiveTileStatePlaceFail(int state = -1)
         {
             tileState = state;
-            
+
             //re enable grab for the tile
             currentTilePrefab.EnableInteraction();
             //m_TilePlacementUI.HidePanel();
         }
-        
+
         int i = 1;
 
         private List<GameObject> objectsToCheck = new List<GameObject>();
@@ -179,17 +192,18 @@ namespace RoofTileVR
         [SerializeField] private Toggle Toggle_bottomOverhangCheck;
         [SerializeField] private Toggle Toggle_sidewayGapCheck;
         [SerializeField] private Toggle Toggle_overlapCheck;
-        
+        public TileDropCollisionCheck currentTileRegion;
+
         public void SetToggle_SideOverhangCheck(Toggle toggle)
         {
             b_sideOverhangCheck = toggle.isOn;
         }
-        
+
         public void SetToggle_BottomOverhangCheck(Toggle toggle)
         {
             b_bottomOverhangCheck = toggle.isOn;
         }
-        
+
         public void SetToggle_SidewayGapCheck(Toggle toggle)
         {
             b_sidewayGapCheck = toggle.isOn;
@@ -199,7 +213,7 @@ namespace RoofTileVR
         {
             b_sidewayGapCheck = toggle.isOn;
         }
-        
+
         public void UpdateToggleUI()
         {
             Toggle_overlapCheck.isOn = (b_overlapCheck);
@@ -227,11 +241,11 @@ namespace RoofTileVR
                 SetToggle_OverlapCheck(Toggle_overlapCheck);
             });
         }
-        
+
         void PlaceTile()
         {
             currentTilePrefab.ShowPlacementPrompt();
-            
+
             try
             {
                 if (objectsToCheck.Contains(currentTilePrefab.gameObject) == false)
@@ -249,11 +263,11 @@ namespace RoofTileVR
             }
 
             tilePlaced_log.text = $"{currentTilePrefab.name} placed";
-            DOVirtual.DelayedCall(2f, delegate()
+            DOVirtual.DelayedCall(2f, delegate ()
             {
                 tilePlaced_log.transform.parent.gameObject.SetActive(false);
             });
-            
+
             //CheckProximity(currentTilePrefab.gameObject);
             if (b_sidewayGapCheck)
             {
@@ -264,15 +278,15 @@ namespace RoofTileVR
                 CheckDistanceFromRoofSides();
             }
         }
-        
-        
+
+
         /// <summary>
         /// 1.0f distance in Unity = 39.37inch in real world 
         /// </summary>
         public const float Inch = 39.37f;
 
         public float checkSideEdge;
-        
+
         public TextMeshProUGUI prevTileLog;
 
         public string rr(float f)
@@ -281,7 +295,7 @@ namespace RoofTileVR
         }
         public bool CheckDistanceFromLastTile()
         {
-            
+
             StringBuilder log = new StringBuilder();
             if (prevTilePrefab != null && prevTilePrefab != currentTilePrefab)
             {
@@ -292,13 +306,13 @@ namespace RoofTileVR
                 float dx = currentTilePrefab.transform.position.x - closestTile.transform.position.x;
                 log.Append($"{closestTile.name} to {currentTilePrefab.name} in X: {rr(dx * Inch)}''");
 
-                float sideEdgeDx= Mathf.Epsilon;
+                float sideEdgeDx = Mathf.Epsilon;
                 if (dx > 0)
                 {
                     //new tile is placed to RIGHT
                     //compare Tile 2 side edge left x Tile 1 side edge right
                     Vector3 tile2Edge = currentTilePrefab.SideEdgeLeft.position;
-                    
+
                     Vector3 tile1Edge = closestTile.SideEdgeRight.position;
 
                     sideEdgeDx = Vector3.Distance(tile2Edge, tile1Edge);
@@ -310,9 +324,9 @@ namespace RoofTileVR
                     //new tile is placed to LEFT    
                     //compare Tile 2 side edge right x Tile 1 side edge left
                     Vector3 tile2Edge = currentTilePrefab.SideEdgeRight.position;
-                    
+
                     Vector3 tile1Edge = closestTile.SideEdgeLeft.position;
-                    
+
                     sideEdgeDx = Vector3.Distance(tile2Edge, tile1Edge);
                     sideEdgeDx = (tile2Edge.x - tile1Edge.x);
                     log.Append($"\n{currentTilePrefab.name} placed on LEFT of {closestTile.name} by dist: {rr(Mathf.Abs(sideEdgeDx) * Inch)}''");
@@ -322,7 +336,7 @@ namespace RoofTileVR
                 if (sideEdgeDx > checkSideEdge)
                 {
                     //Fail
-                    
+
                     log.Append($"\nBAD Keyway Spacing {currentTilePrefab.name} ({rr(sideEdgeDx * Inch)}'') >> {rr(checkSideEdge * Inch)}'' distance ");
                     if (dx > 0)
                     {
@@ -352,17 +366,17 @@ namespace RoofTileVR
                 prevTilePrefab = currentTilePrefab;
                 prevTileLog.text = "last tile = " + prevTilePrefab.name + "";
             }
-            
+
             return false;
         }
 
         public TileObject GetLeftRightMostTilePos()
         {
             TileObject result = prevTilePrefab;
-            
+
             float dx = (currentTilePrefab.transform.position.x - prevTilePrefab.transform.position.x);
             float closestDist = Mathf.Abs(dx);
-            
+
             foreach (GameObject tile in objectsToCheck)
             {
                 if (tile != currentTilePrefab)
@@ -375,10 +389,10 @@ namespace RoofTileVR
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         public float checkEaveOverhang;
         public float checkRakeOverhang;
 
@@ -388,7 +402,7 @@ namespace RoofTileVR
 
         public TextMeshProUGUI sideOverhanglog;
         public TextMeshProUGUI bottomOverhanglog;
-        
+
         public void CheckDistanceFromRoofSides()
         {
 
@@ -399,12 +413,12 @@ namespace RoofTileVR
                 sideOverhanglog.transform.parent.gameObject.SetActive(true);
                 sideOverhanglog.text =
                     $"dist = {dx_left}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
-                
+
                 if (CompareRakeOverHangDist(dx_left))
                 {
                     sideOverhanglog.text +=
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang*Inch))} {dx_left}''";
-                    
+                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_left}''";
+
                     m_RoofObject.SideOverhangEffect.SetActive(false);
                     b_sideOverhangCheck = false;
                 }
@@ -418,7 +432,7 @@ namespace RoofTileVR
 
                     sideOverhanglog.text +=
                         $"\nWrong. {currentTilePrefab.name} is {align} in {dx_left}''";
-                    
+
                     m_RoofObject.SideOverhangEffect.SetActive(true);
                     SetActiveTileStatePlaceFail(-2);
                 }
@@ -427,20 +441,20 @@ namespace RoofTileVR
             if (RightSideCheck.activeTile && b_sideOverhangCheck)
             {
                 sideOverhanglog.transform.parent.gameObject.SetActive(true);
-                
+
                 //check rightmost tile
                 float dx_right = currentTilePrefab.SideEdgeRight.position.x -
                                  m_RoofObject.RightRoofPoint.position.x;
-            
+
                 sideOverhanglog.transform.parent.gameObject.SetActive(true);
                 sideOverhanglog.text =
                     $"dist = {dx_right}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
-                
+
                 if (CompareRakeOverHangDist(dx_right))
                 {
                     sideOverhanglog.text +=
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang*Inch))} {dx_right}''";
-                    
+                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_right}''";
+
                     m_RoofObject.SideOverhangEffect.SetActive(false);
                 }
                 else
@@ -453,21 +467,21 @@ namespace RoofTileVR
 
                     sideOverhanglog.text +=
                         $"\nWrong. {currentTilePrefab.name} is {align} in {dx_right}''";
-                    
+
                     m_RoofObject.SideOverhangEffect.SetActive(true);
                     SetActiveTileStatePlaceFail(-2);
                 }
             }
-            
+
             float dy = (m_RoofObject.BottomRoofPoint.position - currentTilePrefab.SideEdgeBottom.position).y;
-            
+
             if (b_bottomOverhangCheck)
             {
                 ShowBottomOverhangAlert();
                 if (CompareEaveOverHangDist(dy))
                 {
                     bottomOverhanglog.text =
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkEaveOverhang*Inch))} {dy}''";
+                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkEaveOverhang * Inch))} {dy}''";
                     m_RoofObject.BottomOverhangEffect.SetActive(false);
                 }
                 else
@@ -489,48 +503,48 @@ namespace RoofTileVR
         bool CompareRakeOverHangDist(float tileDistance)
         {
             float rakeOverHangDist;
-            
-            
+
+
             // rakeOverHangDist = Mathf.Abs(tileDistance - checkRakeOverhang);
             if (tileDistance < 0)
             {
-                
+
                 return false;
             }
-            
+
             if (tileDistance > (checkRakeOverhang * 0.75f) && tileDistance <= checkRakeOverhang)
             {
-                
+
                 return true;
             }
-            
+
             return false;
         }
-        
+
         bool CompareEaveOverHangDist(float tileDistance)
         {
             // rakeOverHangDist = Mathf.Abs(tileDistance - checkRakeOverhang);
             if (tileDistance < 0)
             {
-                
+
                 return false;
             }
-            
+
             if (tileDistance > (checkEaveOverhang * 0.7f) && tileDistance <= checkEaveOverhang)
             {
                 return true;
             }
-            
+
             return false;
         }
-        
+
         public void OnTilePick()
         {
             m_TilePlacementUI.HidePanel();
-            
+
         }
-        
-        
+
+
         public MeshRenderer tileSideEdge_Effect;
         /// <summary>
         /// 
@@ -539,14 +553,14 @@ namespace RoofTileVR
         public void HighlightIncorrectTilePlacement(int right)
         {
             m_TileSelectPanelUI.BGColorChange(Color.red);
-            
+
             Transform _transform = tileSideEdge_Effect.transform;
             _transform.SetParent(currentTilePrefab.transform);
             _transform.localRotation = Quaternion.Euler(Vector3.zero);
             _transform.localScale = currentTilePrefab.EffectSideEdgeScale;
-            
+
             tileSideEdge_Effect.material.color = currentTilePrefab.ColorFail;
-            
+
             if (right == 1)
             {
                 _transform.position = currentTilePrefab.SideEdgeRight.position;
@@ -555,9 +569,9 @@ namespace RoofTileVR
             {
                 _transform.position = currentTilePrefab.SideEdgeLeft.position;
             }
-            
+
             _transform.gameObject.SetActive(true);
-            
+
             if (!currentTilePrefab.OffsetUI.Equals(Vector3.zero))
             {
                 m_TilePlacementUI.ShowTileFailUI(currentTilePrefab.tileCanvasUI.transform, currentTilePrefab.OffsetUI);
@@ -572,17 +586,17 @@ namespace RoofTileVR
         public void HighlightCorrectTilePlacement()
         {
             m_TileSelectPanelUI.BGColorChange(Color.green);
-            
+
             Transform _transform = tileSideEdge_Effect.transform;
             _transform.SetParent(currentTilePrefab.transform);
             _transform.localRotation = Quaternion.Euler(Vector3.zero);
             _transform.localScale = new Vector3(1f, currentTilePrefab.EffectSideEdgeScale.y, 1f);
             _transform.localPosition = Vector3.zero;
-            
+
             tileSideEdge_Effect.material.color = currentTilePrefab.ColorTrue;
-            
+
             _transform.gameObject.SetActive(true);
-            
+
             if (!currentTilePrefab.OffsetUI.Equals(Vector3.zero))
             {
                 m_TilePlacementUI.ShowTilePassUI(currentTilePrefab.tileCanvasUI.transform, currentTilePrefab.OffsetUI);
@@ -597,34 +611,41 @@ namespace RoofTileVR
         {
             tileSideEdge_Effect.gameObject.SetActive(false);
         }
-        
+
         public void EnableTileGrab()
         {
             tileStatusPrompt.text = "enabled grab";
             currentTilePrefab.EnableInteraction();
         }
-        
+
         public void DisableTileGrab()
         {
             currentTilePrefab.DisableInteraction();
         }
-        
+
         public GameObject placementPrompt;
+        public GameObject wrongRegionPlacementPrompt;
         public void ShowPlacementPrompt()
         {
             placementPrompt.gameObject.SetActive(true);
-            
             placementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
             placementPrompt.transform.localPosition = Vector3.zero;
             placementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
-            
+        }
+
+        public void ShowWrongRegionPlacementPrompt()
+        {
+            wrongRegionPlacementPrompt.SetActive(true);
+            wrongRegionPlacementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
+            wrongRegionPlacementPrompt.transform.localPosition = Vector3.zero;
+            wrongRegionPlacementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
         public void ShowBottomOverhangAlert()
         {
             Transform _root = bottomOverhanglog.transform.parent;
             _root.gameObject.SetActive(true);
-            
+
             _root.transform.SetParent(currentTilePrefab.BottomOverhangLogUIRoot);
             _root.transform.localPosition = Vector3.zero;
             _root.transform.localRotation = Quaternion.Euler(Vector3.zero);
@@ -638,31 +659,82 @@ namespace RoofTileVR
         [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
         {
+
             if (currentTilePrefab.isTileAbove)
             {
-                ShowPlacementPrompt();
-                DisableTileGrab();
+                if (currentTilePrefab.isValidTile)
+                {
+                    ShowPlacementPrompt();
+                    // DisableTileGrab();
+                    // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
+                    currentTilePrefab.ShowStarterErrors();
+                }
+                else
+                {
+                    ShowWrongRegionPlacementPrompt();
+                }
             }
+
+
         }
 
         public void CheckCurrentTileAboveRoof()
         {
-            
+
         }
-        
+
+        public bool starterTilesPlaced = false;
+        public void changeTiles()
+        {
+            int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
+            print("Change starter tiles" + num);
+
+            currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+            if (num < starterColliders.Count - 1)
+            {
+                starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
+            }
+            else
+            {
+                starterColliders[num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
+                starterTilesPlaced = true;
+                foreach (var coll in starterColliders)
+                {
+                    coll.GetComponent<MeshRenderer>().enabled = true;
+                }
+            }
+
+            placementPrompt.gameObject.SetActive(true);
+        }
+
         public void YesButtonPressed()
         {
             DisableTileGrab();
             SetActiveTileStateToPlaced(1);
             TileSelectText("Tile Placed! Pick New Tile");
-            //placementPrompt.gameObject.SetActive(true);
+            int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
+            print("Change starter tiles" + num);
+
+            currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+            // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
+            if (num < starterColliders.Count)
+            {
+                starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
+            }
+            else
+            {
+                starterColliders[num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
+                starterTilesPlaced = true;
+            }
+
+            // placementPrompt.gameObject.SetActive(true);
         }
-        
+
         public TextMeshProUGUI distanceLog;
         private void CheckProximity(GameObject placedObject)
         {
             //distanceLog.text = "run proximity check";
-            
+
             foreach (GameObject obj in objectsToCheck)
             {
                 if (obj != placedObject) // Skip the object itself
@@ -687,14 +759,14 @@ namespace RoofTileVR
                 }
             }
         }
-        
+
         static readonly int[,] EdgePairs = new int[,]
         {
             {0, 1}, {1, 2}, {2, 3}, {3, 0}, // Bottom face edges
             {4, 5}, {5, 6}, {6, 7}, {7, 4}, // Top face edges
             {0, 4}, {1, 5}, {2, 6}, {3, 7}  // Side edges connecting top and bottom
         };
-        
+
         private Vector3[] GetCorners(GameObject obj)
         {
             BoxCollider collider = obj.GetComponent<BoxCollider>();
@@ -714,17 +786,17 @@ namespace RoofTileVR
 
             return corners;
         }
-        
+
         // Update is called once per frame
         void Update()
-        {   
-            if (isCastingActive == false)   return;
-            
+        {
+            if (isCastingActive == false) return;
+
             // Perform the box casting
             Vector3 origin = rightController.position;
             Vector3 direction = rightController.forward;
             Vector3 halfExtents = new Vector3(boxCastSize, boxCastSize, boxCastSize);
-            
+
             if (Physics.BoxCast(origin, halfExtents, direction, out RaycastHit hit, Quaternion.identity, Mathf.Infinity, layerMask))
             {
                 if (prevHitPoint == null)
@@ -733,18 +805,18 @@ namespace RoofTileVR
                 }
                 else
                 {
-                    
+
                 }
-                
+
                 // Show the placeholder at the hit position
                 SetLog($"Hit detected: {hit.point}");
                 prevPos = hit.point;
                 prevRot = hit.normal;
-                
+
                 currentPlaceholder.transform.position = hit.point;
                 currentPlaceholder.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
                 currentPlaceholder.SetActive(true);
-                
+
             }
             else
             {
@@ -753,7 +825,7 @@ namespace RoofTileVR
                 SetLog($"No Object detected in front {rightController.name}");
             }
         }
-        
+
         void PlaceObject(Vector3 position, Vector3 normal)
         {
             // Instantiate the prefab at the hit position with rotation based on the normal
@@ -767,7 +839,7 @@ namespace RoofTileVR
         }
 
         private int currentTile;
-        
+
         public void ToggleCasting(int tileIndex)
         {
             if (tileIndex == currentTile)
@@ -778,15 +850,15 @@ namespace RoofTileVR
             {
                 isCastingActive = true;
             }
-            
+
             currentTile = tileIndex;
             ToggleCastingUI();
         }
-        
-        
+
+
 
         [SerializeField] private TileSelectPanelUI m_TileSelectPanelUI;
-        
+
         public void ToggleCastingUI()
         {
             m_TileSelectPanelUI.OnPanelSelect(isCastingActive, currentTile);
@@ -818,11 +890,11 @@ namespace RoofTileVR
                 PlaceObject(prevPos, prevRot);
             }
         }
-        
+
         private void triggerInvoke()
         {
             triggerTMP.gameObject.SetActive(false);
-            
+
         }
     }
 }
