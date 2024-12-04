@@ -8,7 +8,7 @@ public class Whiteboard : MonoBehaviour
     public Texture2D texture;
     public Vector2 textureSize = new Vector2(2048, 2048); // Resolution of the texture
     public List<BoxCollider> LineTraceCaller;
-    public float initialMarkDistanceInches = 11.5f;
+    public float initialMarkDistanceInches = 21.5f;
     public float subsequentMarkDistanceInches = 10f;
     float widthInInches;
     float lengthInInches;
@@ -40,7 +40,9 @@ public class Whiteboard : MonoBehaviour
         lengthInInches = planeLengthUnits * 39.37f;
 
         Debug.Log($"Plane Dimensions in Inches: Width = {widthInInches:F2} inches, Length = {lengthInInches:F2} inches");
-
+        DrawVerticalAtDistance(8);
+        DrawVerticalAtDistance(9);
+        DrawVerticalAtDistance(10);
         // Draw marks
         // DrawMarks();
     }
@@ -101,6 +103,8 @@ public class Whiteboard : MonoBehaviour
             }
         }
         texture.Apply();
+
+
     }
 
     public bool isFirstLineMade()

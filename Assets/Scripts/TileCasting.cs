@@ -39,6 +39,8 @@ namespace RoofTileVR
         public GameObject starterColliderHolder;
 
         public List<BoxCollider> starterColliders;
+        public GameObject markerCube;
+        public GameObject Marker;
 
         private void OnEnable()
         {
@@ -104,6 +106,14 @@ namespace RoofTileVR
 
             UpdateToggleUI();
             SubToggleUIs();
+            float x = markerCube.transform.localPosition.x;
+
+            // Get the y and z from the target object
+            float y = starterColliders[0].transform.position.y;
+            float z = starterColliders[0].transform.position.z;
+            markerCube.transform.SetParent(starterColliders[0].transform.parent);
+            // Update the child's position while keeping the x the same
+            markerCube.transform.localPosition = new Vector3(x, y, z);
         }
 
         /// <summary>
@@ -667,7 +677,15 @@ namespace RoofTileVR
                     ShowPlacementPrompt();
                     // DisableTileGrab();
                     // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
-                    currentTilePrefab.ShowStarterErrors();
+                    if (starterTilesPlaced)
+                    {
+                        currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced);
+                    }
+                    else
+                    {
+
+                        currentTilePrefab.ShowStarterErrors();
+                    }
                 }
                 else
                 {
@@ -682,6 +700,7 @@ namespace RoofTileVR
         {
 
         }
+        public TileObject TileToCompare;
 
         public bool starterTilesPlaced = false;
         public void changeTiles()
@@ -698,6 +717,7 @@ namespace RoofTileVR
             {
                 starterColliders[num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
                 starterTilesPlaced = true;
+                // TileToCompare
                 foreach (var coll in starterColliders)
                 {
                     coll.GetComponent<MeshRenderer>().enabled = true;
@@ -706,9 +726,15 @@ namespace RoofTileVR
 
             placementPrompt.gameObject.SetActive(true);
         }
-
+        public List<GameObject> TilesPlaced;
+        public bool isFirstShakePlaced = false;
         public void YesButtonPressed()
         {
+            if(!currentTilePrefab.GetComponent<TileObject>().isStarter)
+            {
+                isFirstShakePlaced=true;
+            }
+            TilesPlaced.Add(currentTilePrefab.gameObject);
             DisableTileGrab();
             SetActiveTileStateToPlaced(1);
             TileSelectText("Tile Placed! Pick New Tile");
@@ -725,10 +751,14 @@ namespace RoofTileVR
             {
                 starterColliders[num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
                 starterTilesPlaced = true;
+                markerCube.SetActive(true);
+                markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
+
             }
 
             // placementPrompt.gameObject.SetActive(true);
         }
+
 
         public TextMeshProUGUI distanceLog;
         private void CheckProximity(GameObject placedObject)
@@ -790,6 +820,7 @@ namespace RoofTileVR
         // Update is called once per frame
         void Update()
         {
+            // currentTilePrefab.ShowShakeTIleErrors(true);
             if (isCastingActive == false) return;
 
             // Perform the box casting
@@ -824,6 +855,7 @@ namespace RoofTileVR
                 currentPlaceholder.SetActive(false);
                 SetLog($"No Object detected in front {rightController.name}");
             }
+
         }
 
         void PlaceObject(Vector3 position, Vector3 normal)

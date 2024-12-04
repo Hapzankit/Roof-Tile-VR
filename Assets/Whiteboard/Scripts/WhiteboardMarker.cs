@@ -32,6 +32,13 @@ public class WhiteboardMarker : MonoBehaviour
     Transform pickedObject;
     public Transform secondObject;
     public Transform thirdObject;
+
+
+    public Transform secondObjectShake;
+    public Transform thirdObjectShake;
+
+
+    public float DrawLineAtDistance = 11.5f;
     void Start()
     {
         pickedObject = this.transform;
@@ -46,6 +53,16 @@ public class WhiteboardMarker : MonoBehaviour
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
         lineRenderer.positionCount = 2;
+    }
+    bool isSecondLine = false;
+    public void ChangeObjects()
+    {
+        secondObjectShake.transform.gameObject.SetActive(true);
+        thirdObjectShake.transform.gameObject.SetActive(true);
+        secondObject = secondObjectShake;
+        thirdObject = thirdObjectShake;
+        isSecondLine = true;
+        DrawLineAtDistance = 21.5f;
     }
 
     void Update()
@@ -64,18 +81,42 @@ public class WhiteboardMarker : MonoBehaviour
         // Check if picked object is near the third object
         if (Vector3.Distance(pickedObject.position, thirdObject.position) < 0.05f)
         {
-            Destroy(pickedObject.gameObject);
             isObjectPicked = false;
             lineRenderer.enabled = false; // Hide the line
-            whiteboard.DrawVerticalAtDistance(11.5f);
+            whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
             lineRenderer.SetPosition(0, thirdObject.position);
             lineRenderer.SetPosition(1, secondObject.position);
+            pickedObject.gameObject.SetActive(false);
+            // ChangeObjects();
+
         }
         else
         {
             lineRenderer.SetPosition(0, pickedObject.position);
             lineRenderer.SetPosition(1, secondObject.position);
+        }
 
+
+        if (isSecondLine)
+        {
+            lineRenderer.enabled = true;
+            if (Vector3.Distance(pickedObject.position, thirdObjectShake.position) < 0.05f)
+            {
+                isObjectPicked = false;
+                lineRenderer.enabled = false; // Hide the line
+                whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
+                lineRenderer.SetPosition(0, thirdObjectShake.position);
+                lineRenderer.SetPosition(1, secondObjectShake.position);
+                whiteboard.DrawMarks();
+                pickedObject.gameObject.SetActive(false);
+
+
+            }
+            else
+            {
+                lineRenderer.SetPosition(0, pickedObject.position);
+                lineRenderer.SetPosition(1, secondObjectShake.position);
+            }
         }
         // }
         // else
@@ -90,78 +131,7 @@ public class WhiteboardMarker : MonoBehaviour
     }
 
 
-    // void OnTriggerEnter(Collider other)
-    // {
-    //     // Pick up the object on trigger
-    //     if (!isObjectPicked && other.CompareTag("Pickup"))
-    //     {
-    //         pickedObject = other.transform;
-    //         pickedObject.SetParent(transform); // Parent to player or hand
-    //         isObjectPicked = true;
-    //         lineRenderer.enabled = true;
-    //     }
-    // }
 
-    // void OnTriggerExit(Collider other)
-    // {
-    //     // Release the object when it leaves the player's hand area
-    //     if (isObjectPicked && other.transform == pickedObject)
-    //     {
-    //         pickedObject.SetParent(null);
-    //         isObjectPicked = false;
-    //     }
-    // }
-
-
-    // private void DrawBroad()
-    // {
-    //     int numRays = 4; // Number of raycasts to cast in a circular pattern
-    //     float radius = 0.0002f; // Radius of the broad area
-
-    //     // Cast multiple raycasts in a circular pattern
-    //     for (int i = 0; i < numRays; i++)
-    //     {
-    //         float angle = (i / (float)numRays) * Mathf.PI * 2;
-    //         Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
-
-    //         Vector3 rayOrigin = _tip.position + offset;
-
-    //         if (Physics.Raycast(rayOrigin, transform.up, out _touch, _tipHeight))
-    //         {
-    //             if (_touch.transform.CompareTag("Whiteboard"))
-    //             {
-    //                 if (_whiteboard == null)
-    //                 {
-    //                     _whiteboard = _touch.transform.GetComponent<Whiteboard>();
-    //                 }
-
-    //                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
-
-    //                 var x = (int)(_touchPos.x * _whiteboard.textureSize.x - (_penSize / 2));
-    //                 var y = (int)(_touchPos.y * _whiteboard.textureSize.y - (_penSize / 2));
-
-    //                 if (y >= 0 && y < _whiteboard.textureSize.y && x >= 0 && x < _whiteboard.textureSize.x)
-    //                 {
-    //                     _whiteboard.texture.SetPixels(x, y, _penSize, _penSize, _colors);
-    //                 }
-    //             }
-    //             // if (_touch.transform.CompareTag("TraceCaller"))
-    //             // {
-    //             //     isLineMade = whiteboard.isFirstLineMade();
-
-    //             //     if (isLineMade)
-    //             //     {
-    //             //         whiteboard.DrawMarks();
-    //             //         // Destroy(Scale);
-    //             //         Destroy(this.gameObject);
-    //             //     }
-    //             //     _touch.transform.gameObject.GetComponent<MeshRenderer>().enabled = true;
-    //             // }
-    //         }
-    //     }
-
-    //     _whiteboard?.texture.Apply(); // Apply the texture update
-    // }
 
 
 

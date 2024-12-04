@@ -10,61 +10,67 @@ namespace RoofTileVR
         public bool isNormalRegion;
         private bool isTileNearRoof;
 
+        TileCasting tileCasting;
+
 
         void Start()
         {
-            // tileCasting=FindObjectOfType<TileCasting>();
+            tileCasting = FindObjectOfType<TileCasting>();
         }
         private void OnTriggerEnter(Collider other)
         {
+            if (!other.TryGetComponent(out TileObject tile))
+                return; // Exit early if no TileObject is found
+
+            // Check if the tile is already in a starter region
+            if (tile.isInStarterRegion)
+            {
+                print("Tile is already in a starter region, ignoring other regions.");
+                return;
+            }
+
             if (isStarterRegion)
             {
-                if (other.TryGetComponent(out TileObject tile))
+                // Handle tiles entering a starter region
+                tile.isInStarterRegion = true; // Lock the tile to the starter region
+                if (tile.isStarter)
                 {
-                    if (tile.isStarter)
-                    {
-                        // Starter in starter region
-                        print("Starter in starter region");
-                        isTileNearRoof = true;
-                        tile.SetTileAboveRoof(true, true, this);
-                        // tileCasting.changeTiles();
-                    }
-                    else
-                    {
-                        isTileNearRoof = true;
-                        tile.SetTileAboveRoof(true, false, this);
-                        //Normal tile in starter region
-                        print("Normal tile in starter region");
-                    }
+                    // Starter in starter region
+                    print("Starter in starter region");
+                    isTileNearRoof = true;
+                    tile.SetTileAboveRoof(true, true, this);
+                }
+                else
+                {
+                    // Normal tile in starter region
+                    print("Normal tile in starter region");
+                    isTileNearRoof = true;
+                    tile.SetTileAboveRoof(true, false, this);
                 }
             }
             else
             {
-                if (other.TryGetComponent(out TileObject tile))
+                // Handle tiles in non-starter regions
+                if (tile.isStarter)
                 {
-                    if (tile.isStarter)
+                    // Starter in normal tile region
+                    print("Starter in normal tile region");
+                    isTileNearRoof = true;
+                    tile.SetTileAboveRoof(true, false, this);
+                }
+                else
+                {
+                    if (tileCasting.starterTilesPlaced)
                     {
-                        //starter in normal tile region
-                        print("starter in normal tile region");
-                        isTileNearRoof = true;
-                        tile.SetTileAboveRoof(true, false, this);
-                    }
-                    else
-                    {
+                        // Normal tile in normal tile region after starter tiles placed
+                        print("Normal tile in normal tile region");
                         isTileNearRoof = true;
                         tile.SetTileAboveRoof(true, true, this);
-                        print("normal tile in normal tile region");
-                        // normal tile in normal tile region
                     }
                 }
-
             }
-            // if (other.TryGetComponent(out TileObject tile))
-            // {
-            //     isTileNearRoof = true;
-            //     tile.SetTileAboveRoof(true);
-            // }
         }
+
 
         private void OnTriggerExit(Collider other)
         {
@@ -73,7 +79,15 @@ namespace RoofTileVR
                 isTileNearRoof = false;
                 tile.SetTileAboveRoof(false, true, this);
             }
+
+            if (isStarterRegion && other.TryGetComponent(out TileObject tile2))
+            {
+                tile2.isInStarterRegion = false; // Allow the tile to react to other regions again
+                print("Tile left the starter region.");
+            }
         }
+
+
 
         public bool TileAboveRoof()
         {
