@@ -42,6 +42,9 @@ namespace RoofTileVR
         public GameObject markerCube;
         public GameObject Marker;
 
+        [SerializeField] public List<GameObject> TileStands;
+
+
         private void OnEnable()
         {
             //RightTriggerAction += TriggerPressed();
@@ -88,6 +91,10 @@ namespace RoofTileVR
         // Start is called before the first frame update
         void Start()
         {
+            foreach (GameObject stands in TileStands)
+            {
+                stands.SetActive(false);
+            }
 
             foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
             {
@@ -106,14 +113,14 @@ namespace RoofTileVR
 
             UpdateToggleUI();
             SubToggleUIs();
-            float x = markerCube.transform.localPosition.x;
+            // float x = markerCube.transform.localPosition.x;
 
-            // Get the y and z from the target object
-            float y = starterColliders[0].transform.position.y;
-            float z = starterColliders[0].transform.position.z;
-            markerCube.transform.SetParent(starterColliders[0].transform.parent);
-            // Update the child's position while keeping the x the same
-            markerCube.transform.localPosition = new Vector3(x, y, z);
+            // // Get the y and z from the target object
+            // float y = starterColliders[0].transform.position.y;
+            // float z = starterColliders[0].transform.position.z;
+            // markerCube.transform.SetParent(starterColliders[0].transform.parent);
+            // // Update the child's position while keeping the x the same
+            // markerCube.transform.localPosition = new Vector3(x, y, z);
         }
 
         /// <summary>
@@ -551,6 +558,8 @@ namespace RoofTileVR
         public void OnTilePick()
         {
             m_TilePlacementUI.HidePanel();
+            placementPrompt.SetActive(false);
+            wrongRegionPlacementPrompt.SetActive(false);
 
         }
 
@@ -563,6 +572,7 @@ namespace RoofTileVR
         public void HighlightIncorrectTilePlacement(int right)
         {
             m_TileSelectPanelUI.BGColorChange(Color.red);
+
 
             Transform _transform = tileSideEdge_Effect.transform;
             _transform.SetParent(currentTilePrefab.transform);
@@ -730,31 +740,45 @@ namespace RoofTileVR
         public bool isFirstShakePlaced = false;
         public void YesButtonPressed()
         {
-            if(!currentTilePrefab.GetComponent<TileObject>().isStarter)
+
+            // for strter tiles
+            if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
-                isFirstShakePlaced=true;
+                isFirstShakePlaced = true;
+                print("First Shake Placed");
             }
+            // normal shakes
+            else
+            {
+                int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
+                print("Change starter tiles" + num + " " + starterColliders.Count);
+
+                currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+                // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
+                if (num < /*starterColliders.Count - 1*/2)
+                {
+                    starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
+                    print("Tile number" + num);
+                }
+                else
+                {
+                    starterTilesPlaced = true;
+                    markerCube.SetActive(true);
+                    markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
+                    starterColliders[/*starterColliders.Count - 1*/2].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+                    starterTilesPlaced = true;
+                    print("All tiles placed");
+
+                }
+            }
+
+
+
             TilesPlaced.Add(currentTilePrefab.gameObject);
+            print("Tile placed number" + TilesPlaced.Count);
             DisableTileGrab();
             SetActiveTileStateToPlaced(1);
             TileSelectText("Tile Placed! Pick New Tile");
-            int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
-            print("Change starter tiles" + num);
-
-            currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
-            // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
-            if (num < starterColliders.Count)
-            {
-                starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
-            }
-            else
-            {
-                starterColliders[num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
-                starterTilesPlaced = true;
-                markerCube.SetActive(true);
-                markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
-
-            }
 
             // placementPrompt.gameObject.SetActive(true);
         }
@@ -820,6 +844,14 @@ namespace RoofTileVR
         // Update is called once per frame
         void Update()
         {
+
+            if (markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
+            {
+                foreach (GameObject stand in TileStands)
+                {
+                    stand.SetActive(true);
+                }
+            }
             // currentTilePrefab.ShowShakeTIleErrors(true);
             if (isCastingActive == false) return;
 

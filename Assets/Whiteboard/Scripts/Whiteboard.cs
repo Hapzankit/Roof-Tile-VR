@@ -40,9 +40,9 @@ public class Whiteboard : MonoBehaviour
         lengthInInches = planeLengthUnits * 39.37f;
 
         Debug.Log($"Plane Dimensions in Inches: Width = {widthInInches:F2} inches, Length = {lengthInInches:F2} inches");
-        DrawVerticalAtDistance(8);
-        DrawVerticalAtDistance(9);
-        DrawVerticalAtDistance(10);
+        // DrawVerticalAtDistance(8);
+        // DrawVerticalAtDistance(9);
+        // DrawVerticalAtDistance(10);
         // Draw marks
         // DrawMarks();
     }
@@ -68,6 +68,7 @@ public class Whiteboard : MonoBehaviour
 
         // Apply texture changes
         texture.Apply();
+        print("Draw MArks");
     }
 
     public void DrawVerticalLine(int x)

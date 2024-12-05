@@ -36,6 +36,8 @@ public class WhiteboardMarker : MonoBehaviour
 
     public Transform secondObjectShake;
     public Transform thirdObjectShake;
+    public bool isLineDrawnForStarter = false;
+
 
 
     public float DrawLineAtDistance = 11.5f;
@@ -79,22 +81,7 @@ public class WhiteboardMarker : MonoBehaviour
         // Update LineRenderer positions in real-time
 
         // Check if picked object is near the third object
-        if (Vector3.Distance(pickedObject.position, thirdObject.position) < 0.05f)
-        {
-            isObjectPicked = false;
-            lineRenderer.enabled = false; // Hide the line
-            whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
-            lineRenderer.SetPosition(0, thirdObject.position);
-            lineRenderer.SetPosition(1, secondObject.position);
-            pickedObject.gameObject.SetActive(false);
-            // ChangeObjects();
 
-        }
-        else
-        {
-            lineRenderer.SetPosition(0, pickedObject.position);
-            lineRenderer.SetPosition(1, secondObject.position);
-        }
 
 
         if (isSecondLine)
@@ -102,13 +89,16 @@ public class WhiteboardMarker : MonoBehaviour
             lineRenderer.enabled = true;
             if (Vector3.Distance(pickedObject.position, thirdObjectShake.position) < 0.05f)
             {
+
+
                 isObjectPicked = false;
+                whiteboard.DrawMarks();
                 lineRenderer.enabled = false; // Hide the line
                 whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
                 lineRenderer.SetPosition(0, thirdObjectShake.position);
                 lineRenderer.SetPosition(1, secondObjectShake.position);
-                whiteboard.DrawMarks();
                 pickedObject.gameObject.SetActive(false);
+
 
 
             }
@@ -116,6 +106,31 @@ public class WhiteboardMarker : MonoBehaviour
             {
                 lineRenderer.SetPosition(0, pickedObject.position);
                 lineRenderer.SetPosition(1, secondObjectShake.position);
+            }
+        }
+
+        else
+        {
+            if (Vector3.Distance(pickedObject.position, thirdObject.position) < 0.05f)
+            {
+                isLineDrawnForStarter = true;
+                isObjectPicked = false;
+                lineRenderer.enabled = false; // Hide the line
+                whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
+                lineRenderer.SetPosition(0, thirdObject.position);
+                lineRenderer.SetPosition(1, secondObject.position);
+                this.transform.position = new Vector3(secondObjectShake.position.x, secondObjectShake.position.y, secondObjectShake.position.z);
+                pickedObject.gameObject.SetActive(false);
+              
+
+
+                // ChangeObjects();
+
+            }
+            else
+            {
+                lineRenderer.SetPosition(0, pickedObject.position);
+                lineRenderer.SetPosition(1, secondObject.position);
             }
         }
         // }

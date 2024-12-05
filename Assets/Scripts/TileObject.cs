@@ -38,6 +38,7 @@ namespace RoofTileVR
         public Vector3 OffsetUI => canvasOffset;
         public Transform ConfirmTileUIRoot;
         public Transform BottomOverhangLogUIRoot;
+        public GameObject CorrectTileIndicator;
 
 
         public bool isInStarterRegion; // Tracks if the tile is currently in a starter region
@@ -72,6 +73,8 @@ namespace RoofTileVR
         {
             spawner = FindObjectOfType<TileCasting>();
             YesButton?.onClick.AddListener(YesButtonPressed);
+
+
             //tileCanvasUI.gameObject.SetActive(false);
         }
 
@@ -113,6 +116,10 @@ namespace RoofTileVR
             spawner.currentTilePrefab = this;
             this.transform.rotation = Quaternion.Euler(-45, 0, 0);
 
+            DistanceErrorCubeRL.gameObject.SetActive(false);
+            DistanceErrorCubeTB.gameObject.SetActive(false);
+
+
         }
 
         public void OnTileDropped()
@@ -128,6 +135,11 @@ namespace RoofTileVR
         void Update()
         {
             // ShowStarterErrors();
+            if (!isStarter)
+            {
+
+                ShowShakeTIleErrorsTesting();
+            }
         }
 
         public void ShowStarterErrors()
@@ -151,28 +163,28 @@ namespace RoofTileVR
                         Debug.Log("Target is to the Right.");
                         DistanceErrorCubeRL.SetActive(true);
                         DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
-                        DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Cube is on right " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
+                        DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                     }
                     else if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                     {
                         Debug.Log("Target is to the Left.");
                         DistanceErrorCubeRL.SetActive(true);
                         DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
-                        DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Cube is on left " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
+                        DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                     }
                     else if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
                         Debug.Log("Target is Above (Forward).");
                         DistanceErrorCubeTB.SetActive(true);
                         DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
-                        DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Cube is above " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
+                        DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                     }
                     else if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
                         Debug.Log("Target is Below (Backward).");
                         DistanceErrorCubeTB.SetActive(true);
                         DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
-                        DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Cube is down " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
+                        DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                     }
                 }
                 else
@@ -223,10 +235,11 @@ namespace RoofTileVR
             if (isfirstShakeTile)
             {
                 objectToCheckFrom = this.sideEdgeRight.gameObject;
+                objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
                 if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove/*true*/)
                 {
                     // this.transform.position = spawner.currentTileRegion.transform.position;
-                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.1f)
+                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
                     {
 
                         // DistanceErrorCube.SetActive(true);
@@ -274,9 +287,12 @@ namespace RoofTileVR
                 }
                 else
                 {
+                    objectToCheck = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1];
                     objectToCheckFrom = this.sideEdgeLeft.gameObject;
                     // this.transform.position = spawner.currentTileRegion.transform.position;
-                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 0.18)
+                    objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
+                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight
+                    .transform.position) * 39.37 > 0.18)
                     {
 
                         // DistanceErrorCube.SetActive(true);
@@ -323,6 +339,129 @@ namespace RoofTileVR
                     }
 
                 }
+
+
+
+
+            }
+        }
+
+
+
+
+        public void ShowShakeTIleErrorsTesting()
+        {
+
+            print("Distance Checking");
+            GameObject objectToCheck = spawner.TilesPlaced[0];
+            GameObject objectToCheckFrom;
+            if (true)
+            {
+                objectToCheckFrom = this.sideEdgeRight.gameObject;
+                objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
+                if (/*objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove*/isTileAbove)
+                {
+                    // this.transform.position = spawner.currentTileRegion.transform.position;
+                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
+                    {
+
+                        // DistanceErrorCube.SetActive(true);
+                        Vector3 direction = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                        direction.y = 0; // Ignore the Y-axis
+
+
+                        print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) + "Direction" + direction);
+
+                        // Determine the relative position
+                        if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
+                        {
+                            Debug.Log("Target is to the Right.");
+                            DistanceErrorCubeRL.SetActive(true);
+                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
+                            DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                        }
+                        else if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
+                        {
+                            Debug.Log("Target is to the Left.");
+                            DistanceErrorCubeRL.SetActive(true);
+                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
+                            DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                        }
+                        else if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
+                        {
+                            Debug.Log("Target is Above (Forward).");
+                            DistanceErrorCubeTB.SetActive(true);
+                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
+                            DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                        }
+                        else if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
+                        {
+                            Debug.Log("Target is Below (Backward).");
+                            DistanceErrorCubeTB.SetActive(true);
+                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                            DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                        }
+                    }
+                    else
+                    {
+                        DistanceErrorCubeRL.SetActive(false);
+                        DistanceErrorCubeTB.SetActive(false);
+                    }
+                }
+                // else
+                // {
+                //     objectToCheck = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1];
+                //     objectToCheckFrom = this.sideEdgeLeft.gameObject;
+                //     // this.transform.position = spawner.currentTileRegion.transform.position;
+                //     objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
+                //     if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight
+                //     .transform.position) * 39.37 > 0.18)
+                //     {
+
+                //         // DistanceErrorCube.SetActive(true);
+                //         Vector3 direction = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                //         direction.y = 0; // Ignore the Y-axis
+
+
+                //         print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) + "Direction" + direction);
+
+                //         // Determine the relative position
+                //         if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
+                //         {
+                //             Debug.Log("Target is to the Right.");
+                //             DistanceErrorCubeRL.SetActive(true);
+                //             DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
+                //             DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right (Bad keyway spacing) " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                //         }
+                //         else if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
+                //         {
+                //             Debug.Log("Target is to the Left.");
+                //             DistanceErrorCubeRL.SetActive(true);
+                //             DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
+                //             DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                //         }
+                //         else if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
+                //         {
+                //             Debug.Log("Target is Above (Forward).");
+                //             DistanceErrorCubeTB.SetActive(true);
+                //             DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
+                //             DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                //         }
+                //         else if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
+                //         {
+                //             Debug.Log("Target is Below (Backward).");
+                //             DistanceErrorCubeTB.SetActive(true);
+                //             DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                //             DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
+                //         }
+                //     }
+                //     else
+                //     {
+                //         DistanceErrorCubeRL.SetActive(false);
+                //         DistanceErrorCubeTB.SetActive(false);
+                //     }
+
+                // }
 
 
 
