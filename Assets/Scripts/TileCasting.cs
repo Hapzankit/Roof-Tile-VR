@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace RoofTileVR
 {
@@ -560,7 +561,7 @@ namespace RoofTileVR
             m_TilePlacementUI.HidePanel();
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
-
+            // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
 
 
@@ -679,7 +680,7 @@ namespace RoofTileVR
         [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
         {
-
+            print("Is all starter placed " + starterTilesPlaced);
             if (currentTilePrefab.isTileAbove)
             {
                 if (currentTilePrefab.isValidTile)
@@ -740,6 +741,7 @@ namespace RoofTileVR
         public bool isFirstShakePlaced = false;
         public void YesButtonPressed()
         {
+            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
 
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
@@ -766,7 +768,7 @@ namespace RoofTileVR
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
                     starterColliders[/*starterColliders.Count - 1*/2].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
-                    starterTilesPlaced = true;
+
                     print("All tiles placed");
 
                 }
