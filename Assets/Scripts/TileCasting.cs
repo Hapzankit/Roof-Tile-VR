@@ -44,6 +44,10 @@ namespace RoofTileVR
         public GameObject Marker;
 
         [SerializeField] public List<GameObject> TileStands;
+        public float tileSpanWidthConstant;
+        public float tileSpanWidth = 0;
+
+        public float currentTileWidth;
 
 
         private void OnEnable()
@@ -100,9 +104,11 @@ namespace RoofTileVR
             foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
             {
                 starterColliders.Add(coll);
-
+                tileSpanWidth += 12.18f;
                 coll.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
             }
+
+            tileSpanWidthConstant = tileSpanWidth;
             starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
             //currentPlaceholder = Instantiate(placeholderPrefab);
             currentPlaceholder.SetActive(false);
@@ -561,6 +567,7 @@ namespace RoofTileVR
             m_TilePlacementUI.HidePanel();
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
+
             // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
 
@@ -680,7 +687,7 @@ namespace RoofTileVR
         [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
         {
-            print("Is all starter placed " + starterTilesPlaced);
+            print("Is all starter placed " + starterTilesPlaced + isFirstShakePlaced);
             if (currentTilePrefab.isTileAbove)
             {
                 if (currentTilePrefab.isValidTile)
@@ -690,7 +697,15 @@ namespace RoofTileVR
                     // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
                     if (starterTilesPlaced)
                     {
-                        currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced);
+                        if (isFirstShakePlaced)
+                        {
+                            currentTilePrefab.ShowKeywayerrors();
+                        }
+                        else
+                        {
+
+                            currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced);
+                        }
                     }
                     else
                     {
@@ -742,7 +757,7 @@ namespace RoofTileVR
         public void YesButtonPressed()
         {
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
-
+            tileSpanWidth -= currentTileWidth;
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {

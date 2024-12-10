@@ -81,7 +81,7 @@ public class Bolts : MonoBehaviour
 
     void snapBolt(int tileNum)
     {
-        print("trying to snap" + Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37);
+        // print("trying to snap" + Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37);
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 1f)
         {
             this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;

@@ -583,6 +583,10 @@ MonoBehaviour:
   ConfirmTileUIRoot: {fileID: 7315642475721869709}
   BottomOverhangLogUIRoot: {fileID: 6753348324381339419}
   CorrectTileIndicator: {fileID: 2066745853439501187}
+  BoltPlaceHolders: []
+  isFirstBoltPlaced: 0
+  isSecondBoltPlaced: 0
+  tileSize: 7
   isInStarterRegion: 0
   isTileAbove: 0
   isValidTile: 0
