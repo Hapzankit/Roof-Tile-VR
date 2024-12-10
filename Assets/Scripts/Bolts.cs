@@ -13,6 +13,8 @@ public class Bolts : MonoBehaviour
 
     TileObject tileToCheckFrom;
     public TMP_Text textToShowErrors;
+
+    public bool isBoltPlaced = false;
     //1- check from 1st bolt placeholder
     //2- check from second bolt placeholder
     //-1 - all bolts are placed
@@ -74,7 +76,6 @@ public class Bolts : MonoBehaviour
         if (tileToCheckFrom)
         {
             snapBolt(tNum);
-
         }
     }
 
@@ -84,6 +85,8 @@ public class Bolts : MonoBehaviour
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 1f)
         {
             this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
+            this.transform.SetParent(tileToCheckFrom.BoltPlaceHolders[tileNum]);
+            isBoltPlaced = true;
             textToShowErrors.gameObject.SetActive(false);
             if (tileNum == 0)
             {
@@ -95,6 +98,7 @@ public class Bolts : MonoBehaviour
                 tileToCheckFrom.isSecondBoltPlaced = true;
             }
             this.GetComponent<XRGrabInteractable>().enabled = false;
+            this.enabled = false;
         }
     }
 

@@ -41,8 +41,8 @@ namespace RoofTileVR
         public Transform BottomOverhangLogUIRoot;
         public GameObject CorrectTileIndicator;
         public List<Transform> BoltPlaceHolders;
-        public bool isFirstBoltPlaced=false;
-        public bool isSecondBoltPlaced=false;
+        public bool isFirstBoltPlaced = false;
+        public bool isSecondBoltPlaced = false;
 
 
         public bool isInStarterRegion; // Tracks if the tile is currently in a starter region
@@ -131,7 +131,7 @@ namespace RoofTileVR
             //ShowPlacementPrompt();
             spawner.TileSelectText("Tile Dropped" + isTileAbove + isValidTile);
             spawner.OnTileDropped();
-            ShowStarterErrors();
+            // ShowStarterErrors();
             //spawner.ShowPlacementPrompt();
             //DisableInteraction();
         }
@@ -144,6 +144,13 @@ namespace RoofTileVR
 
             //     ShowShakeTIleErrorsTesting();
             // }
+
+
+            //JUST FOR DEBUG
+            // if (isTileAbove && isValidTile)
+            // {
+            //     ShowStarterErrors();
+            // }
         }
 
         public void ShowStarterErrors()
@@ -152,11 +159,12 @@ namespace RoofTileVR
             if (spawner.currentTileRegion && isValidTile && isTileAbove)
             {
                 // this.transform.position = spawner.currentTileRegion.transform.position;
-                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 1.1f)
+                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 5.1f)
                 {
 
                     // DistanceErrorCube.SetActive(true);
                     Vector3 direction = this.transform.position - spawner.currentTileRegion.transform.position;
+
                     direction.y = 0; // Ignore the Y-axis
 
 
@@ -165,7 +173,7 @@ namespace RoofTileVR
                     // Determine the relative position
                     if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                     {
-                        
+
                         DistanceErrorCubeRL.SetActive(true);
                         DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                         DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
@@ -198,12 +206,21 @@ namespace RoofTileVR
                     this.transform.position = spawner.currentTileRegion.transform.position;
                     DistanceErrorCubeRL.SetActive(false);
                     DistanceErrorCubeTB.SetActive(false);
+
+                    //JUST FOR DEBUG
+                    // if (!isYesPressed)
+                    // {
+                    //     spawner.YesButtonPressed();
+                    //     isYesPressed = true;
+                    // }
                 }
 
 
 
             }
         }
+
+        bool isYesPressed = false;
 
         public bool isTileAbove = false;
         public bool isValidTile = false;
@@ -215,6 +232,8 @@ namespace RoofTileVR
             isValidTile = isTileValid;
             spawner.currentTileRegion = regionTileDropped;
             this.transform.rotation = Quaternion.Euler(-45, 0, 0);
+
+
             // this.transform.localPosition = new Vector3(this.transform.localPosition.x, regionTileDropped.transform.localPosition.y, this.transform.localPosition.z);
         }
 
@@ -290,6 +309,21 @@ namespace RoofTileVR
                     }
                     else
                     {
+
+                        // Calculate the current position of the child in world space
+                        Vector3 childWorldPosition = objectToCheckFrom.transform.position;
+
+                        // Calculate the direction from the target point to the child
+                        Vector3 direction = (childWorldPosition - objectToCheck.transform.position).normalized;
+
+                        // Calculate the new position for the child
+                        Vector3 newChildPosition = objectToCheck.transform.position + direction * 5;
+
+                        // Calculate the offset needed for the parent to move
+                        Vector3 parentOffset = newChildPosition - childWorldPosition;
+
+                        // Apply the offset to the parent GameObject
+                        transform.position += parentOffset;
                         DistanceErrorCubeRL.SetActive(false);
                         DistanceErrorCubeTB.SetActive(false);
                     }
