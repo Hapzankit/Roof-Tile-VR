@@ -12,7 +12,7 @@ public class Bolts : MonoBehaviour
     bool checkDistance = false;
 
     TileObject tileToCheckFrom;
-    public TMP_Text textToShowErrors;
+    // public TMP_Text textToShowErrors;
 
     public bool isBoltPlaced = false;
     //1- check from 1st bolt placeholder
@@ -50,7 +50,7 @@ public class Bolts : MonoBehaviour
 
     public void OnBoltPicked()
     {
-        textToShowErrors.gameObject.SetActive(false);
+        // textToShowErrors.gameObject.SetActive(false);
         this.transform.rotation = Quaternion.Euler(0, 90, 135);
     }
 
@@ -81,24 +81,34 @@ public class Bolts : MonoBehaviour
 
     void snapBolt(int tileNum)
     {
-        // print("trying to snap" + Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37);
-        if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 1f)
+        if (num != -1)
         {
-            this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
-            this.transform.SetParent(tileToCheckFrom.BoltPlaceHolders[tileNum]);
-            isBoltPlaced = true;
-            textToShowErrors.gameObject.SetActive(false);
-            if (tileNum == 0)
-            {
-                tileToCheckFrom.isFirstBoltPlaced = true;
-            }
-            if (tileNum == 1)
-            {
 
-                tileToCheckFrom.isSecondBoltPlaced = true;
+            // print("trying to snap" + Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37);
+            if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 4f)
+            {
+                this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
+                // Vector3 ogSize = this.transform.localScale;
+                this.transform.SetParent(tileToCheckFrom.BoltPlaceHolders[tileNum], false);
+                // this.transform.localScale = ogSize;
+                // this.transform.SetParent(this.transform);
+                this.transform.localRotation = Quaternion.Euler(0, 90, 180);
+                this.transform.localPosition = new Vector3(0, 0, 0);
+                // this.transform.localScale = new Vector3(1, 1, 1);
+                isBoltPlaced = true;
+                // textToShowErrors.gameObject.SetActive(false);
+                if (tileNum == 0)
+                {
+                    tileToCheckFrom.isFirstBoltPlaced = true;
+                }
+                if (tileNum == 1)
+                {
+
+                    tileToCheckFrom.isSecondBoltPlaced = true;
+                }
+                this.GetComponent<XRGrabInteractable>().enabled = false;
+                this.enabled = false;
             }
-            this.GetComponent<XRGrabInteractable>().enabled = false;
-            this.enabled = false;
         }
     }
 
@@ -109,34 +119,34 @@ public class Bolts : MonoBehaviour
         double distanceInInches = Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37;
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 > .5f)
         {
-            textToShowErrors.gameObject.SetActive(true);
-            if (direction.z > 0 || direction.z < 0)
-            {
-                textToShowErrors.text = "Bolt is not deep enough " + distanceInInches;
-            }
-            else if (direction.x > 0)
-            {
-                textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the right";
-            }
-            else if (direction.x < 0)
-            {
-                textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the left";
-            }
-            else if (direction.y < 0)
-            {
-                textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the bottom";
-            }
-            else if (direction.y > 0)
-            {
+            // textToShowErrors.gameObject.SetActive(true);
+            // if (direction.z > 0 || direction.z < 0)
+            // {
+            //     textToShowErrors.text = "Bolt is not deep enough " + distanceInInches;
+            // }
+            // else if (direction.x > 0)
+            // {
+            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the right";
+            // }
+            // else if (direction.x < 0)
+            // {
+            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the left";
+            // }
+            // else if (direction.y < 0)
+            // {
+            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the bottom";
+            // }
+            // else if (direction.y > 0)
+            // {
 
-                textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the top";
-            }
+            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the top";
+            // }
         }
         else
         {
             print("Bolt placed");
             this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
-            textToShowErrors.gameObject.SetActive(false);
+            // textToShowErrors.gameObject.SetActive(false);
             if (tileNum == 0)
             {
                 tileToCheckFrom.isFirstBoltPlaced = true;

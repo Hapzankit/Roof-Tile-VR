@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RoofTileVR;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,8 +16,11 @@ public class Whiteboard : MonoBehaviour
 
     public TMP_Dropdown exposureDropdown;
 
+    TileCasting tileCasting;
+
     void Start()
     {
+        tileCasting = FindObjectOfType<TileCasting>();
         // Initialize texture
         var r = GetComponent<Renderer>();
         texture = new Texture2D((int)textureSize.x, (int)textureSize.y);
@@ -104,6 +108,7 @@ public class Whiteboard : MonoBehaviour
             }
         }
         texture.Apply();
+        tileCasting.GetDistanceAccordingToExposure(subsequentMarkDistanceInches);
 
 
     }

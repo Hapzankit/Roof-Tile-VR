@@ -48,6 +48,8 @@ namespace RoofTileVR
         public float tileSpanWidth = 0;
 
         public float currentTileWidth;
+        public float overlapSpanAccordingtoExposure = 11;
+        public TMP_Dropdown exposureDropdown;
 
 
         private void OnEnable()
@@ -109,6 +111,7 @@ namespace RoofTileVR
             }
 
             tileSpanWidthConstant = tileSpanWidth;
+            print("Width of roof" + tileSpanWidthConstant);
             starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
             //currentPlaceholder = Instantiate(placeholderPrefab);
             currentPlaceholder.SetActive(false);
@@ -524,6 +527,13 @@ namespace RoofTileVR
             }
         }
 
+        public void GetDistanceAccordingToExposure(float num)
+        {
+            //Placing tiles according to exposure chosen
+            overlapSpanAccordingtoExposure = num;
+
+        }
+
         bool CompareRakeOverHangDist(float tileDistance)
         {
             float rakeOverHangDist;
@@ -754,10 +764,10 @@ namespace RoofTileVR
         }
         public List<GameObject> TilesPlaced;
         public bool isFirstShakePlaced = false;
+        public bool reverseTheLine = false;
         public void YesButtonPressed()
         {
-            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
-            tileSpanWidth -= currentTileWidth;
+
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -772,7 +782,7 @@ namespace RoofTileVR
 
                 currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
                 // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
-                if (num < /*starterColliders.Count - 1*/2)
+                if (num < starterColliders.Count - 1)
                 {
                     starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
                     print("Tile number" + num);
@@ -782,7 +792,7 @@ namespace RoofTileVR
                     starterTilesPlaced = true;
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
-                    starterColliders[/*starterColliders.Count - 1*/2].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+                    starterColliders[starterColliders.Count - 1].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
 
                     print("All tiles placed");
 
@@ -791,11 +801,19 @@ namespace RoofTileVR
 
 
 
+            if (tileSpanWidth <= 0)
+            {
+                tileSpanWidth = tileSpanWidthConstant;
+                reverseTheLine = !reverseTheLine;
+            }
+            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+            tileSpanWidth -= currentTileWidth;
             TilesPlaced.Add(currentTilePrefab.gameObject);
             print("Tile placed number" + TilesPlaced.Count);
             DisableTileGrab();
             SetActiveTileStateToPlaced(1);
             TileSelectText("Tile Placed! Pick New Tile");
+            print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
 
             // placementPrompt.gameObject.SetActive(true);
         }

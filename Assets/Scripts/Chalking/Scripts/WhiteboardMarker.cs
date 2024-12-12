@@ -6,20 +6,20 @@ using UnityEngine;
 
 public class WhiteboardMarker : MonoBehaviour
 {
-    [SerializeField] private Transform _tip;
-    [SerializeField] private int _penSize = 15;
-    [SerializeField] GameObject markerBall;
+    // [SerializeField] private Transform _tip;
+    // [SerializeField] private int _penSize = 15;
+    // [SerializeField] GameObject markerBall;
     // public GameObject Scale;
 
-    private Renderer _renderer;
-    private Color[] _colors;
-    private float _tipHeight;
+    // private Renderer _renderer;
+    // private Color[] _colors;
+    // private float _tipHeight;
 
-    private RaycastHit _touch;
-    private Whiteboard _whiteboard;
-    private Vector2 _touchPos, _lastTouchPos;
-    private bool _touchedLastFrame;
-    private Quaternion _lastTouchRot;
+    // private RaycastHit _touch;
+    // private Whiteboard _whiteboard;
+    // private Vector2 _touchPos, _lastTouchPos;
+    // private bool _touchedLastFrame;
+    // private Quaternion _lastTouchRot;
 
     public Whiteboard whiteboard;
 

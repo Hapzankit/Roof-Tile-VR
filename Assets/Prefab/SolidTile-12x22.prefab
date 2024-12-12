@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4861023785016330389
 Transform:
   m_ObjectHideFlags: 0
@@ -281,7 +281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5045543769807334330
 Transform:
   m_ObjectHideFlags: 0
@@ -417,6 +417,8 @@ Transform:
   - {fileID: 9220402942265571771}
   - {fileID: 1038377384931581783}
   - {fileID: 2492870220251978645}
+  - {fileID: 8166971813883667042}
+  - {fileID: 1195865253853852334}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5728299278448039442
@@ -520,13 +522,16 @@ MonoBehaviour:
   ConfirmTileUIRoot: {fileID: 322217225116574198}
   BottomOverhangLogUIRoot: {fileID: 4343275767871178592}
   CorrectTileIndicator: {fileID: 41649843166996333}
-  BoltPlaceHolders: []
+  BoltPlaceHolders:
+  - {fileID: 8166971813883667042}
+  - {fileID: 1195865253853852334}
   isFirstBoltPlaced: 0
   isSecondBoltPlaced: 0
-  tileSize: 12
+  tileSize: 12.18
   isInStarterRegion: 0
   isTileAbove: 0
   isValidTile: 0
+  distanceToCheckAccordingToExposure: 0
 --- !u!54 &5197156651012241288
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -947,6 +952,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4768926383521248972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1195865253853852334}
+  m_Layer: 0
+  m_Name: BoltPlacement2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1195865253853852334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4768926383521248972}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.25, y: 0.45, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8727765562456717546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6015391993673468952
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,7 +1001,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8235793345166873762
 Transform:
   m_ObjectHideFlags: 0
@@ -1554,6 +1590,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 6.92
+--- !u!1 &6613427016643749803
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8166971813883667042}
+  m_Layer: 0
+  m_Name: BoltPlacement1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8166971813883667042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6613427016643749803}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.25, y: 0.45, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8727765562456717546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6723819247530530870
 GameObject:
   m_ObjectHideFlags: 0
