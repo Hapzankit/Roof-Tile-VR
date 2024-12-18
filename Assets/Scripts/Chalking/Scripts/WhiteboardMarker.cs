@@ -97,8 +97,10 @@ public class WhiteboardMarker : MonoBehaviour
                 whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
                 lineRenderer.SetPosition(0, thirdObjectShake.position);
                 lineRenderer.SetPosition(1, secondObjectShake.position);
+                whiteboard.tileCasting.WriteOnHandMenu("Now start placing normal shakes over starter tiles from bottom right");
                 pickedObject.gameObject.SetActive(false);
-
+                secondObjectShake.GetComponent<MeshRenderer>().enabled = false;
+                thirdObjectShake.GetComponent<MeshRenderer>().enabled = false;
 
 
             }
@@ -120,8 +122,10 @@ public class WhiteboardMarker : MonoBehaviour
                 lineRenderer.SetPosition(0, thirdObject.position);
                 lineRenderer.SetPosition(1, secondObject.position);
                 this.transform.position = new Vector3(secondObjectShake.position.x, secondObjectShake.position.y, secondObjectShake.position.z);
+                whiteboard.tileCasting.WriteOnHandMenu("Now Place Starter tiles on correct place (starting from bottom right) until its border turns green");
                 pickedObject.gameObject.SetActive(false);
-              
+                secondObject.GetComponent<MeshRenderer>().enabled = false;
+                thirdObject.GetComponent<MeshRenderer>().enabled = false;
 
 
                 // ChangeObjects();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RoofTileVR;
 using UnityEngine;
 
 public class BoltMachine : MonoBehaviour
@@ -10,6 +11,7 @@ public class BoltMachine : MonoBehaviour
     public Bolts bolts;
     public Transform BoltPosition;
     Bolts currentBolt;
+    public TileCasting tileCasting;
 
 
     void Start()
@@ -30,6 +32,7 @@ public class BoltMachine : MonoBehaviour
     public void SpawnAnotherBolt()
     {
         print("Spawn bolt");
+        tileCasting.WriteOnHandMenu("Bolted");
         currentBolt = Instantiate(bolts, BoltPosition);
     }
 }

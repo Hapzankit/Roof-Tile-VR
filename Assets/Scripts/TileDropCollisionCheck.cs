@@ -26,6 +26,20 @@ namespace RoofTileVR
             if (tile.isInStarterRegion)
             {
                 print("Tile is already in a starter region, ignoring other regions.");
+                if (tile.isStarter)
+                {
+                    // Starter in starter region
+                    print("Starter in starter region");
+                    isTileNearRoof = true;
+                    tile.SetTileAboveRoof(true, true, this);
+                }
+                else
+                {
+                    // Normal tile in starter region
+                    print("Normal tile in starter region");
+                    isTileNearRoof = true;
+                    tile.SetTileAboveRoof(true, false, this);
+                }
                 return;
             }
 

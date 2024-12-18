@@ -16,7 +16,7 @@ public class Whiteboard : MonoBehaviour
 
     public TMP_Dropdown exposureDropdown;
 
-    TileCasting tileCasting;
+    public TileCasting tileCasting;
 
     void Start()
     {

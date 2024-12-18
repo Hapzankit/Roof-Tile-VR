@@ -25,7 +25,7 @@ namespace RoofTileVR
         [SerializeField] private GameObject currentPlaceholder;
         [SerializeField] private TextMeshProUGUI logTMP;
         [SerializeField] private GameObject triggerTMP;
-        [SerializeField] private InputAction RightTriggerAction;
+        // [SerializeField] private InputAction RightTriggerAction;
         [SerializeField] private InputActionReference RightTriggerRef;
         [SerializeField] private InputActionReference PrimaryButtonRef;
         private System.Nullable<Vector3> prevHitPoint = null;
@@ -50,6 +50,8 @@ namespace RoofTileVR
         public float currentTileWidth;
         public float overlapSpanAccordingtoExposure = 11;
         public TMP_Dropdown exposureDropdown;
+
+        public List<HandMenu> handMenu;
 
 
         private void OnEnable()
@@ -96,8 +98,22 @@ namespace RoofTileVR
         }
 
         // Start is called before the first frame update
+
+        public void WriteOnHandMenu(String textToWrite)
+        {
+            foreach (var menu in handMenu)
+            {
+                if (menu)
+                {
+                    menu.handText.text = textToWrite;
+                }
+            }
+        }
         void Start()
         {
+
+            WriteOnHandMenu("Draw a chalk Line");
+
             foreach (GameObject stands in TileStands)
             {
                 stands.SetActive(false);
@@ -298,11 +314,11 @@ namespace RoofTileVR
             //CheckProximity(currentTilePrefab.gameObject);
             if (b_sidewayGapCheck)
             {
-                CheckDistanceFromLastTile();
+                // CheckDistanceFromLastTile();
             }
             if (LeftSideCheck.activeTile == currentTilePrefab || RightSideCheck.activeTile == currentTilePrefab)
             {
-                CheckDistanceFromRoofSides();
+                // CheckDistanceFromRoofSides();
             }
         }
 
@@ -430,102 +446,102 @@ namespace RoofTileVR
         public TextMeshProUGUI sideOverhanglog;
         public TextMeshProUGUI bottomOverhanglog;
 
-        public void CheckDistanceFromRoofSides()
-        {
+        // public void CheckDistanceFromRoofSides()
+        // {
 
-            if (LeftSideCheck.activeTile && b_sideOverhangCheck)
-            {
-                //check leftmost tile
-                float dx_left = (m_RoofObject.LeftRoofPoint.position - currentTilePrefab.SideEdgeLeft.position).x;
-                sideOverhanglog.transform.parent.gameObject.SetActive(true);
-                sideOverhanglog.text =
-                    $"dist = {dx_left}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
+        //     if (LeftSideCheck.activeTile && b_sideOverhangCheck)
+        //     {
+        //         //check leftmost tile
+        //         float dx_left = (m_RoofObject.LeftRoofPoint.position - currentTilePrefab.SideEdgeLeft.position).x;
+        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
+        //         sideOverhanglog.text =
+        //             $"dist = {dx_left}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
 
-                if (CompareRakeOverHangDist(dx_left))
-                {
-                    sideOverhanglog.text +=
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_left}''";
+        //         if (CompareRakeOverHangDist(dx_left))
+        //         {
+        //             sideOverhanglog.text +=
+        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_left}''";
 
-                    m_RoofObject.SideOverhangEffect.SetActive(false);
-                    b_sideOverhangCheck = false;
-                }
-                else
-                {
-                    string align = "left";
-                    if (dx_left < 0)
-                        align = "left";
-                    else
-                        align = "right";
+        //             m_RoofObject.SideOverhangEffect.SetActive(false);
+        //             b_sideOverhangCheck = false;
+        //         }
+        //         else
+        //         {
+        //             string align = "left";
+        //             if (dx_left < 0)
+        //                 align = "left";
+        //             else
+        //                 align = "right";
 
-                    sideOverhanglog.text +=
-                        $"\nWrong. {currentTilePrefab.name} is {align} in {dx_left}''";
+        //             sideOverhanglog.text +=
+        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dx_left}''";
 
-                    m_RoofObject.SideOverhangEffect.SetActive(true);
-                    SetActiveTileStatePlaceFail(-2);
-                }
-            }
+        //             m_RoofObject.SideOverhangEffect.SetActive(true);
+        //             SetActiveTileStatePlaceFail(-2);
+        //         }
+        //     }
 
-            if (RightSideCheck.activeTile && b_sideOverhangCheck)
-            {
-                sideOverhanglog.transform.parent.gameObject.SetActive(true);
+        //     if (RightSideCheck.activeTile && b_sideOverhangCheck)
+        //     {
+        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
 
-                //check rightmost tile
-                float dx_right = currentTilePrefab.SideEdgeRight.position.x -
-                                 m_RoofObject.RightRoofPoint.position.x;
+        //         //check rightmost tile
+        //         float dx_right = currentTilePrefab.SideEdgeRight.position.x -
+        //                          m_RoofObject.RightRoofPoint.position.x;
 
-                sideOverhanglog.transform.parent.gameObject.SetActive(true);
-                sideOverhanglog.text =
-                    $"dist = {dx_right}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
+        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
+        //         sideOverhanglog.text =
+        //             $"dist = {dx_right}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
 
-                if (CompareRakeOverHangDist(dx_right))
-                {
-                    sideOverhanglog.text +=
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_right}''";
+        //         if (CompareRakeOverHangDist(dx_right))
+        //         {
+        //             sideOverhanglog.text +=
+        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_right}''";
 
-                    m_RoofObject.SideOverhangEffect.SetActive(false);
-                }
-                else
-                {
-                    string align = "left";
-                    if (dx_right < 0)
-                        align = "left";
-                    else
-                        align = "right";
+        //             m_RoofObject.SideOverhangEffect.SetActive(false);
+        //         }
+        //         else
+        //         {
+        //             string align = "left";
+        //             if (dx_right < 0)
+        //                 align = "left";
+        //             else
+        //                 align = "right";
 
-                    sideOverhanglog.text +=
-                        $"\nWrong. {currentTilePrefab.name} is {align} in {dx_right}''";
+        //             sideOverhanglog.text +=
+        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dx_right}''";
 
-                    m_RoofObject.SideOverhangEffect.SetActive(true);
-                    SetActiveTileStatePlaceFail(-2);
-                }
-            }
+        //             m_RoofObject.SideOverhangEffect.SetActive(true);
+        //             SetActiveTileStatePlaceFail(-2);
+        //         }
+        //     }
 
-            float dy = (m_RoofObject.BottomRoofPoint.position - currentTilePrefab.SideEdgeBottom.position).y;
+        //     float dy = (m_RoofObject.BottomRoofPoint.position - currentTilePrefab.SideEdgeBottom.position).y;
 
-            if (b_bottomOverhangCheck)
-            {
-                ShowBottomOverhangAlert();
-                if (CompareEaveOverHangDist(dy))
-                {
-                    bottomOverhanglog.text =
-                        $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkEaveOverhang * Inch))} {dy}''";
-                    m_RoofObject.BottomOverhangEffect.SetActive(false);
-                }
-                else
-                {
-                    string align = "left";
-                    if (dy < 0)
-                        align = "ABOVE";
-                    else
-                        align = "BELOW";
+        //     if (b_bottomOverhangCheck)
+        //     {
+        //         ShowBottomOverhangAlert();
+        //         if (CompareEaveOverHangDist(dy))
+        //         {
+        //             bottomOverhanglog.text =
+        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkEaveOverhang * Inch))} {dy}''";
+        //             m_RoofObject.BottomOverhangEffect.SetActive(false);
+        //         }
+        //         else
+        //         {
+        //             string align = "left";
+        //             if (dy < 0)
+        //                 align = "ABOVE";
+        //             else
+        //                 align = "BELOW";
 
-                    bottomOverhanglog.text =
-                        $"\nWrong. {currentTilePrefab.name} is {align} in {dy}''";
-                    m_RoofObject.BottomOverhangEffect.SetActive(true);
-                    SetActiveTileStatePlaceFail(-2);
-                }
-            }
-        }
+        //             bottomOverhanglog.text =
+        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dy}''";
+        //             m_RoofObject.BottomOverhangEffect.SetActive(true);
+        //             SetActiveTileStatePlaceFail(-2);
+        //         }
+        //     }
+        // }
 
         public void GetDistanceAccordingToExposure(float num)
         {
@@ -732,10 +748,12 @@ namespace RoofTileVR
 
         }
 
-        public void CheckCurrentTileAboveRoof()
-        {
+        // public void ShowWrongSidelap()
+        // {
 
-        }
+        // }
+
+
         public TileObject TileToCompare;
 
         public bool starterTilesPlaced = false;
@@ -790,11 +808,16 @@ namespace RoofTileVR
                 else
                 {
                     starterTilesPlaced = true;
+                    // foreach (var tiles in TilesPlaced)
+                    // {
+                    //     tiles.GetComponent<TileObject>().tileSize = 12;
+                    // }
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
                     starterColliders[starterColliders.Count - 1].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
 
                     print("All tiles placed");
+                    WriteOnHandMenu("All Starter tiles placed, Now select Exposure and draw chalk line");
 
                 }
             }
@@ -807,13 +830,25 @@ namespace RoofTileVR
                 reverseTheLine = !reverseTheLine;
             }
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+            currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
             tileSpanWidth -= currentTileWidth;
             TilesPlaced.Add(currentTilePrefab.gameObject);
+            if (currentTilePrefab.GetComponent<TileObject>().isStarter)
+            {
+                currentTilePrefab.GetComponent<TileObject>().tileSize = 12;
+            }
+            else
+            {
+                currentTilePrefab.GetComponent<TileObject>().ReduceTileArea();
+            }
             print("Tile placed number" + TilesPlaced.Count);
             DisableTileGrab();
             SetActiveTileStateToPlaced(1);
             TileSelectText("Tile Placed! Pick New Tile");
             print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
+            currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
+            WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
+
 
             // placementPrompt.gameObject.SetActive(true);
         }
