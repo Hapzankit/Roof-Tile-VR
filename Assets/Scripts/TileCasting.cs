@@ -710,7 +710,7 @@ namespace RoofTileVR
             bottomOverhanglog.transform.parent.gameObject.SetActive(false);
         }
 
-        
+
 
         [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
@@ -784,6 +784,7 @@ namespace RoofTileVR
         public List<GameObject> TilesPlaced;
         public bool isFirstShakePlaced = false;
         public bool reverseTheLine = false;
+        public StatisticsManager statisticsManager;
         public void YesButtonPressed()
         {
 

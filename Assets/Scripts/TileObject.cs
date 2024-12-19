@@ -57,6 +57,7 @@ namespace RoofTileVR
         public int InCorrectoverHangs = 0;
         public int InCorrectKeywaySpaces = 0;
         public int IncorrectExposure = 0;
+        public int IncorrectSidelap;
         public bool isBothFastnersplaced = false;
         public bool isPlacedCorrectlyAfterConfirmedPlacement = false;
 
@@ -242,6 +243,7 @@ namespace RoofTileVR
                     {
                         print("TIle size incorrect");
                         spawner.WriteOnHandMenu("Incorrect sidelap");
+                        IncorrectSidelap++;
                         return false;
                     }
                 }
@@ -253,6 +255,7 @@ namespace RoofTileVR
                     {
                         print("TIle size incorrect");
                         spawner.WriteOnHandMenu("Incorrect sidelap");
+                        IncorrectSidelap++;
                         return false;
                     }
                     else
@@ -309,6 +312,7 @@ namespace RoofTileVR
                     }
                     else
                     {
+                        IncorrectSidelap++;
                         return false;
                     }
                 }
@@ -348,6 +352,7 @@ namespace RoofTileVR
                     }
                     else
                     {
+                        IncorrectSidelap++;
                         return false;
                     }
                 }
@@ -395,6 +400,7 @@ namespace RoofTileVR
                     }
                     else
                     {
+                        IncorrectSidelap++;
                         return false;
                     }
                 }
@@ -434,6 +440,7 @@ namespace RoofTileVR
                     }
                     else
                     {
+                        IncorrectSidelap++;
                         return false;
                     }
                 }
@@ -473,6 +480,8 @@ namespace RoofTileVR
 
         public void StoreStatistics()
         {
+            Vector3 rightDirection = this.transform.right;//+VE means tile is on left side of the target
+            Vector3 forwardDirection = this.transform.forward;//+VE means tile is above
             if (isStarter)
             {
                 if (spawner.currentTileRegion && isValidTile && isTileAbove)
@@ -481,21 +490,20 @@ namespace RoofTileVR
                     if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 2.1f)
                     {
                         Vector3 distanceFromPoint = this.transform.position - spawner.currentTileRegion.transform.position;
-                        Vector3 rightDirection = this.transform.right;//+VE means tile is on left side of the target
-                        Vector3 forwardDirection = this.transform.forward;//+VE means tile is above
 
-                        float sideWaysDistance = Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f;
-                        float verticalDistance = Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f;
+
+                        float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
+                        float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
                         print(" Distance measured for starters" + sideWaysDistance + " " + verticalDistance);
                         if (spawner.TilesPlaced.Count == 0 || spawner.TilesPlaced.Count == spawner.starterColliders.Count - 1)
                         {
                             //Placing First Tile starter 
-                            if (sideWaysDistance > 0 )
+                            if (sideWaysDistance > 0)
                             {
                                 InCorrectoverHangs++;
                                 InCorrectKeywaySpaces++;
                             }
-                            if(verticalDistance > 0)
+                            if (verticalDistance > 0)
                             {
                                 InCorrectoverHangs++;
                             }
@@ -506,9 +514,9 @@ namespace RoofTileVR
                             {
                                 InCorrectoverHangs++;
                             }
-                            if(sideWaysDistance>0)
+                            if (sideWaysDistance > 0)
                             {
-                               InCorrectKeywaySpaces++;  
+                                InCorrectKeywaySpaces++;
                             }
                         }
 
@@ -516,6 +524,99 @@ namespace RoofTileVR
                     }
 
 
+                }
+            }
+            else
+            {
+
+
+                // For shake tiles
+                GameObject objectToCheck = spawner.TilesPlaced[0];
+                GameObject objectToCheckFrom;
+                if (!spawner.isFirstShakePlaced)
+                {
+                    // first shake errors
+                    objectToCheckFrom = this.sideEdgeRight.gameObject;
+                    // objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
+                    if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove/*true*/)
+                    {
+                        // this.transform.position = spawner.currentTileRegion.transform.position;
+                        if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
+                        {
+                            Vector3 distanceFromPoint = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                            float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
+                            float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
+                            if (verticalDistance > 0)
+                            {
+                                IncorrectExposure++;
+                            }
+                            if (sideWaysDistance > 0)
+                            {
+                                InCorrectoverHangs++;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    // other shake errors
+
+                    GameObject objectToCheckNormal;
+                    GameObject objectToCheckFromNormal;
+                    print("Checking keyway distance");
+                    objectToCheckNormal = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.gameObject;
+                    float distanceInInches;
+                    if (spawner.tileSpanWidth <= 0)
+                    {
+                        objectToCheckFromNormal = this.sideEdgeLeft.gameObject;
+                        distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
+                        distanceInInches = spawner.overlapSpanAccordingtoExposure;
+                        print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                    }
+                    else
+                    {
+                        objectToCheckFromNormal = this.sideEdgeRight.gameObject;
+                        distanceToCheckAccordingToExposure = 0.25f * 0.0254f;
+                        distanceInInches = 2f;
+                    }
+
+                    if (spawner.reverseTheLine)
+                    {
+                        print("Going right to left");
+                        objectToCheckNormal = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.gameObject;
+
+                        if (spawner.tileSpanWidth <= 0)
+                        {
+                            objectToCheckFromNormal = this.sideEdgeRight.gameObject;
+                            distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
+                            distanceInInches = spawner.overlapSpanAccordingtoExposure;
+                            print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                        }
+                        else
+                        {
+                            objectToCheckFromNormal = this.sideEdgeLeft.gameObject;
+                            distanceToCheckAccordingToExposure = 0.18f * 0.0254f;
+                            distanceInInches = 2f;
+                        }
+
+                    }
+
+                    if (Vector3.Distance(objectToCheckFromNormal.transform.position, objectToCheckNormal
+                    .transform.position) * 39.37 > distanceInInches)
+                    {
+                        Vector3 distanceFromPoint = objectToCheckFromNormal.transform.position - objectToCheckNormal.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                        float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
+                        float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
+                        if (sideWaysDistance > 0)
+                        {
+                            InCorrectKeywaySpaces++;
+                        }
+                        if (verticalDistance > 0)
+                        {
+                            IncorrectExposure++;
+                        }
+                    }
                 }
             }
         }
@@ -529,11 +630,7 @@ namespace RoofTileVR
                 if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 2.1f)
                 {
 
-
-
-
-
-
+                    isPlacedCorrectlyAfterConfirmedPlacement = false;
 
 
                     // DistanceErrorCube.SetActive(true);
@@ -581,6 +678,7 @@ namespace RoofTileVR
                 }
                 else
                 {
+                    isPlacedCorrectlyAfterConfirmedPlacement = true;
                     CorrectTileIndicator.SetActive(true);
                     // this.transform.localPosition = new Vector3(0, 0, 0.24f);
                     this.transform.position = spawner.currentTileRegion.transform.position;
@@ -651,7 +749,7 @@ namespace RoofTileVR
                     // this.transform.position = spawner.currentTileRegion.transform.position;
                     if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
                     {
-
+                        isPlacedCorrectlyAfterConfirmedPlacement = false;
                         // DistanceErrorCube.SetActive(true);
                         Vector3 direction = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
                         direction.y = 0; // Ignore the Y-axis
@@ -722,6 +820,7 @@ namespace RoofTileVR
                         DistanceErrorCubeRL.SetActive(false);
                         DistanceErrorCubeTB.SetActive(false);
                         spawner.WriteOnHandMenu("Tile Placed Correctly");
+                        isPlacedCorrectlyAfterConfirmedPlacement = true;
                     }
                 }
                 else
@@ -786,7 +885,7 @@ namespace RoofTileVR
                 // DistanceErrorCube.SetActive(true);
                 Vector3 direction = objectToCheckFrom.transform.position - objectToCheck.transform.position;
                 direction.y = 0; // Ignore the Y-axis
-
+                isPlacedCorrectlyAfterConfirmedPlacement = false;
 
                 print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) + "Direction" + direction);
 
@@ -830,7 +929,7 @@ namespace RoofTileVR
 
 
 
-
+                isPlacedCorrectlyAfterConfirmedPlacement = true;
 
 
                 if (spawner.tileSpanWidth <= 0)

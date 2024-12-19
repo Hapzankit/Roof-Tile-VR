@@ -16291,6 +16291,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285381611}
   m_CullTransparentMesh: 1
+--- !u!1 &1286924357
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1286924359}
+  - component: {fileID: 1286924358}
+  m_Layer: 0
+  m_Name: StatisticsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1286924358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286924357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc2d2696abb4344590ad40777f367f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeSpent: 0
+--- !u!4 &1286924359
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286924357}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.33495897, y: -1.3465917, z: 5.3091335}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1289417974 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1351743018952959274, guid: 88920e9f15c07e74a93ed1854c223a57, type: 3}
@@ -27556,6 +27601,7 @@ MonoBehaviour:
   TilesPlaced: []
   isFirstShakePlaced: 0
   reverseTheLine: 0
+  statisticsManager: {fileID: 1286924358}
   distanceLog: {fileID: 624251358}
   m_TileSelectPanelUI: {fileID: 295172920}
 --- !u!114 &2000961827
@@ -32436,3 +32482,4 @@ SceneRoots:
   - {fileID: 1896228811}
   - {fileID: 1164917168}
   - {fileID: 241649559}
+  - {fileID: 1286924359}
