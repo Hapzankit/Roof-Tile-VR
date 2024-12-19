@@ -710,6 +710,8 @@ namespace RoofTileVR
             bottomOverhanglog.transform.parent.gameObject.SetActive(false);
         }
 
+        
+
         [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
         {
@@ -729,7 +731,6 @@ namespace RoofTileVR
                         }
                         else
                         {
-
                             currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced);
                         }
                     }
