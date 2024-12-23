@@ -7,7 +7,6 @@ namespace RoofTileVR
     public class TileDropCollisionCheck : MonoBehaviour
     {
         public bool isStarterRegion;
-        public bool isNormalRegion;
         private bool isTileNearRoof;
 
         TileCasting tileCasting;

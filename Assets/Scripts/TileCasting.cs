@@ -720,24 +720,33 @@ namespace RoofTileVR
             {
                 if (currentTilePrefab.isValidTile)
                 {
-                    ShowPlacementPrompt();
+                    // ShowPlacementPrompt();
                     // DisableTileGrab();
                     // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
                     if (starterTilesPlaced)
                     {
                         if (isFirstShakePlaced)
                         {
-                            currentTilePrefab.ShowKeywayerrors();
+                            if (currentTilePrefab.ShowKeywayerrors())
+                            {
+                                ShowPlacementPrompt();
+                            }
                         }
                         else
                         {
-                            currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced);
+                            if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
+                            {
+                                ShowPlacementPrompt();
+                            }
                         }
                     }
                     else
                     {
 
-                        currentTilePrefab.ShowStarterErrors();
+                        if (currentTilePrefab.ShowStarterErrors())
+                        {
+                            ShowPlacementPrompt();
+                        }
                     }
                 }
                 else
@@ -785,6 +794,7 @@ namespace RoofTileVR
         public bool isFirstShakePlaced = false;
         public bool reverseTheLine = false;
         public StatisticsManager statisticsManager;
+        public int linesOfTileTobePlaced = 1;
         public void YesButtonPressed()
         {
 
@@ -830,7 +840,9 @@ namespace RoofTileVR
             {
                 tileSpanWidth = tileSpanWidthConstant;
                 reverseTheLine = !reverseTheLine;
+                linesOfTileTobePlaced++;
             }
+
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
             currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
             tileSpanWidth -= currentTileWidth;
@@ -850,7 +862,11 @@ namespace RoofTileVR
             print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
             currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
             WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
-
+            print(linesOfTileTobePlaced + "Number of lines of tile placed");
+            if (linesOfTileTobePlaced == /*markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade*/1)
+            {
+                statisticsManager.SaveStatistics(TilesPlaced);
+            }
 
             // placementPrompt.gameObject.SetActive(true);
         }

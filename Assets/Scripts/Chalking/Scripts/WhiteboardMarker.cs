@@ -117,6 +117,7 @@ public class WhiteboardMarker : MonoBehaviour
             {
                 isLineDrawnForStarter = true;
                 isObjectPicked = false;
+                // whiteboard.DrawMarks();
                 lineRenderer.enabled = false; // Hide the line
                 whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
                 lineRenderer.SetPosition(0, thirdObject.position);

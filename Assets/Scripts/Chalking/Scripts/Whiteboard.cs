@@ -18,6 +18,8 @@ public class Whiteboard : MonoBehaviour
 
     public TileCasting tileCasting;
 
+    public int numberOfLinesOftileTobeMade = 0;
+
     void Start()
     {
         tileCasting = FindObjectOfType<TileCasting>();
@@ -58,6 +60,7 @@ public class Whiteboard : MonoBehaviour
         float pixelsPerInch = textureSize.x / widthInInches;
 
         // Start drawing marks
+        int n = 0;
         float currentWidthInches = initialMarkDistanceInches;
         while (currentWidthInches <= widthInInches)
         {
@@ -68,8 +71,10 @@ public class Whiteboard : MonoBehaviour
 
             // Move to the next mark position
             currentWidthInches += subsequentMarkDistanceInches;
+            n++;
         }
-
+        print("number of lines" + n);
+        numberOfLinesOftileTobeMade = n;
         // Apply texture changes
         texture.Apply();
         print("Draw MArks");
@@ -101,12 +106,14 @@ public class Whiteboard : MonoBehaviour
 
         for (int thickness = -lineThickness / 2; thickness < lineThickness / 2; thickness++)
         {
+
             int drawX = Mathf.Clamp(x + thickness, 0, (int)textureSize.x - 1);
             for (int y = 0; y < textureSize.y; y++)
             {
                 texture.SetPixel(drawX, y, markColor);
             }
         }
+
         texture.Apply();
         tileCasting.GetDistanceAccordingToExposure(subsequentMarkDistanceInches);
 

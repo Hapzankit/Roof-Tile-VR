@@ -7,6 +7,10 @@ public class StatisticsManager : MonoBehaviour
 {
     // Start is called before the first frame update
 
+
+
+
+
     // AI-Powered Compliance Check and Summary Report:
 
     // Once a section is completed, use an AI module to analyze the installed roof section and provide a compliance summary.
@@ -65,6 +69,10 @@ public class StatisticsManager : MonoBehaviour
             IncorrectExposure += tile.GetComponent<TileObject>().IncorrectExposure;
             IncorrectSidelap += tile.GetComponent<TileObject>().IncorrectSidelap;
         }
+        print("Correct Exposure" + CorrectExposure + "Correct Keyway" + CorrectKeyway + "Correct Overhangs" + CorrectOverhangs + "Correct Sidelap" + CorrectSidelap + "\n");
+        print("InCorrect Exposure" + IncorrectExposure + "InCorrect Keyway" + IncorrectKeyway + "InCorrect Overhangs" + IncorrectOverhangs + "InCorrect Sidelap" + IncorrectSidelap + "\n");
     }
+
+
 
 }

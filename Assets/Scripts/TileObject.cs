@@ -159,18 +159,19 @@ namespace RoofTileVR
         float checkDepth = 0.04f; // Depth of the box below the plane
         public void OnTileDropped()
         {
-            StoreStatistics();
             //ShowPlacementPrompt();
-            spawner.TileSelectText("Tile Dropped" + isTileAbove + isValidTile);
+            // spawner.TileSelectText("Tile Dropped" + isTileAbove + isValidTile);
+            print("Tile Dropped" + isTileAbove + isValidTile);
             if (CalculateSidelapCheck())
             {
                 spawner.OnTileDropped();
             }
             else
             {
-                DistanceErrorCubeTB.SetActive(true);
-                DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                // DistanceErrorCubeTB.SetActive(true);
+                // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
             }
+            StoreStatistics();
 
 
         }
@@ -605,7 +606,7 @@ namespace RoofTileVR
                     if (Vector3.Distance(objectToCheckFromNormal.transform.position, objectToCheckNormal
                     .transform.position) * 39.37 > distanceInInches)
                     {
-                        Vector3 distanceFromPoint = objectToCheckFromNormal.transform.position - objectToCheckNormal.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                        Vector3 distanceFromPoint = objectToCheckFromNormal.transform.position - objectToCheckNormal.transform.position;
                         float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
                         float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
                         if (sideWaysDistance > 0)
@@ -621,13 +622,13 @@ namespace RoofTileVR
             }
         }
 
-        public void ShowStarterErrors()
+        public bool ShowStarterErrors()
         {
             print("Showing starter tile errors");
-            if (spawner.currentTileRegion && isValidTile && isTileAbove)
+            if (spawner.currentTileRegion && isValidTile)
             {
                 // this.transform.position = spawner.currentTileRegion.transform.position;
-                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 2.1f)
+                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 5.1f)
                 {
 
                     isPlacedCorrectlyAfterConfirmedPlacement = false;
@@ -675,6 +676,7 @@ namespace RoofTileVR
                         // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
                     }
+                    return false;
                 }
                 else
                 {
@@ -685,7 +687,8 @@ namespace RoofTileVR
                     DistanceErrorCubeRL.SetActive(false);
                     DistanceErrorCubeTB.SetActive(false);
                     spawner.WriteOnHandMenu("Tile Placed Correctly");
-
+                    GetComponent<Rigidbody>().isKinematic = true;
+                    return true;
                     //JUST FOR DEBUG
                     // if (!isYesPressed)
                     // {
@@ -697,11 +700,15 @@ namespace RoofTileVR
 
 
             }
+            else
+            {
+                return false;
+            }
         }
 
         bool isYesPressed = false;
 
-        public bool isTileAbove = false;
+        public bool isTileAbove = true;
         public bool isValidTile = false;
         public void SetTileAboveRoof(bool isAbove, bool isTileValid, TileDropCollisionCheck regionTileDropped)
         {
@@ -733,7 +740,7 @@ namespace RoofTileVR
 
 
 
-        public void ShowShakeTIleErrors(bool isfirstShakeTile)
+        public bool ShowShakeTIleErrors(bool isfirstShakeTile)
         {
 
             print("Showing shake tile errors");
@@ -790,6 +797,7 @@ namespace RoofTileVR
                             // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
                             spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
                         }
+                        return false;
                     }
                     else
                     {
@@ -821,19 +829,26 @@ namespace RoofTileVR
                         DistanceErrorCubeTB.SetActive(false);
                         spawner.WriteOnHandMenu("Tile Placed Correctly");
                         isPlacedCorrectlyAfterConfirmedPlacement = true;
+                        GetComponent<Rigidbody>().isKinematic = true;
+                        return true;
                     }
                 }
                 else
                 {
                     // written in other function
+                    return false;
                 }
 
 
 
             }
+            else
+            {
+                return false;
+            }
         }
 
-        public void ShowKeywayerrors()
+        public bool ShowKeywayerrors()
         {
             GameObject objectToCheck;
             GameObject objectToCheckFrom;
@@ -922,6 +937,7 @@ namespace RoofTileVR
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
                 }
+                return false;
             }
             else
             {
@@ -930,7 +946,7 @@ namespace RoofTileVR
 
 
                 isPlacedCorrectlyAfterConfirmedPlacement = true;
-
+                GetComponent<Rigidbody>().isKinematic = true;
 
                 if (spawner.tileSpanWidth <= 0)
                 {
@@ -965,22 +981,24 @@ namespace RoofTileVR
                     Vector3 childWorldPosition = objectToCheckFrom.transform.position;
 
                     // Calculate the direction from the target point to the child's current position
-                    Vector3 direction = (childWorldPosition - objectToCheck.transform.position).normalized;
+                    Vector3 direction;
                     Vector3 newChildWorldPosition;
                     if (spawner.reverseTheLine)
                     {
                         print("Going right to left");
-
+                        direction = objectToCheckFrom.transform.right;
                         newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
                     }
                     else
                     {
+                        direction = -objectToCheckFrom.transform.right;
                         print("Going left to right");
                         newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
                     }
                     // Calculate the required offset for the parent
                     Vector3 offset = newChildWorldPosition - childWorldPosition;
-
+                    float dotProduct = Vector3.Dot(offset, direction);
+                    offset = dotProduct * direction;
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
 
@@ -989,6 +1007,7 @@ namespace RoofTileVR
                 DistanceErrorCubeRL.SetActive(false);
                 DistanceErrorCubeTB.SetActive(false);
                 CorrectTileIndicator.SetActive(true);
+                return true;
             }
         }
 
