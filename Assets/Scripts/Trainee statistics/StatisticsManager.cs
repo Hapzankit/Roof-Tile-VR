@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using RoofTileVR;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI.TableUI;
 
 public class StatisticsManager : MonoBehaviour
 {
@@ -42,15 +44,64 @@ public class StatisticsManager : MonoBehaviour
 
     public float timeSpent = 0;
 
+    public TableUI table;
+    public Canvas StatsPage;
+    public TMP_Text timeText;
+
     void Start()
     {
-
+        StatsPage.gameObject.SetActive(false);
+        // ShowStatsTable();
     }
 
     // Update is called once per frame
     void Update()
     {
         timeSpent += Time.deltaTime;
+    }
+
+    public void ShowStatsTable()
+    {
+        StatsPage.gameObject.SetActive(true);
+        //starts at 1,1
+        //OVERHANGS
+        // OVERHANG
+        float overhangPercentage = ((float)CorrectOverhangs / (CorrectOverhangs + IncorrectOverhangs)) * 100;
+        table.GetCell(1, 1).text = CorrectOverhangs.ToString();
+        table.GetCell(1, 2).text = IncorrectOverhangs.ToString();
+        table.GetCell(1, 3).text = overhangPercentage.ToString("F2"); // Formats to 2 decimal places
+
+        // KEYWAY
+        float keywayPercentage = ((float)CorrectKeyway / (CorrectKeyway + IncorrectKeyway)) * 100;
+        table.GetCell(2, 1).text = CorrectKeyway.ToString();
+        table.GetCell(2, 2).text = IncorrectKeyway.ToString();
+        table.GetCell(2, 3).text = keywayPercentage.ToString("F2");
+
+        // EXPOSURE
+        float exposurePercentage = ((float)CorrectExposure / (CorrectExposure + IncorrectExposure)) * 100;
+        table.GetCell(3, 1).text = CorrectExposure.ToString();
+        table.GetCell(3, 2).text = IncorrectExposure.ToString();
+        table.GetCell(3, 3).text = exposurePercentage.ToString("F2");
+
+        // SIDELAP
+        float sidelapPercentage = ((float)CorrectSidelap / (CorrectSidelap + IncorrectSidelap)) * 100;
+        table.GetCell(4, 1).text = CorrectSidelap.ToString();
+        table.GetCell(4, 2).text = IncorrectSidelap.ToString();
+        table.GetCell(4, 3).text = sidelapPercentage.ToString("F2");
+
+        // TIME
+        timeText.text = ConvertSecondsToHHMMSS((int)timeSpent);
+
+
+    }
+
+    string ConvertSecondsToHHMMSS(int totalSeconds)
+    {
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+
+        return $"<color=\"red\">{hours:D2}</color> H : <color=\"red\">{minutes:D2}</color> M : <color=\"red\">{seconds:D2}</color> S";
     }
 
     public void SaveStatistics(List<GameObject> tilesPlaced)

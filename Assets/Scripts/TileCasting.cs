@@ -237,6 +237,8 @@ namespace RoofTileVR
         [SerializeField] private Toggle Toggle_overlapCheck;
         public TileDropCollisionCheck currentTileRegion;
 
+        public List<GameObject> tilesPickedUp;
+
         public void SetToggle_SideOverhangCheck(Toggle toggle)
         {
             b_sideOverhangCheck = toggle.isOn;
@@ -593,6 +595,7 @@ namespace RoofTileVR
             m_TilePlacementUI.HidePanel();
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
+            
 
             // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
@@ -716,8 +719,8 @@ namespace RoofTileVR
         public void OnTileDropped()
         {
             print("Is all starter placed " + starterTilesPlaced + isFirstShakePlaced);
-            if (currentTilePrefab.isTileAbove)
-            {
+            // if (currentTilePrefab.isTileAbove)
+            // {
                 if (currentTilePrefab.isValidTile)
                 {
                     // ShowPlacementPrompt();
@@ -753,7 +756,7 @@ namespace RoofTileVR
                 {
                     ShowWrongRegionPlacementPrompt();
                 }
-            }
+            // }
 
 
         }
@@ -863,9 +866,10 @@ namespace RoofTileVR
             currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
             WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
             print(linesOfTileTobePlaced + "Number of lines of tile placed");
-            if (linesOfTileTobePlaced == /*markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade*/1)
+            if (linesOfTileTobePlaced == /*markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade*/2)
             {
-                statisticsManager.SaveStatistics(TilesPlaced);
+                statisticsManager.SaveStatistics(tilesPickedUp);
+                statisticsManager.ShowStatsTable();
             }
 
             // placementPrompt.gameObject.SetActive(true);

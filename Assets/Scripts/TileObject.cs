@@ -152,6 +152,11 @@ namespace RoofTileVR
             DistanceErrorCubeRL.gameObject.SetActive(false);
             DistanceErrorCubeTB.gameObject.SetActive(false);
             CorrectTileIndicator.gameObject.SetActive(false);
+            this.GetComponent<Rigidbody>().isKinematic = false;
+            if (!spawner.tilesPickedUp.Contains(gameObject)) // Check if the object is already in the list
+            {
+                spawner.tilesPickedUp.Add(gameObject);
+            }
 
 
         }
@@ -539,7 +544,7 @@ namespace RoofTileVR
                     // first shake errors
                     objectToCheckFrom = this.sideEdgeRight.gameObject;
                     // objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
-                    if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove/*true*/)
+                    if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile /*true*/)
                     {
                         // this.transform.position = spawner.currentTileRegion.transform.position;
                         if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
@@ -628,7 +633,7 @@ namespace RoofTileVR
             if (spawner.currentTileRegion && isValidTile)
             {
                 // this.transform.position = spawner.currentTileRegion.transform.position;
-                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 5.1f)
+                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 7.1f)
                 {
 
                     isPlacedCorrectlyAfterConfirmedPlacement = false;
@@ -979,26 +984,29 @@ namespace RoofTileVR
                 {
                     //    // Get the current world position of the child object
                     Vector3 childWorldPosition = objectToCheckFrom.transform.position;
-
+                    Vector3 targetPosition = objectToCheck.transform.position;
                     // Calculate the direction from the target point to the child's current position
                     Vector3 direction;
                     Vector3 newChildWorldPosition;
                     if (spawner.reverseTheLine)
                     {
+
+
                         print("Going right to left");
-                        direction = objectToCheckFrom.transform.right;
-                        newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
+                        direction = (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
+                        // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
                     }
                     else
                     {
-                        direction = -objectToCheckFrom.transform.right;
+                        direction = (-objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         print("Going left to right");
-                        newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
+                        // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
                     }
+                    newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
                     // Calculate the required offset for the parent
                     Vector3 offset = newChildWorldPosition - childWorldPosition;
-                    float dotProduct = Vector3.Dot(offset, direction);
-                    offset = dotProduct * direction;
+                    // float dotProduct = Vector3.Dot(offset, direction);
+                    // offset = dotProduct * direction;
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
 
