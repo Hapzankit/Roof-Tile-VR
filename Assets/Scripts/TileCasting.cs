@@ -595,7 +595,7 @@ namespace RoofTileVR
             m_TilePlacementUI.HidePanel();
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
-            
+
 
             // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
@@ -721,32 +721,23 @@ namespace RoofTileVR
             print("Is all starter placed " + starterTilesPlaced + isFirstShakePlaced);
             // if (currentTilePrefab.isTileAbove)
             // {
-                if (currentTilePrefab.isValidTile)
+            if (currentTilePrefab.isValidTile)
+            {
+                // ShowPlacementPrompt();
+                // DisableTileGrab();
+                // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
+                if (starterTilesPlaced)
                 {
-                    // ShowPlacementPrompt();
-                    // DisableTileGrab();
-                    // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
-                    if (starterTilesPlaced)
+                    if (isFirstShakePlaced)
                     {
-                        if (isFirstShakePlaced)
+                        if (currentTilePrefab.ShowKeywayerrors())
                         {
-                            if (currentTilePrefab.ShowKeywayerrors())
-                            {
-                                ShowPlacementPrompt();
-                            }
-                        }
-                        else
-                        {
-                            if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
-                            {
-                                ShowPlacementPrompt();
-                            }
+                            ShowPlacementPrompt();
                         }
                     }
                     else
                     {
-
-                        if (currentTilePrefab.ShowStarterErrors())
+                        if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
                         {
                             ShowPlacementPrompt();
                         }
@@ -754,8 +745,17 @@ namespace RoofTileVR
                 }
                 else
                 {
-                    ShowWrongRegionPlacementPrompt();
+
+                    if (currentTilePrefab.ShowStarterErrors())
+                    {
+                        ShowPlacementPrompt();
+                    }
                 }
+            }
+            else
+            {
+                ShowWrongRegionPlacementPrompt();
+            }
             // }
 
 
@@ -800,7 +800,7 @@ namespace RoofTileVR
         public int linesOfTileTobePlaced = 1;
         public void YesButtonPressed()
         {
-
+            int numOfTile = 9999;
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -834,6 +834,7 @@ namespace RoofTileVR
                     print("All tiles placed");
                     WriteOnHandMenu("All Starter tiles placed, Now select Exposure and draw chalk line");
 
+                    numOfTile = num;
                 }
             }
 
@@ -864,7 +865,12 @@ namespace RoofTileVR
             TileSelectText("Tile Placed! Pick New Tile");
             print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
             currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
-            WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
+            if (numOfTile > starterColliders.Count - 1)
+            {
+
+                WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
+            }
+
             print(linesOfTileTobePlaced + "Number of lines of tile placed");
             if (linesOfTileTobePlaced == /*markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade*/2)
             {

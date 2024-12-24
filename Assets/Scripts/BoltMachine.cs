@@ -33,6 +33,7 @@ public class BoltMachine : MonoBehaviour
     {
         print("Spawn bolt");
         tileCasting.WriteOnHandMenu("Bolted");
+        tileCasting.statisticsManager.boltsPlaced++;
         currentBolt = Instantiate(bolts, BoltPosition);
     }
 }

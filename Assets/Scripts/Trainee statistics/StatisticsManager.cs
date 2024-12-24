@@ -30,19 +30,22 @@ public class StatisticsManager : MonoBehaviour
 
     // public TileCasting tileCasting;
     int IncorrectOverhangs = 0;
-    int CorrectOverhangs = 0;
+    public int CorrectOverhangs = 0;
 
     int IncorrectKeyway = 0;
-    int CorrectKeyway = 0;
+    public int CorrectKeyway = 0;
 
 
     int IncorrectExposure = 0;
-    int CorrectExposure = 0;
+    public int CorrectExposure = 0;
 
     int IncorrectSidelap = 0;
-    int CorrectSidelap = 0;
+    public int CorrectSidelap = 0;
 
     public float timeSpent = 0;
+
+    public int boltsPlaced = 0;
+    int boltsLeftToPlace = 0;
 
     public TableUI table;
     public Canvas StatsPage;
@@ -64,7 +67,7 @@ public class StatisticsManager : MonoBehaviour
     {
         StatsPage.gameObject.SetActive(true);
         //starts at 1,1
-        //OVERHANGS
+        
         // OVERHANG
         float overhangPercentage = ((float)CorrectOverhangs / (CorrectOverhangs + IncorrectOverhangs)) * 100;
         table.GetCell(1, 1).text = CorrectOverhangs.ToString();
@@ -88,6 +91,12 @@ public class StatisticsManager : MonoBehaviour
         table.GetCell(4, 1).text = CorrectSidelap.ToString();
         table.GetCell(4, 2).text = IncorrectSidelap.ToString();
         table.GetCell(4, 3).text = sidelapPercentage.ToString("F2");
+
+        // BOLTS
+        float boltPercentage = ((float)boltsPlaced / (boltsLeftToPlace + boltsPlaced)) * 100;
+        table.GetCell(5, 1).text = boltsPlaced.ToString();
+        table.GetCell(5, 2).text = boltsLeftToPlace.ToString();
+        table.GetCell(5, 3).text = boltPercentage.ToString("F2");
 
         // TIME
         timeText.text = ConvertSecondsToHHMMSS((int)timeSpent);
@@ -119,6 +128,17 @@ public class StatisticsManager : MonoBehaviour
             IncorrectOverhangs += tile.GetComponent<TileObject>().InCorrectoverHangs;
             IncorrectExposure += tile.GetComponent<TileObject>().IncorrectExposure;
             IncorrectSidelap += tile.GetComponent<TileObject>().IncorrectSidelap;
+            if (!tile.GetComponent<TileObject>().isSecondBoltPlaced || !tile.GetComponent<TileObject>().isFirstBoltPlaced)
+            {
+                if (!tile.GetComponent<TileObject>().isSecondBoltPlaced && !tile.GetComponent<TileObject>().isFirstBoltPlaced)
+                {
+                    boltsLeftToPlace += 2;
+                }
+                else
+                {
+                    boltsLeftToPlace++;
+                }
+            }
         }
         print("Correct Exposure" + CorrectExposure + "Correct Keyway" + CorrectKeyway + "Correct Overhangs" + CorrectOverhangs + "Correct Sidelap" + CorrectSidelap + "\n");
         print("InCorrect Exposure" + IncorrectExposure + "InCorrect Keyway" + IncorrectKeyway + "InCorrect Overhangs" + IncorrectOverhangs + "InCorrect Sidelap" + IncorrectSidelap + "\n");

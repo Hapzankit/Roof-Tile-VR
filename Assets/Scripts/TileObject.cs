@@ -248,7 +248,7 @@ namespace RoofTileVR
                     else
                     {
                         print("TIle size incorrect");
-                        spawner.WriteOnHandMenu("Incorrect sidelap");
+                        spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
                         return false;
                     }
@@ -260,7 +260,7 @@ namespace RoofTileVR
                     if (areaLeft < Sidelap)
                     {
                         print("TIle size incorrect");
-                        spawner.WriteOnHandMenu("Incorrect sidelap");
+                        spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
                         return false;
                     }
@@ -508,10 +508,24 @@ namespace RoofTileVR
                             {
                                 InCorrectoverHangs++;
                                 InCorrectKeywaySpaces++;
+                                print("Showing stats:- incorrect overhangs and keyway for starter");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectOverhangs++;
+                                spawner.statisticsManager.CorrectKeyway++;
+                                print("Showing stats:- correct overhangs and keyway for starter");
+
                             }
                             if (verticalDistance > 0)
                             {
                                 InCorrectoverHangs++;
+                                print("Showing stats:- incorrect overhangs  for starter");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectOverhangs++;
+                                print("Showing stats:- correct overhangs  for starter");
                             }
                         }
                         else
@@ -519,10 +533,22 @@ namespace RoofTileVR
                             if (verticalDistance > 0)
                             {
                                 InCorrectoverHangs++;
+                                print("Showing stats:- incorrect overhangs for starter");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectOverhangs++;
+                                print("Showing stats:- correct overhangs for starter");
                             }
                             if (sideWaysDistance > 0)
                             {
                                 InCorrectKeywaySpaces++;
+                                print("Showing stats:- incorrect keyway for starter");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectKeyway++;
+                                print("Showing stats:- correct keyway for starter");
                             }
                         }
 
@@ -555,10 +581,22 @@ namespace RoofTileVR
                             if (verticalDistance > 0)
                             {
                                 IncorrectExposure++;
+                                print("Showing stats:- incorrect exposure for normal shake");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectExposure++;
+                                print("Showing stats:- correct exposure for normal shake");
                             }
                             if (sideWaysDistance > 0)
                             {
                                 InCorrectoverHangs++;
+                                print("Showing stats:- incorrect overhang for normal shake");
+                            }
+                            else
+                            {
+                                spawner.statisticsManager.CorrectOverhangs++;
+                                print("Showing stats:- correct overhang for normal shake");
                             }
 
                         }
@@ -617,10 +655,22 @@ namespace RoofTileVR
                         if (sideWaysDistance > 0)
                         {
                             InCorrectKeywaySpaces++;
+                            print("Showing stats:- incorrect keyway for normal shake");
+                        }
+                        else
+                        {
+                            spawner.statisticsManager.CorrectKeyway++;
+                            print("Showing stats:- correct keyway for normal shake");
                         }
                         if (verticalDistance > 0)
                         {
                             IncorrectExposure++;
+                            print("Showing stats:- incorrect exposure for normal shake");
+                        }
+                        else
+                        {
+                            spawner.statisticsManager.CorrectExposure++;
+                            print("Showing stats:- correct exposure for normal shake");
                         }
                     }
                 }
@@ -633,7 +683,7 @@ namespace RoofTileVR
             if (spawner.currentTileRegion && isValidTile)
             {
                 // this.transform.position = spawner.currentTileRegion.transform.position;
-                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 7.1f)
+                if (Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 > 2.1f)
                 {
 
                     isPlacedCorrectlyAfterConfirmedPlacement = false;
@@ -655,6 +705,8 @@ namespace RoofTileVR
                         DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                         // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is on right by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
+                        tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
+
 
                     }
                     if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
@@ -664,6 +716,7 @@ namespace RoofTileVR
                         DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                         // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile  is on left by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
+                        tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
                     }
                     if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
@@ -672,6 +725,7 @@ namespace RoofTileVR
                         DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                         // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
+                        tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
                     }
                     if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
@@ -680,6 +734,7 @@ namespace RoofTileVR
                         DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                         // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
+                        tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
                     }
                     return false;
                 }
@@ -721,7 +776,10 @@ namespace RoofTileVR
             // spawner.ShowPlacementPrompt();
             isTileAbove = isAbove;
             isValidTile = isTileValid;
-            spawner.currentTileRegion = regionTileDropped;
+            if (regionTileDropped.isStarterRegion)
+            {
+                spawner.currentTileRegion = regionTileDropped;
+            }
             this.transform.rotation = Quaternion.Euler(-45, 0, 0);
 
 
@@ -777,6 +835,7 @@ namespace RoofTileVR
                             DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                             // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
                             spawner.WriteOnHandMenu("Tile is on right by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
+                            tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
                         }
                         if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                         {
@@ -785,6 +844,7 @@ namespace RoofTileVR
                             DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                             // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
                             spawner.WriteOnHandMenu("Tile is on left by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
+                            tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
                         }
                         if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                         {
@@ -793,6 +853,7 @@ namespace RoofTileVR
                             DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                             // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
                             spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
+                            tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
                         }
                         if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                         {
@@ -801,6 +862,7 @@ namespace RoofTileVR
                             DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                             // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
                             spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
+                            tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
                         }
                         return false;
                     }
@@ -917,6 +979,7 @@ namespace RoofTileVR
                     DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                     // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right (Bad keyway spacing) " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is on right by (Bad keyway spacing) " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
+                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                 {
@@ -925,6 +988,7 @@ namespace RoofTileVR
                     DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                     // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is on left by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
+                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
@@ -933,6 +997,7 @@ namespace RoofTileVR
                     DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
+                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
@@ -941,6 +1006,7 @@ namespace RoofTileVR
                     DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
+                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 return false;
             }
