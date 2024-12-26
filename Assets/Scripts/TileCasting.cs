@@ -137,16 +137,7 @@ namespace RoofTileVR
                 TryGetComponent(out m_RoofObject);
             }
 
-            UpdateToggleUI();
-            SubToggleUIs();
-            // float x = markerCube.transform.localPosition.x;
-
-            // // Get the y and z from the target object
-            // float y = starterColliders[0].transform.position.y;
-            // float z = starterColliders[0].transform.position.z;
-            // markerCube.transform.SetParent(starterColliders[0].transform.parent);
-            // // Update the child's position while keeping the x the same
-            // markerCube.transform.localPosition = new Vector3(x, y, z);
+           
         }
 
         /// <summary>
@@ -168,7 +159,7 @@ namespace RoofTileVR
         }
 
         [SerializeField] private Transform tileOffset;
-        [SerializeField] private GameObject solidTile;
+        
 
         [SerializeField] public TileObject currentTilePrefab;
         private TileObject prevTilePrefab;
@@ -226,66 +217,12 @@ namespace RoofTileVR
         private List<GameObject> objectsToCheck = new List<GameObject>();
         private List<Transform> tileTransformList = new List<Transform>();
 
-        [SerializeField] private bool b_sideOverhangCheck;
-        [SerializeField] private bool b_bottomOverhangCheck;
-        [SerializeField] private bool b_sidewayGapCheck;
-        [SerializeField] private bool b_overlapCheck;
-
-        [SerializeField] private Toggle Toggle_sideOverhangCheck;
-        [SerializeField] private Toggle Toggle_bottomOverhangCheck;
-        [SerializeField] private Toggle Toggle_sidewayGapCheck;
-        [SerializeField] private Toggle Toggle_overlapCheck;
+       
         public TileDropCollisionCheck currentTileRegion;
 
         public List<GameObject> tilesPickedUp;
 
-        public void SetToggle_SideOverhangCheck(Toggle toggle)
-        {
-            b_sideOverhangCheck = toggle.isOn;
-        }
-
-        public void SetToggle_BottomOverhangCheck(Toggle toggle)
-        {
-            b_bottomOverhangCheck = toggle.isOn;
-        }
-
-        public void SetToggle_SidewayGapCheck(Toggle toggle)
-        {
-            b_sidewayGapCheck = toggle.isOn;
-        }
-
-        public void SetToggle_OverlapCheck(Toggle toggle)
-        {
-            b_sidewayGapCheck = toggle.isOn;
-        }
-
-        public void UpdateToggleUI()
-        {
-            Toggle_overlapCheck.isOn = (b_overlapCheck);
-            Toggle_sidewayGapCheck.isOn = (b_sidewayGapCheck);
-            Toggle_bottomOverhangCheck.isOn = (b_bottomOverhangCheck);
-            Toggle_sideOverhangCheck.isOn = (b_sideOverhangCheck);
-        }
-
-        public void SubToggleUIs()
-        {
-            Toggle_sideOverhangCheck.onValueChanged.AddListener(delegate
-            {
-                SetToggle_SideOverhangCheck(Toggle_sideOverhangCheck);
-            });
-            Toggle_bottomOverhangCheck.onValueChanged.AddListener(delegate
-            {
-                SetToggle_BottomOverhangCheck(Toggle_bottomOverhangCheck);
-            });
-            Toggle_sidewayGapCheck.onValueChanged.AddListener(delegate
-            {
-                SetToggle_SidewayGapCheck(Toggle_sidewayGapCheck);
-            });
-            Toggle_overlapCheck.onValueChanged.AddListener(delegate
-            {
-                SetToggle_OverlapCheck(Toggle_overlapCheck);
-            });
-        }
+    
 
         void PlaceTile()
         {
@@ -313,15 +250,7 @@ namespace RoofTileVR
                 tilePlaced_log.transform.parent.gameObject.SetActive(false);
             });
 
-            //CheckProximity(currentTilePrefab.gameObject);
-            if (b_sidewayGapCheck)
-            {
-                // CheckDistanceFromLastTile();
-            }
-            if (LeftSideCheck.activeTile == currentTilePrefab || RightSideCheck.activeTile == currentTilePrefab)
-            {
-                // CheckDistanceFromRoofSides();
-            }
+            
         }
 
 
@@ -448,102 +377,7 @@ namespace RoofTileVR
         public TextMeshProUGUI sideOverhanglog;
         public TextMeshProUGUI bottomOverhanglog;
 
-        // public void CheckDistanceFromRoofSides()
-        // {
-
-        //     if (LeftSideCheck.activeTile && b_sideOverhangCheck)
-        //     {
-        //         //check leftmost tile
-        //         float dx_left = (m_RoofObject.LeftRoofPoint.position - currentTilePrefab.SideEdgeLeft.position).x;
-        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
-        //         sideOverhanglog.text =
-        //             $"dist = {dx_left}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
-
-        //         if (CompareRakeOverHangDist(dx_left))
-        //         {
-        //             sideOverhanglog.text +=
-        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_left}''";
-
-        //             m_RoofObject.SideOverhangEffect.SetActive(false);
-        //             b_sideOverhangCheck = false;
-        //         }
-        //         else
-        //         {
-        //             string align = "left";
-        //             if (dx_left < 0)
-        //                 align = "left";
-        //             else
-        //                 align = "right";
-
-        //             sideOverhanglog.text +=
-        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dx_left}''";
-
-        //             m_RoofObject.SideOverhangEffect.SetActive(true);
-        //             SetActiveTileStatePlaceFail(-2);
-        //         }
-        //     }
-
-        //     if (RightSideCheck.activeTile && b_sideOverhangCheck)
-        //     {
-        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
-
-        //         //check rightmost tile
-        //         float dx_right = currentTilePrefab.SideEdgeRight.position.x -
-        //                          m_RoofObject.RightRoofPoint.position.x;
-
-        //         sideOverhanglog.transform.parent.gameObject.SetActive(true);
-        //         sideOverhanglog.text =
-        //             $"dist = {dx_right}. Range is {checkRakeOverhang * .9f} to {rr(checkRakeOverhang)}";
-
-        //         if (CompareRakeOverHangDist(dx_right))
-        //         {
-        //             sideOverhanglog.text +=
-        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkRakeOverhang * Inch))} {dx_right}''";
-
-        //             m_RoofObject.SideOverhangEffect.SetActive(false);
-        //         }
-        //         else
-        //         {
-        //             string align = "left";
-        //             if (dx_right < 0)
-        //                 align = "left";
-        //             else
-        //                 align = "right";
-
-        //             sideOverhanglog.text +=
-        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dx_right}''";
-
-        //             m_RoofObject.SideOverhangEffect.SetActive(true);
-        //             SetActiveTileStatePlaceFail(-2);
-        //         }
-        //     }
-
-        //     float dy = (m_RoofObject.BottomRoofPoint.position - currentTilePrefab.SideEdgeBottom.position).y;
-
-        //     if (b_bottomOverhangCheck)
-        //     {
-        //         ShowBottomOverhangAlert();
-        //         if (CompareEaveOverHangDist(dy))
-        //         {
-        //             bottomOverhanglog.text =
-        //                 $"\nCorrect. {currentTilePrefab.name} is placed correct under {rr(Mathf.Abs(checkEaveOverhang * Inch))} {dy}''";
-        //             m_RoofObject.BottomOverhangEffect.SetActive(false);
-        //         }
-        //         else
-        //         {
-        //             string align = "left";
-        //             if (dy < 0)
-        //                 align = "ABOVE";
-        //             else
-        //                 align = "BELOW";
-
-        //             bottomOverhanglog.text =
-        //                 $"\nWrong. {currentTilePrefab.name} is {align} in {dy}''";
-        //             m_RoofObject.BottomOverhangEffect.SetActive(true);
-        //             SetActiveTileStatePlaceFail(-2);
-        //         }
-        //     }
-        // }
+       
 
         public void GetDistanceAccordingToExposure(float num)
         {
@@ -688,6 +522,8 @@ namespace RoofTileVR
             placementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
             placementPrompt.transform.localPosition = Vector3.zero;
             placementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            // currentTilePrefab.YesButtonPressed();
+            // YesButtonPressed();
         }
 
         public void ShowWrongRegionPlacementPrompt()
@@ -733,6 +569,9 @@ namespace RoofTileVR
                         if (currentTilePrefab.ShowKeywayerrors())
                         {
                             ShowPlacementPrompt();
+                            currentTilePrefab.tileNameText.text = "";
+                            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+
                         }
                     }
                     else
@@ -740,6 +579,9 @@ namespace RoofTileVR
                         if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
                         {
                             ShowPlacementPrompt();
+                            currentTilePrefab.tileNameText.text = "";
+                            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+
                         }
                     }
                 }
@@ -749,6 +591,9 @@ namespace RoofTileVR
                     if (currentTilePrefab.ShowStarterErrors())
                     {
                         ShowPlacementPrompt();
+                        currentTilePrefab.tileNameText.text = "";
+                        currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+
                     }
                 }
             }
@@ -865,14 +710,14 @@ namespace RoofTileVR
             TileSelectText("Tile Placed! Pick New Tile");
             print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
             currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
-            if (numOfTile > starterColliders.Count - 1)
+            if (numOfTile > starterColliders.Count)
             {
 
                 WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
             }
 
-            print(linesOfTileTobePlaced + "Number of lines of tile placed");
-            if (linesOfTileTobePlaced == /*markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade*/2)
+            print(linesOfTileTobePlaced + "Number of lines of tile placed " + markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade);
+            if (linesOfTileTobePlaced == markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade+2)
             {
                 statisticsManager.SaveStatistics(tilesPickedUp);
                 statisticsManager.ShowStatsTable();
@@ -883,61 +728,11 @@ namespace RoofTileVR
 
 
         public TextMeshProUGUI distanceLog;
-        private void CheckProximity(GameObject placedObject)
-        {
-            //distanceLog.text = "run proximity check";
 
-            foreach (GameObject obj in objectsToCheck)
-            {
-                if (obj != placedObject) // Skip the object itself
-                {
-                    float distance = Vector3.Distance(placedObject.transform.position, obj.transform.position);
-                    //distanceLog.gameObject.SetActive(true);
-                    //distanceLog.text = "Distance between " + placedObject.name + " and " + obj.name + ": " + distance*39.37 + " inch.";
 
-                    // Calculate edge distances
-                    Vector3[] corners1 = GetCorners(placedObject);
-                    Vector3[] corners2 = GetCorners(obj);
-                    for (int i = 0; i < 12; i++)
-                    {
-                        Vector3 point1Start = corners1[EdgePairs[i, 0]];
-                        Vector3 point1End = corners1[EdgePairs[i, 1]];
-                        Vector3 point2Start = corners2[EdgePairs[i, 0]];
-                        Vector3 point2End = corners2[EdgePairs[i, 1]];
+       
 
-                        float edgeDistance = Vector3.Distance(point1Start, point2Start); // Simplified; consider the actual edge distance calculation
-                        //Debug.Log($"Edge {i} distance: {edgeDistance}");
-                    }
-                }
-            }
-        }
-
-        static readonly int[,] EdgePairs = new int[,]
-        {
-            {0, 1}, {1, 2}, {2, 3}, {3, 0}, // Bottom face edges
-            {4, 5}, {5, 6}, {6, 7}, {7, 4}, // Top face edges
-            {0, 4}, {1, 5}, {2, 6}, {3, 7}  // Side edges connecting top and bottom
-        };
-
-        private Vector3[] GetCorners(GameObject obj)
-        {
-            BoxCollider collider = obj.GetComponent<BoxCollider>();
-            Vector3[] corners = new Vector3[8];
-            Vector3 center = obj.transform.position;
-            Vector3 extents = collider.size * 0.5f;
-            Quaternion rotation = obj.transform.rotation;
-
-            corners[0] = center + rotation * new Vector3(-extents.x, -extents.y, -extents.z);
-            corners[1] = center + rotation * new Vector3(extents.x, -extents.y, -extents.z);
-            corners[2] = center + rotation * new Vector3(extents.x, -extents.y, extents.z);
-            corners[3] = center + rotation * new Vector3(-extents.x, -extents.y, extents.z);
-            corners[4] = center + rotation * new Vector3(-extents.x, extents.y, -extents.z);
-            corners[5] = center + rotation * new Vector3(extents.x, extents.y, -extents.z);
-            corners[6] = center + rotation * new Vector3(extents.x, extents.y, extents.z);
-            corners[7] = center + rotation * new Vector3(-extents.x, extents.y, extents.z);
-
-            return corners;
-        }
+       
 
         // Update is called once per frame
         void Update()

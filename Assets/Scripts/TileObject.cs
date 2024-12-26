@@ -157,6 +157,7 @@ namespace RoofTileVR
             {
                 spawner.tilesPickedUp.Add(gameObject);
             }
+            tileNameText.text="";
 
 
         }
@@ -329,8 +330,8 @@ namespace RoofTileVR
                     Vector3 localLeft = -this.transform.right;
 
                     // Calculate the vector distances
-                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
-                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
 
                     // Project the world direction vector onto the local left vector
                     float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
@@ -341,8 +342,8 @@ namespace RoofTileVR
                     leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
 
                     // Draw lines to visualize the directions and magnitudes
-                    Debug.DrawLine(sideEdgeLeft.transform.position, sideEdgeLeft.transform.position + (localLeft * leftwardDistanceLocal1), Color.red, 5.0f);
-                    Debug.DrawLine(sideEdgeRight.transform.position, sideEdgeRight.transform.position + (localLeft * leftwardDistanceLocal2), Color.blue, 5.0f);
+                    // Debug.DrawLine(sideEdgeLeft.transform.position, sideEdgeLeft.transform.position + (localLeft * leftwardDistanceLocal1), Color.red, 5.0f);
+                    // Debug.DrawLine(sideEdgeRight.transform.position, sideEdgeRight.transform.position + (localLeft * leftwardDistanceLocal2), Color.blue, 5.0f);
 
 
                     print("Going left to right Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
@@ -352,8 +353,8 @@ namespace RoofTileVR
                         // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
                         // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
-                        tileNum = 1;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
+                        tileNum = 0;
                         return true;
                     }
                     else
@@ -417,8 +418,8 @@ namespace RoofTileVR
                     Vector3 localLeft = -this.transform.right;
 
                     // Calculate the vector distances
-                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
-                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
 
                     // Project the world direction vector onto the local left vector
                     float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
@@ -440,8 +441,8 @@ namespace RoofTileVR
                         // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
                         // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[2].tileSize - leftwardDistanceLocal2 * 39.37f;
-                        tileNum = 2;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
+                        tileNum = 0;
                         return true;
                     }
                     else
@@ -766,8 +767,6 @@ namespace RoofTileVR
             }
         }
 
-        bool isYesPressed = false;
-
         public bool isTileAbove = true;
         public bool isValidTile = false;
         public void SetTileAboveRoof(bool isAbove, bool isTileValid, TileDropCollisionCheck regionTileDropped)
@@ -979,7 +978,7 @@ namespace RoofTileVR
                     DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                     // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right (Bad keyway spacing) " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is on right by (Bad keyway spacing) " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
-                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
+                    tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                 {
@@ -988,7 +987,7 @@ namespace RoofTileVR
                     DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                     // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is on left by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
-                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
+                    tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
@@ -997,7 +996,7 @@ namespace RoofTileVR
                     DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
-                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
+                    tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
@@ -1006,7 +1005,7 @@ namespace RoofTileVR
                     DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
-                    tileNameText.text=((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
+                    tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
                 }
                 return false;
             }
@@ -1027,12 +1026,8 @@ namespace RoofTileVR
                     // Get the target position from the side edge
                     Vector3 targetPosition = objectToCheck.transform.position;
 
-                    // Calculate the direction from the target point to the child's current position
-                    Vector3 direction = (childWorldPosition - targetPosition).normalized;
-
                     // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
-                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.2f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
-                    Vector3 newYDirectionWorldPosition = targetPosition + localYDirection * distanceToCheckAccordingToExposure;
+                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.05f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
 
                     // Combine the Y-direction offset with the original directional offset
                     Vector3 combinedDirection = localYDirection.normalized;
