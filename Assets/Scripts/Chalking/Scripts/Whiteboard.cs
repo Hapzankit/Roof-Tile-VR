@@ -20,6 +20,11 @@ public class Whiteboard : MonoBehaviour
 
     public int numberOfLinesOftileTobeMade = 0;
 
+
+    public TMP_Text exposureMeasurements;
+    public GameObject MeasuretextL;
+    public GameObject MeasuretextR;
+
     void Start()
     {
         tileCasting = FindObjectOfType<TileCasting>();
@@ -68,6 +73,7 @@ public class Whiteboard : MonoBehaviour
 
             // Draw a vertical line or mark
             DrawVerticalLine(x);
+            SnapTheText(n);
 
             // Move to the next mark position
             currentWidthInches += subsequentMarkDistanceInches;
@@ -77,13 +83,42 @@ public class Whiteboard : MonoBehaviour
         numberOfLinesOftileTobeMade = n;
         // Apply texture changes
         texture.Apply();
-        print("Draw MArks");
+        print("Draw Marks");
+    }
+
+
+    void SnapTheText(int num)
+    {
+        //from =text
+        // Get the current world position of the child object
+        TMP_Text instantiatedText = Instantiate(exposureMeasurements);
+        Vector3 childWorldPosition = instantiatedText.transform.position;
+
+        // Get the target position from the side edge
+        Vector3 targetPosition = MeasuretextL.transform.position;
+
+        // Calculate the direction from the target point to the child's current position
+        Vector3 direction = (childWorldPosition - targetPosition).normalized;
+
+        // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
+        Vector3 localYDirection = MeasuretextL.transform.right; // This gets the local 'up' direction which corresponds to the local +Y axis
+
+        // Combine the Y-direction offset with the original directional offset
+        Vector3 combinedDirection = (localYDirection.normalized * num) + new Vector3(0.5f, 0, 0);
+        Vector3 newChildWorldPosition = targetPosition + combinedDirection * float.Parse(exposureDropdown.options[exposureDropdown.value].text) * 0.0254f;
+
+        // Calculate the required offset for the parent
+        Vector3 offset = newChildWorldPosition - childWorldPosition;
+        instantiatedText.text = float.Parse(exposureDropdown.options[exposureDropdown.value].text) + " inches";
+        // Apply the offset to the parent to snap it
+        instantiatedText.transform.position += offset;
     }
 
     public void DrawVerticalLine(int x)
     {
         // x=x * textureSize.x / widthInInches
         int lineThickness = 5; // Thickness of the mark in pixels
+        float pixelsPerInch = textureSize.x / widthInInches;
         Color markColor = Color.black; // Color of the mark
 
         for (int thickness = -lineThickness / 2; thickness < lineThickness / 2; thickness++)
@@ -94,6 +129,9 @@ public class Whiteboard : MonoBehaviour
                 texture.SetPixel(drawX, y, markColor);
             }
         }
+
+        float.TryParse(exposureDropdown.options[exposureDropdown.value].text, out float result);
+
     }
     public void DrawVerticalAtDistance(float dist)
     {
@@ -134,4 +172,12 @@ public class Whiteboard : MonoBehaviour
 
         return i == LineTraceCaller.Count;
     }
+
+
+
+
+
+
+
+
 }

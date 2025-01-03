@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Collections;
 using UnityEngine;
 
@@ -40,6 +41,7 @@ public class WhiteboardMarker : MonoBehaviour
 
 
 
+
     public float DrawLineAtDistance = 11.5f;
     void Start()
     {
@@ -49,11 +51,11 @@ public class WhiteboardMarker : MonoBehaviour
         // _tipHeight = _tip.localScale.y;
 
         lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = 0.01f;
-        lineRenderer.endWidth = 0.01f;
+        lineRenderer.startWidth = 0.005f;
+        lineRenderer.endWidth = 0.005f;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = Color.white;
-        lineRenderer.endColor = Color.white;
+        lineRenderer.startColor = Color.black;
+        lineRenderer.endColor = Color.black;
         lineRenderer.positionCount = 2;
     }
     bool isSecondLine = false;
@@ -99,8 +101,9 @@ public class WhiteboardMarker : MonoBehaviour
                 lineRenderer.SetPosition(1, secondObjectShake.position);
                 whiteboard.tileCasting.WriteOnHandMenu("Now start placing normal shakes over starter tiles from bottom right");
                 pickedObject.gameObject.SetActive(false);
-                secondObjectShake.GetComponent<MeshRenderer>().enabled = false;
-                thirdObjectShake.GetComponent<MeshRenderer>().enabled = false;
+                secondObjectShake.gameObject.SetActive(false);
+                thirdObjectShake.gameObject.SetActive(false);
+
 
 
             }
@@ -125,8 +128,8 @@ public class WhiteboardMarker : MonoBehaviour
                 this.transform.position = new Vector3(secondObjectShake.position.x, secondObjectShake.position.y, secondObjectShake.position.z);
                 whiteboard.tileCasting.WriteOnHandMenu("Now Place Starter tiles on correct place (starting from bottom right) until its border turns green");
                 pickedObject.gameObject.SetActive(false);
-                secondObject.GetComponent<MeshRenderer>().enabled = false;
-                thirdObject.GetComponent<MeshRenderer>().enabled = false;
+                secondObject.gameObject.SetActive(false);
+                thirdObject.gameObject.SetActive(false);
 
 
                 // ChangeObjects();

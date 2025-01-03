@@ -67,7 +67,7 @@ public class StatisticsManager : MonoBehaviour
     {
         StatsPage.gameObject.SetActive(true);
         //starts at 1,1
-        
+
         // OVERHANG
         float overhangPercentage = ((float)CorrectOverhangs / (CorrectOverhangs + IncorrectOverhangs)) * 100;
         table.GetCell(1, 1).text = CorrectOverhangs.ToString();
@@ -113,7 +113,7 @@ public class StatisticsManager : MonoBehaviour
         return $"<color=\"red\">{hours:D2}</color> H : <color=\"red\">{minutes:D2}</color> M : <color=\"red\">{seconds:D2}</color> S";
     }
 
-    public void SaveStatistics(List<GameObject> tilesPlaced)
+    public void SaveStatistics(List<GameObject> tilesPlaced, List<GameObject> tilesPl)
     {
         foreach (var tile in tilesPlaced)
         {
@@ -128,9 +128,14 @@ public class StatisticsManager : MonoBehaviour
             IncorrectOverhangs += tile.GetComponent<TileObject>().InCorrectoverHangs;
             IncorrectExposure += tile.GetComponent<TileObject>().IncorrectExposure;
             IncorrectSidelap += tile.GetComponent<TileObject>().IncorrectSidelap;
-            if (!tile.GetComponent<TileObject>().isSecondBoltPlaced || !tile.GetComponent<TileObject>().isFirstBoltPlaced)
+
+        }
+
+        foreach (var til in tilesPl)
+        {
+            if (!til.GetComponent<TileObject>().isSecondBoltPlaced || !til.GetComponent<TileObject>().isFirstBoltPlaced)
             {
-                if (!tile.GetComponent<TileObject>().isSecondBoltPlaced && !tile.GetComponent<TileObject>().isFirstBoltPlaced)
+                if (!til.GetComponent<TileObject>().isSecondBoltPlaced && !til.GetComponent<TileObject>().isFirstBoltPlaced)
                 {
                     boltsLeftToPlace += 2;
                 }

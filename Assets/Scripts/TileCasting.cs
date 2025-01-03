@@ -22,12 +22,10 @@ namespace RoofTileVR
         public float boxCastSize = 0.1f; // Size of the box cast
         public LayerMask layerMask; // Layer mask to define what to hit
 
-        [SerializeField] private GameObject currentPlaceholder;
+        // [SerializeField] private GameObject currentPlaceholder;
         [SerializeField] private TextMeshProUGUI logTMP;
-        [SerializeField] private GameObject triggerTMP;
-        // [SerializeField] private InputAction RightTriggerAction;
-        [SerializeField] private InputActionReference RightTriggerRef;
-        [SerializeField] private InputActionReference PrimaryButtonRef;
+
+
         private System.Nullable<Vector3> prevHitPoint = null;
         private Vector3 prevPos;
         private Vector3 prevRot;
@@ -52,29 +50,10 @@ namespace RoofTileVR
         public TMP_Dropdown exposureDropdown;
 
         public List<HandMenu> handMenu;
+        bool isTilePicked = false;
+        public GameObject BoardArea;
 
 
-        private void OnEnable()
-        {
-            //RightTriggerAction += TriggerPressed();
-            RightTriggerRef.action.performed += RightTriggerPressed;
-            RightTriggerRef.action.Enable();
-
-            PrimaryButtonRef.action.performed += OnPrimaryButtonPressed;
-            PrimaryButtonRef.action.Enable();
-
-
-        }
-
-
-        private void OnDisable()
-        {
-            RightTriggerRef.action.performed -= RightTriggerPressed;
-            RightTriggerRef.action.Disable();
-
-            PrimaryButtonRef.action.performed -= OnPrimaryButtonPressed;
-            PrimaryButtonRef.action.Disable();
-        }
 
         private void EnableIA(InputActionReference inputActionReference, System.Action<InputAction.CallbackContext> callBackFunction)
         {
@@ -90,11 +69,11 @@ namespace RoofTileVR
 
         public void RightTriggerPressed(InputAction.CallbackContext obj)
         {
-            if (currentPlaceholder.activeSelf)
-            {
-                PlaceObject(prevPos, prevRot);
-                tilePlacedMsg?.Invoke("Tile placed success");
-            }
+            // if (currentPlaceholder.activeSelf)
+            // {
+            //     PlaceObject(prevPos, prevRot);
+            //     tilePlacedMsg?.Invoke("Tile placed success");
+            // }
         }
 
         // Start is called before the first frame update
@@ -130,14 +109,14 @@ namespace RoofTileVR
             print("Width of roof" + tileSpanWidthConstant);
             starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
             //currentPlaceholder = Instantiate(placeholderPrefab);
-            currentPlaceholder.SetActive(false);
-            triggerTMP.SetActive(false);
+            // currentPlaceholder.SetActive(false);
+            // triggerTMP.SetActive(false);
             if (m_RoofObject != null)
             {
                 TryGetComponent(out m_RoofObject);
             }
 
-           
+
         }
 
         /// <summary>
@@ -158,47 +137,20 @@ namespace RoofTileVR
             return false;
         }
 
-        [SerializeField] private Transform tileOffset;
-        
+
+
 
         [SerializeField] public TileObject currentTilePrefab;
+
         private TileObject prevTilePrefab;
-        [SerializeField] private TileObject[] TileObjects;
-        private int currentTileIndex;
 
-        public void PlaceTileInFront(int tileIndex = 0)
-        {
-            currentTileIndex = tileIndex;
-            distanceLog.transform.parent.gameObject.SetActive(false);
 
-            m_TileSelectPanelUI.BGColorReset();
-            Vector3 pos = tileOffset.position;
-            //pos.y = 1f;
-            GameObject placedObject =
-                Instantiate(TileObjects[currentTileIndex].gameObject, pos, tileOffset.localRotation);
 
-            if (prevTilePrefab)
-            {
-                prevTilePrefab = currentTilePrefab;
-                prevTileLog.text = "last tile = " + prevTilePrefab.name + "";
-            }
-            currentTilePrefab = placedObject.GetComponent<TileObject>();
-            tileState = -1;
 
-        }
-
-        public TextMeshProUGUI tileStatusPrompt;
-        public void TileSelectText(string label)
-        {
-            tileStatusPrompt.text = label;
-
-        }
-
-        public TextMeshProUGUI tilePlaced_log;
         public void SetActiveTileStateToPlaced(int state = 1)
         {
             tileState = state;
-            tilePlaced_log.transform.parent.gameObject.SetActive(true);
+            // tilePlaced_log.transform.parent.gameObject.SetActive(true);
             //tilePlaced_log.text = $"Tile {i + 1} placed";
             PlaceTile();
         }
@@ -215,14 +167,14 @@ namespace RoofTileVR
         int i = 1;
 
         private List<GameObject> objectsToCheck = new List<GameObject>();
-        private List<Transform> tileTransformList = new List<Transform>();
+        // private List<Transform> tileTransformList = new List<Transform>();
 
-       
+
         public TileDropCollisionCheck currentTileRegion;
 
         public List<GameObject> tilesPickedUp;
 
-    
+
 
         void PlaceTile()
         {
@@ -233,7 +185,7 @@ namespace RoofTileVR
                 if (objectsToCheck.Contains(currentTilePrefab.gameObject) == false)
                 {
                     objectsToCheck.Add(currentTilePrefab.gameObject);
-                    currentTilePrefab.SetName("Tile" + i);
+                    // currentTilePrefab.SetName("Tile" + i);
                     currentTilePrefab.name = "Tile" + i;
                     i++;
                 }
@@ -244,140 +196,21 @@ namespace RoofTileVR
 
             }
 
-            tilePlaced_log.text = $"{currentTilePrefab.name} placed";
-            DOVirtual.DelayedCall(2f, delegate ()
-            {
-                tilePlaced_log.transform.parent.gameObject.SetActive(false);
-            });
 
-            
+
+
         }
 
 
-        /// <summary>
-        /// 1.0f distance in Unity = 39.37inch in real world 
-        /// </summary>
-        public const float Inch = 39.37f;
 
-        public float checkSideEdge;
 
-        public TextMeshProUGUI prevTileLog;
 
-        public string rr(float f)
-        {
-            return f.ToString("F3");
-        }
-        public bool CheckDistanceFromLastTile()
-        {
 
-            StringBuilder log = new StringBuilder();
-            if (prevTilePrefab != null && prevTilePrefab != currentTilePrefab)
-            {
-                distanceLog.transform.parent.gameObject.SetActive(true);
-                //check horizontal distance from previous tile
-                //var closestTile = GetLeftRightMostTilePos();
-                var closestTile = prevTilePrefab;
-                float dx = currentTilePrefab.transform.position.x - closestTile.transform.position.x;
-                log.Append($"{closestTile.name} to {currentTilePrefab.name} in X: {rr(dx * Inch)}''");
-
-                float sideEdgeDx = Mathf.Epsilon;
-                if (dx > 0)
-                {
-                    //new tile is placed to RIGHT
-                    //compare Tile 2 side edge left x Tile 1 side edge right
-                    Vector3 tile2Edge = currentTilePrefab.SideEdgeLeft.position;
-
-                    Vector3 tile1Edge = closestTile.SideEdgeRight.position;
-
-                    sideEdgeDx = Vector3.Distance(tile2Edge, tile1Edge);
-                    sideEdgeDx = tile2Edge.x - tile1Edge.x;
-                    log.Append($"\n{currentTilePrefab.name} placed on RIGHT of {closestTile.name} by dist: {rr(Mathf.Abs(sideEdgeDx) * Inch)}''");
-                }
-                else
-                {
-                    //new tile is placed to LEFT    
-                    //compare Tile 2 side edge right x Tile 1 side edge left
-                    Vector3 tile2Edge = currentTilePrefab.SideEdgeRight.position;
-
-                    Vector3 tile1Edge = closestTile.SideEdgeLeft.position;
-
-                    sideEdgeDx = Vector3.Distance(tile2Edge, tile1Edge);
-                    sideEdgeDx = (tile2Edge.x - tile1Edge.x);
-                    log.Append($"\n{currentTilePrefab.name} placed on LEFT of {closestTile.name} by dist: {rr(Mathf.Abs(sideEdgeDx) * Inch)}''");
-                }
-
-                sideEdgeDx = Mathf.Abs(sideEdgeDx);
-                if (sideEdgeDx > checkSideEdge)
-                {
-                    //Fail
-
-                    log.Append($"\nBAD Keyway Spacing {currentTilePrefab.name} ({rr(sideEdgeDx * Inch)}'') >> {rr(checkSideEdge * Inch)}'' distance ");
-                    if (dx > 0)
-                    {
-                        HighlightIncorrectTilePlacement(-1);
-                    }
-                    else
-                    {
-                        HighlightIncorrectTilePlacement(1);
-                    }
-                    distanceLog.text = log.ToString();
-                    SetActiveTileStatePlaceFail(-2);
-
-                    return true;
-                }
-                else if (sideEdgeDx > 0 && sideEdgeDx < checkSideEdge)
-                {
-                    //Pass
-                    log.Append($"\nGOOD Keyway Spacing {currentTilePrefab.name} ({rr(sideEdgeDx * Inch)}'') ~= {rr(checkSideEdge * Inch)}'' distance");
-                    HighlightCorrectTilePlacement();
-                    distanceLog.text = log.ToString();
-
-                    return true;
-                }
-            }
-            else
-            {
-                prevTilePrefab = currentTilePrefab;
-                prevTileLog.text = "last tile = " + prevTilePrefab.name + "";
-            }
-
-            return false;
-        }
-
-        public TileObject GetLeftRightMostTilePos()
-        {
-            TileObject result = prevTilePrefab;
-
-            float dx = (currentTilePrefab.transform.position.x - prevTilePrefab.transform.position.x);
-            float closestDist = Mathf.Abs(dx);
-
-            foreach (GameObject tile in objectsToCheck)
-            {
-                if (tile != currentTilePrefab)
-                {
-                    dx = currentTilePrefab.transform.position.x - tile.transform.position.x;
-                    if (closestDist < Mathf.Abs(dx))
-                    {
-                        closestDist = Mathf.Abs(dx);
-                        result = tile.GetComponent<TileObject>();
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public float checkEaveOverhang;
-        public float checkRakeOverhang;
 
         public TileObject CurrentTileObject => currentTilePrefab;
-        public CollisionCheck LeftSideCheck;
-        public CollisionCheck RightSideCheck;
 
-        public TextMeshProUGUI sideOverhanglog;
-        public TextMeshProUGUI bottomOverhanglog;
 
-       
+
 
         public void GetDistanceAccordingToExposure(float num)
         {
@@ -386,50 +219,14 @@ namespace RoofTileVR
 
         }
 
-        bool CompareRakeOverHangDist(float tileDistance)
-        {
-            float rakeOverHangDist;
 
-
-            // rakeOverHangDist = Mathf.Abs(tileDistance - checkRakeOverhang);
-            if (tileDistance < 0)
-            {
-
-                return false;
-            }
-
-            if (tileDistance > (checkRakeOverhang * 0.75f) && tileDistance <= checkRakeOverhang)
-            {
-
-                return true;
-            }
-
-            return false;
-        }
-
-        bool CompareEaveOverHangDist(float tileDistance)
-        {
-            // rakeOverHangDist = Mathf.Abs(tileDistance - checkRakeOverhang);
-            if (tileDistance < 0)
-            {
-
-                return false;
-            }
-
-            if (tileDistance > (checkEaveOverhang * 0.7f) && tileDistance <= checkEaveOverhang)
-            {
-                return true;
-            }
-
-            return false;
-        }
 
         public void OnTilePick()
         {
             m_TilePlacementUI.HidePanel();
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
-
+            isTilePicked = true;
 
             // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
@@ -498,16 +295,7 @@ namespace RoofTileVR
             }
         }
 
-        private void DisableTileHighlightEffect()
-        {
-            tileSideEdge_Effect.gameObject.SetActive(false);
-        }
 
-        public void EnableTileGrab()
-        {
-            tileStatusPrompt.text = "enabled grab";
-            currentTilePrefab.EnableInteraction();
-        }
 
         public void DisableTileGrab()
         {
@@ -518,91 +306,57 @@ namespace RoofTileVR
         public GameObject wrongRegionPlacementPrompt;
         public void ShowPlacementPrompt()
         {
-            placementPrompt.gameObject.SetActive(true);
-            placementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
-            placementPrompt.transform.localPosition = Vector3.zero;
-            placementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
+            // placementPrompt.gameObject.SetActive(true);
+            // placementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
+            // placementPrompt.transform.localPosition = Vector3.zero;
+            // placementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
             // currentTilePrefab.YesButtonPressed();
-            // YesButtonPressed();
+
+
+            YesButtonPressed();
+            currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
+            currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
+
         }
 
         public void ShowWrongRegionPlacementPrompt()
         {
-            wrongRegionPlacementPrompt.SetActive(true);
-            wrongRegionPlacementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
-            wrongRegionPlacementPrompt.transform.localPosition = Vector3.zero;
-            wrongRegionPlacementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        }
+            // wrongRegionPlacementPrompt.SetActive(true);
+            // wrongRegionPlacementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
+            // wrongRegionPlacementPrompt.transform.localPosition = Vector3.zero;
+            // wrongRegionPlacementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
-        public void ShowBottomOverhangAlert()
-        {
-            Transform _root = bottomOverhanglog.transform.parent;
-            _root.gameObject.SetActive(true);
-
-            _root.transform.SetParent(currentTilePrefab.BottomOverhangLogUIRoot);
-            _root.transform.localPosition = Vector3.zero;
-            _root.transform.localRotation = Quaternion.Euler(Vector3.zero);
-        }
-
-        public void HideBottomOverhangAlert()
-        {
-            bottomOverhanglog.transform.parent.gameObject.SetActive(false);
+            WriteOnHandMenu("Tile placed in wrong region!");
         }
 
 
-
-        [SerializeField] private TileDropCollisionCheck m_TileDropCollisionCheck;
         public void OnTileDropped()
         {
-            print("Is all starter placed " + starterTilesPlaced + isFirstShakePlaced);
-            // if (currentTilePrefab.isTileAbove)
-            // {
-            if (currentTilePrefab.isValidTile)
-            {
-                // ShowPlacementPrompt();
-                // DisableTileGrab();
-                // currentTilePrefab.gameObject.transform.position=new Vector3(currentTilePrefab.gameObject.transform.position.x,currentTileRegion.transform.position.y,currentTilePrefab.gameObject.transform.position.z);
-                if (starterTilesPlaced)
-                {
-                    if (isFirstShakePlaced)
-                    {
-                        if (currentTilePrefab.ShowKeywayerrors())
-                        {
-                            ShowPlacementPrompt();
-                            currentTilePrefab.tileNameText.text = "";
-                            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+            // print("Is all starter placed " + starterTilesPlaced + isFirstShakePlaced);
+            isTilePicked = false;
+            // SnapToTheRoof();
 
-                        }
-                    }
-                    else
-                    {
-                        if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
-                        {
-                            ShowPlacementPrompt();
-                            currentTilePrefab.tileNameText.text = "";
-                            currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+            // SnapTilesAndShowErrors();
 
-                        }
-                    }
-                }
-                else
-                {
 
-                    if (currentTilePrefab.ShowStarterErrors())
-                    {
-                        ShowPlacementPrompt();
-                        currentTilePrefab.tileNameText.text = "";
-                        currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
 
-                    }
-                }
-            }
-            else
-            {
-                ShowWrongRegionPlacementPrompt();
-            }
-            // }
+        }
 
+        void SnapToTheRoof()
+        {
+            GameObject instantiatedText = currentTilePrefab.gameObject;
+            float roofWorldY = BoardArea.transform.position.y;
+            // Get the original world position of the instantiatedText
+            Vector3 originalPosition = instantiatedText.transform.position;
+
+            // Calculate the Y offset required to "zero" the instantiatedText to the roof's Y position
+            // Assuming the instantiatedText should have a local Y position of 0 relative to the roof
+
+            // Construct the new position by modifying the Y coordinate to align with the roof
+            Vector3 newPosition = new Vector3(originalPosition.x, roofWorldY, originalPosition.z);
+
+            // Apply the new position to the instantiatedText
+            instantiatedText.transform.position = newPosition;
 
         }
 
@@ -656,14 +410,14 @@ namespace RoofTileVR
             else
             {
                 int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
-                print("Change starter tiles" + num + " " + starterColliders.Count);
+                // print("Change starter tiles" + num + " " + starterColliders.Count);
 
                 currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
                 // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
                 if (num < starterColliders.Count - 1)
                 {
                     starterColliders[++num].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
-                    print("Tile number" + num);
+                    // print("Tile number" + num);
                 }
                 else
                 {
@@ -689,7 +443,7 @@ namespace RoofTileVR
             {
                 tileSpanWidth = tileSpanWidthConstant;
                 reverseTheLine = !reverseTheLine;
-                linesOfTileTobePlaced++;
+
             }
 
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
@@ -698,28 +452,33 @@ namespace RoofTileVR
             TilesPlaced.Add(currentTilePrefab.gameObject);
             if (currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
+                // print("apply the area covered");
                 currentTilePrefab.GetComponent<TileObject>().tileSize = 12;
+                currentTilePrefab.areaLeftByTileAbove = 12;
             }
             else
             {
                 currentTilePrefab.GetComponent<TileObject>().ReduceTileArea();
             }
-            print("Tile placed number" + TilesPlaced.Count);
-            DisableTileGrab();
+            // print("Tile placed number" + TilesPlaced.Count);
+            // DisableTileGrab();
             SetActiveTileStateToPlaced(1);
-            TileSelectText("Tile Placed! Pick New Tile");
+            // TileSelectText("Tile Placed! Pick New Tile");
             print("Tile width reduced to" + tileSpanWidth + " " + currentTileWidth);
             currentTilePrefab.GetComponent<TileObject>().isPlaced = true;
             if (numOfTile > starterColliders.Count)
             {
-
-                WriteOnHandMenu("Now bolt the screws to the tile (it should be atleast 3/16 inches deep)");
+                WriteOnHandMenu("Now fasten the fasteners to the tile (it should be atleast 3/4\" inches deep).");
             }
 
             print(linesOfTileTobePlaced + "Number of lines of tile placed " + markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade);
-            if (linesOfTileTobePlaced == markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade+2)
+            if (tileSpanWidth <= 0)
             {
-                statisticsManager.SaveStatistics(tilesPickedUp);
+                linesOfTileTobePlaced++;
+            }
+            if (linesOfTileTobePlaced == markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade + 2)
+            {
+                statisticsManager.SaveStatistics(tilesPickedUp, TilesPlaced);
                 statisticsManager.ShowStatsTable();
             }
 
@@ -730,13 +489,84 @@ namespace RoofTileVR
         public TextMeshProUGUI distanceLog;
 
 
-       
 
-       
+
+
 
         // Update is called once per frame
+        void SnapTilesAndShowErrors()
+        {
+            if (currentTilePrefab.isValidTile && !currentTilePrefab.checkKeywayFlag)
+            {
+
+                if (starterTilesPlaced)
+                {
+                    if (isFirstShakePlaced)
+                    {
+                        if (currentTilePrefab.CalculateSidelapCheck())
+                        {
+
+                            if (currentTilePrefab.ShowKeywayerrors())
+                            {
+                                ShowPlacementPrompt();
+                                currentTilePrefab.tileNameText.text = "";
+                                currentTilePrefab.checkKeywayFlag = true;
+                                currentTilePrefab = null;
+                                // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (currentTilePrefab.CalculateSidelapCheck())
+                        {
+
+                            if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
+                            {
+                                ShowPlacementPrompt();
+                                currentTilePrefab.tileNameText.text = "";
+                                currentTilePrefab.checkKeywayFlag = true;
+                                currentTilePrefab = null;
+                                // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (currentTilePrefab.CalculateSidelapCheck())
+                    {
+
+                        if (currentTilePrefab.ShowStarterErrors())
+                        {
+                            ShowPlacementPrompt();
+                            currentTilePrefab.tileNameText.text = "";
+                            currentTilePrefab.checkKeywayFlag = true;
+                            currentTilePrefab = null;
+                            // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
+
+                        }
+                    }
+                }
+            }
+
+        }
         void Update()
         {
+            if (isTilePicked)
+            {
+                // print("Running function");
+                if (currentTilePrefab)
+                {
+                    SnapTilesAndShowErrors();
+                }
+            }
+
+            if (tileSpanWidth < 0 && currentTilePrefab)
+            {
+                currentTilePrefab.rightToLeft = !currentTilePrefab.rightToLeft;
+            }
 
             if (markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
             {
@@ -769,26 +599,19 @@ namespace RoofTileVR
                 prevPos = hit.point;
                 prevRot = hit.normal;
 
-                currentPlaceholder.transform.position = hit.point;
-                currentPlaceholder.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-                currentPlaceholder.SetActive(true);
+
 
             }
             else
             {
                 // Hide the placeholder if no hit
-                currentPlaceholder.SetActive(false);
+                // currentPlaceholder.SetActive(false);
                 SetLog($"No Object detected in front {rightController.name}");
             }
 
         }
 
-        void PlaceObject(Vector3 position, Vector3 normal)
-        {
-            // Instantiate the prefab at the hit position with rotation based on the normal
-            GameObject placedObject = Instantiate(prefabToPlace, position, Quaternion.FromToRotation(Vector3.up, normal));
-            // Optional: You can add more logic here, like snapping or parenting
-        }
+
 
         public void QuitApp()
         {
@@ -826,32 +649,6 @@ namespace RoofTileVR
             logTMP.text = log;
         }
 
-        public void TriggerDetect()
-        {
-            triggerTMP.gameObject.SetActive(true);
-            Invoke(nameof(triggerInvoke), 0.7f);
-        }
 
-        public void OnRightTriggerPressed()
-        {
-            if (currentPlaceholder.activeSelf)
-            {
-                PlaceObject(prevPos, prevRot);
-            }
-        }
-
-        public void OnPrimaryButtonPressed(InputAction.CallbackContext obj)
-        {
-            if (currentPlaceholder.activeSelf)
-            {
-                PlaceObject(prevPos, prevRot);
-            }
-        }
-
-        private void triggerInvoke()
-        {
-            triggerTMP.gameObject.SetActive(false);
-
-        }
     }
 }

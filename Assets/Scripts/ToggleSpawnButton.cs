@@ -20,7 +20,7 @@ public class ToggleSpawnButton : MonoBehaviour
     {
         if (spawner.CheckCurrentTileState())
         {
-            spawner.PlaceTileInFront(index);
+            // spawner.PlaceTileInFront(index);
         }
         else
         {
@@ -31,7 +31,7 @@ public class ToggleSpawnButton : MonoBehaviour
             {
                 DOVirtual.DelayedCall(2f, () =>
                 {
-                    placeTileBeforeWarn.SetActive(false);
+                    // placeTileBeforeWarn.SetActive(false);
                 });
             }));
         }

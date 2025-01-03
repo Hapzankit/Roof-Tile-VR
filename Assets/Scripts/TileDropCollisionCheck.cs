@@ -90,7 +90,8 @@ namespace RoofTileVR
             if (other.TryGetComponent(out TileObject tile))
             {
                 isTileNearRoof = false;
-                tile.SetTileAboveRoof(false, true, this);
+                tile.SetTileAboveRoof(false, false, this);
+                tile.RemoveIndications();
             }
 
             if (isStarterRegion && other.TryGetComponent(out TileObject tile2))

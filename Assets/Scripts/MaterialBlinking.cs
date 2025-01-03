@@ -21,7 +21,7 @@ namespace RoofTileVR.Utility
             }
             else
             {
-                Debug.Log("MaterialBlinking=> please attach mesh model");
+                // Debug.Log("MaterialBlinking=> please attach mesh model");
             }
         }
 

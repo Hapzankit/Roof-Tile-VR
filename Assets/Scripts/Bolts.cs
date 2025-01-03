@@ -22,7 +22,7 @@ public class Bolts : MonoBehaviour
     int tNum = 0;
     private void OnTriggerEnter(Collider other)
     {
-        print("Enetered Tile");
+        // print("Enetered Tile");
         if (other.gameObject.TryGetComponent<TileObject>(out TileObject tileToPlaceBolt))
         {
             tileToCheckFrom = tileToPlaceBolt;
@@ -77,6 +77,10 @@ public class Bolts : MonoBehaviour
         {
             snapBolt(tNum);
         }
+        else
+        {
+            this.transform.localPosition = Vector3.zero;
+        }
     }
 
     void snapBolt(int tileNum)
@@ -85,7 +89,7 @@ public class Bolts : MonoBehaviour
         {
 
             // print("trying to snap" + Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37);
-            if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 4f)
+            if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 4f && tileToCheckFrom.BoltPlaceHolders[tileNum].gameObject.activeInHierarchy)
             {
                 this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
                 // Vector3 ogSize = this.transform.localScale;
