@@ -402,7 +402,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.25, z: 1.5}
-  m_LocalScale: {x: 0.30500004, y: 0.0254, z: 0.559}
+  m_LocalScale: {x: 0.30500004, y: 0.0254, z: 0.55}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5749141739176134229}
@@ -533,6 +533,7 @@ MonoBehaviour:
   tileSize: 12.18
   isPlaced: 0
   isInStarterRegion: 0
+  rowNumber: 0
   InCorrectoverHangs: 0
   InCorrectKeywaySpaces: 0
   IncorrectExposure: 0
@@ -551,6 +552,7 @@ MonoBehaviour:
   distanceToCheckAccordingToExposure: 0
   bottomTopTextError: {fileID: 5138097091136871604}
   LeftRightTextError: {fileID: 5960356263289170133}
+  rightToLeft: 1
 --- !u!54 &5197156651012241288
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1282,8 +1284,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: -0.281, y: -0.42, z: -0.321}
-  m_LocalScale: {x: 1.01, y: 12.1279545, z: 0.5510734}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 1.01, y: 12.1279545, z: 0.56}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5273145698015149815}
   m_Father: {fileID: 8727765562456717546}

@@ -25,6 +25,8 @@ public class Whiteboard : MonoBehaviour
     public GameObject MeasuretextL;
     public GameObject MeasuretextR;
 
+    public SelectableButton exposureButton;
+
     void Start()
     {
         tileCasting = FindObjectOfType<TileCasting>();
@@ -60,7 +62,7 @@ public class Whiteboard : MonoBehaviour
 
     public void DrawMarks()
     {
-        subsequentMarkDistanceInches = float.Parse(exposureDropdown.options[exposureDropdown.value].text);
+        subsequentMarkDistanceInches = /*float.Parse(exposureDropdown.options[exposureDropdown.value].text)*/ exposureButton.exposureSelected;
         // Calculate the width in texture space
         float pixelsPerInch = textureSize.x / widthInInches;
 
@@ -105,11 +107,19 @@ public class Whiteboard : MonoBehaviour
 
         // Combine the Y-direction offset with the original directional offset
         Vector3 combinedDirection = (localYDirection.normalized * num) + new Vector3(0.5f, 0, 0);
-        Vector3 newChildWorldPosition = targetPosition + combinedDirection * float.Parse(exposureDropdown.options[exposureDropdown.value].text) * 0.0254f;
+        Vector3 newChildWorldPosition = targetPosition + combinedDirection * exposureButton.exposureSelected * 0.0254f;
 
         // Calculate the required offset for the parent
         Vector3 offset = newChildWorldPosition - childWorldPosition;
-        instantiatedText.text = float.Parse(exposureDropdown.options[exposureDropdown.value].text) + " inches";
+        if (num == 0)
+        {
+
+            instantiatedText.text = 10 + " inches";
+        }
+        else
+        {
+            instantiatedText.text = exposureButton.exposureSelected + " inches";
+        }
         // Apply the offset to the parent to snap it
         instantiatedText.transform.position += offset;
     }
@@ -130,7 +140,7 @@ public class Whiteboard : MonoBehaviour
             }
         }
 
-        float.TryParse(exposureDropdown.options[exposureDropdown.value].text, out float result);
+        // float.TryParse(exposureDropdown.options[exposureDropdown.value].text, out float result);
 
     }
     public void DrawVerticalAtDistance(float dist)

@@ -628,6 +628,7 @@ MonoBehaviour:
   tileSize: 5.18
   isPlaced: 0
   isInStarterRegion: 0
+  rowNumber: 0
   InCorrectoverHangs: 0
   InCorrectKeywaySpaces: 0
   IncorrectExposure: 0
@@ -646,6 +647,7 @@ MonoBehaviour:
   distanceToCheckAccordingToExposure: 0
   bottomTopTextError: {fileID: 8574610038546662469}
   LeftRightTextError: {fileID: 6544313962741627624}
+  rightToLeft: 1
 --- !u!54 &5197156651012241288
 Rigidbody:
   m_ObjectHideFlags: 0

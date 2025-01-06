@@ -47,7 +47,7 @@ namespace RoofTileVR
 
         public float currentTileWidth;
         public float overlapSpanAccordingtoExposure = 11;
-        public TMP_Dropdown exposureDropdown;
+        // public TMP_Dropdown exposureDropdown;
 
         public List<HandMenu> handMenu;
         bool isTilePicked = false;
@@ -367,7 +367,7 @@ namespace RoofTileVR
 
 
         public TileObject TileToCompare;
-
+        public bool rightToLeft = true;
         public bool starterTilesPlaced = false;
         public void changeTiles()
         {
@@ -449,6 +449,12 @@ namespace RoofTileVR
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
             currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
             tileSpanWidth -= currentTileWidth;
+
+            if (tileSpanWidth < 0 && currentTilePrefab)
+            {
+                print("Called once right to left");
+                rightToLeft = !rightToLeft;
+            }
             TilesPlaced.Add(currentTilePrefab.gameObject);
             if (currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -552,6 +558,7 @@ namespace RoofTileVR
             }
 
         }
+
         void Update()
         {
             if (isTilePicked)
@@ -563,10 +570,6 @@ namespace RoofTileVR
                 }
             }
 
-            if (tileSpanWidth < 0 && currentTilePrefab)
-            {
-                currentTilePrefab.rightToLeft = !currentTilePrefab.rightToLeft;
-            }
 
             if (markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
             {

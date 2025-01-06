@@ -46,6 +46,8 @@ namespace RoofTileVR
         public bool isPlaced = false;
         public bool isInStarterRegion; // Tracks if the tile is currently in a starter region
 
+        public int rowNumber = 0;
+
 
 
 
@@ -229,7 +231,14 @@ namespace RoofTileVR
                 if (collider.GetComponent<TileObject>())
                 {
                     Debug.Log("Detected object underneath: " + collider.gameObject.name);
-                    tilesUnderneath.Add(collider.GetComponent<TileObject>());
+                    if (collider.GetComponent<TileObject>().isStarter)
+                    {
+                        tilesUnderneath.Add(collider.GetComponent<TileObject>());
+                    }
+                    else if (collider.GetComponent<TileObject>().rowNumber != rowNumber)
+                    {
+                        tilesUnderneath.Add(collider.GetComponent<TileObject>());
+                    }
                 }
             }
             if (tilesUnderneath.Count == 0) return false;
@@ -494,6 +503,11 @@ namespace RoofTileVR
                     this.GetComponent<XRGrabInteractable>().enabled = false;
                 }
             }
+            if (!isPlaced)
+            {
+                rowNumber = spawner.linesOfTileTobePlaced;
+            }
+
 
             // ShowStarterErrors();
             // if (!isStarter)
@@ -599,7 +613,7 @@ namespace RoofTileVR
                     if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile /*true*/)
                     {
                         // this.transform.position = spawner.currentTileRegion.transform.position;
-                        if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 1.3f)
+                        if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
                         {
                             Vector3 distanceFromPoint = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
                             float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
@@ -648,7 +662,7 @@ namespace RoofTileVR
                     else
                     {
                         objectToCheckFromNormal = this.sideEdgeRight.gameObject;
-                        distanceToCheckAccordingToExposure = 0.25f * 0.0254f;
+                        distanceToCheckAccordingToExposure = 0.25f * 0.0254f * 2;
                         distanceInInches = 2f;
                     }
 
@@ -791,9 +805,9 @@ namespace RoofTileVR
 
                     if (spawner.TilesPlaced.Count == 0)
                     {
-                        //First Shake tile Being Placed
+                        //First starter tile Being Placed
                         SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.white, 0.03f);
-                        PlaceTheMeasurementTag(false, new Vector3(0, 0, 0.55f), new Vector3(-0.1f, 0, 0), sideEdgeRight);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-0.12f, 0, 0), sideEdgeRight);
 
                     }
                     else
@@ -802,15 +816,17 @@ namespace RoofTileVR
                         {
                             //Last starter being placed
                             SpawnTileMeasurements(sideEdgeLeft, "1\" rake overhang", Color.white, 0.03f);
-                            PlaceTheMeasurementTag(false, new Vector3(0, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
+                            PlaceTheMeasurementTag(false, new Vector3(0.03f, 0, 0.55f), new Vector3(0.12f, 0, 0), sideEdgeLeft);
+                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.white, 0.03f);
+                            PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.08f, 0, 0), sideEdgeRight);
 
                         }
                         else
                         {
                             //0.49 0.532
                             //all other starter being placed
-                            SpawnTileMeasurements(sideEdgeRight, "3/16\" keyway spacing", Color.white, 0.03f);
-                            PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.04f, 0, 0), sideEdgeRight);
+                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.white, 0.03f);
+                            PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.08f, 0, 0), sideEdgeRight);
 
 
                         }
@@ -839,7 +855,6 @@ namespace RoofTileVR
         void SpawnTileMeasurements(Transform side, string measurementToWrite, Color color, float textHeight)
         {
             Text = Instantiate(distanceChecks, this.transform);
-            Text.color = Color.black;
             measureTag1 = Instantiate(MeasurementTags, this.transform);
             measureTag2 = Instantiate(MeasurementTags, this.transform);
 
@@ -855,7 +870,7 @@ namespace RoofTileVR
             // Set up the text position and content
             Text.transform.localPosition = new Vector3(side.transform.localPosition.x, textHeight, side.transform.localPosition.z);
             Text.text = measurementToWrite;
-            Text.color = color;
+            Text.color = new Color(1.0f, 0.5f, 0.0f, 1.0f);
 
             // Store the spawned objects for later reference
             measurements.Add(Text.gameObject);
@@ -879,7 +894,7 @@ namespace RoofTileVR
             }
 
             Vector3 midpoint = (measureTag1.transform.localPosition + measureTag2.transform.localPosition) / 2;
-            Text.transform.localPosition = new Vector3(midpoint.x, Text.transform.localPosition.y, midpoint.z + 0.01f);
+            Text.transform.localPosition = new Vector3(midpoint.x, Text.transform.localPosition.y, midpoint.z + 0.1f);
 
             // Update the LineRenderer positions
             LineRenderer measureLine = measureTag1.GetComponent<LineRenderer>();
@@ -1015,7 +1030,7 @@ namespace RoofTileVR
 
                         // Combine the Y-direction offset with the original directional offset
                         Vector3 combinedDirection = localYDirection.normalized;
-                        Vector3 newChildWorldPosition = targetPosition + combinedDirection * 5 * 0.0254f;
+                        Vector3 newChildWorldPosition = targetPosition + combinedDirection * 5f * 0.0254f;
 
                         // Calculate the required offset for the parent
                         Vector3 offset = newChildWorldPosition - childWorldPosition;
@@ -1029,7 +1044,7 @@ namespace RoofTileVR
                         isPlacedCorrectlyAfterConfirmedPlacement = true;
                         GetComponent<Rigidbody>().isKinematic = true;
                         SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(0, 0, 0.55f), new Vector3(-1 / tileSize, 0, 0), sideEdgeRight);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-1 / tileSize, 0, 0), sideEdgeRight);
                         SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + " Sidelap left", Color.white, 0.5f);
                         PlaceTheMeasurementTag(false, new Vector3(-0.55f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         bottomTopTextError.gameObject.SetActive(false);
@@ -1051,7 +1066,7 @@ namespace RoofTileVR
                 return false;
             }
         }
-        public bool rightToLeft = true;
+        // public bool rightToLeft = true;
 
         public bool ShowKeywayerrors()
         {
@@ -1070,8 +1085,8 @@ namespace RoofTileVR
             else
             {
                 objectToCheckFrom = this.sideEdgeRight.gameObject;
-                distanceToCheckAccordingToExposure = 0.25f * 0.0254f;
-                distanceInInches = 0.4f;
+                distanceToCheckAccordingToExposure = 0.25f * 0.0254f * 2;
+                distanceInInches = 0.6f;
             }
 
             if (spawner.reverseTheLine)
@@ -1083,7 +1098,7 @@ namespace RoofTileVR
                 {
                     objectToCheckFrom = this.sideEdgeRight.gameObject;
                     distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
-                    distanceInInches = spawner.overlapSpanAccordingtoExposure / 2;
+                    distanceInInches = spawner.overlapSpanAccordingtoExposure;
                     print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
                 }
                 else
@@ -1175,7 +1190,7 @@ namespace RoofTileVR
                     Vector3 targetPosition = objectToCheck.transform.position;
 
                     // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
-                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.05f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
+                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.16f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
 
                     // Combine the Y-direction offset with the original directional offset
                     Vector3 combinedDirection = localYDirection.normalized;
@@ -1187,18 +1202,20 @@ namespace RoofTileVR
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
                     SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
-                    if (rightToLeft)
+                    print(spawner.rightToLeft + " Right to left");
+                    if (spawner.rightToLeft)
                     {
 
-                        PlaceTheMeasurementTag(false, new Vector3(-0.55f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.5f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(0, 0, 0.55f), new Vector3(-0.1f, 0, 0), sideEdgeRight);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeRight);
                     }
                     else
                     {
-                        PlaceTheMeasurementTag(false, new Vector3(0.55f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        PlaceTheMeasurementTag(false, new Vector3(0.5f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(0, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeLeft);
+                        // PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
 
                     }
 
@@ -1221,9 +1238,9 @@ namespace RoofTileVR
                         direction = (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
                         SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(0.55f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/16\" keyway spacing", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.05f, 0, 0), sideEdgeLeft);
+                        PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.white, 0.5f);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
                     }
                     else
                     {
@@ -1231,9 +1248,9 @@ namespace RoofTileVR
                         print("Going right to left");
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
                         SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.55f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/16\" keyway spacing", Color.white, 0.5f);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.05f, 0, 0), sideEdgeRight);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.white, 0.5f);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
                     }
                     newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
                     // Calculate the required offset for the parent
