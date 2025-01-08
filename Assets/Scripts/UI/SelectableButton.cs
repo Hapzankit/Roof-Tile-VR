@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using RoofTileVR;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,8 @@ public class SelectableButton : MonoBehaviour
     public Color normalColor = Color.white;  // Color for non-selected buttons
     public float exposureSelected = 10;
 
+    public TileCasting tileCasting;
+
     void Start()
     {
         // Initialize each button with a click listener
@@ -23,7 +26,7 @@ public class SelectableButton : MonoBehaviour
 
     void Update()
     {
-       
+
     }
 
     // Method to select a button and change colors appropriately
@@ -47,5 +50,7 @@ public class SelectableButton : MonoBehaviour
             }
             button.colors = cb; // Apply the color changes to the button
         }
+
+        tileCasting.markerCube.GetComponent<WhiteboardMarker>().InstantiateLines();
     }
 }

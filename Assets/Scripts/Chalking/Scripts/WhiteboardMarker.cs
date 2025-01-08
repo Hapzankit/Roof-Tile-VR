@@ -38,6 +38,7 @@ public class WhiteboardMarker : MonoBehaviour
     public Transform secondObjectShake;
     public Transform thirdObjectShake;
     public bool isLineDrawnForStarter = false;
+    public GameObject markerBody;
 
 
 
@@ -63,26 +64,31 @@ public class WhiteboardMarker : MonoBehaviour
     {
         secondObjectShake.transform.gameObject.SetActive(true);
         thirdObjectShake.transform.gameObject.SetActive(true);
-        secondObject = secondObjectShake;
-        thirdObject = thirdObjectShake;
-        isSecondLine = true;
+        // secondObject = secondObjectShake;
+        // thirdObject = thirdObjectShake;
+        // isSecondLine = true;
+        markerBody.SetActive(false);
+        isLineDrawnForStarter = false;
         DrawLineAtDistance = 21.5f;
+    }
+
+    public void InstantiateLines()
+    {
+        isObjectPicked = false;
+        whiteboard.DrawMarks();
+        lineRenderer.enabled = false; // Hide the line
+        whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
+        whiteboard.tileCasting.WriteOnHandMenu("Now start placing shakes over starter tiles from bottom right.");
+        pickedObject.gameObject.SetActive(false);
+        secondObjectShake.gameObject.SetActive(false);
+        thirdObjectShake.gameObject.SetActive(false);
+        isLineDrawnForStarter = true;
+        // Destroy(this);
     }
 
     void Update()
     {
-        // Draw();
-        // if (Time.frameCount % 3 == 0) // Apply every 3 frames
-        // {
-        // DrawBroad();
-        // }
 
-
-        // if (isObjectPicked && pickedObject != null)
-        // {
-        // Update LineRenderer positions in real-time
-
-        // Check if picked object is near the third object
 
 
 

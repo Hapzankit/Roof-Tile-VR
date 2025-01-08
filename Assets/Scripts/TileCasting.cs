@@ -52,7 +52,17 @@ namespace RoofTileVR
         public List<HandMenu> handMenu;
         bool isTilePicked = false;
         public GameObject BoardArea;
+        public Transform BoardPosition;
+        public List<Transform> boardPositionsToSnap;
+        public List<float> exposureConvertedToUnityfromInches;
 
+        public GameObject TileStandGroup;
+// XRGrabInteractable[]
+
+        void Awake()
+        {
+
+        }
 
 
         private void EnableIA(InputActionReference inputActionReference, System.Action<InputAction.CallbackContext> callBackFunction)
@@ -90,6 +100,7 @@ namespace RoofTileVR
         }
         void Start()
         {
+            exposureConvertedToUnityfromInches.Add(10);
 
             WriteOnHandMenu("Draw a chalk Line");
 
@@ -316,6 +327,9 @@ namespace RoofTileVR
             YesButtonPressed();
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
+            currentTilePrefab.GetComponent<Rigidbody>().isKinematic = true;
+            currentTilePrefab.GetComponent<Rigidbody>().useGravity = false;
+            currentTilePrefab.GetComponent<TileObject>().DestroyErrors();
 
         }
 
@@ -342,28 +356,8 @@ namespace RoofTileVR
 
         }
 
-        void SnapToTheRoof()
-        {
-            GameObject instantiatedText = currentTilePrefab.gameObject;
-            float roofWorldY = BoardArea.transform.position.y;
-            // Get the original world position of the instantiatedText
-            Vector3 originalPosition = instantiatedText.transform.position;
 
-            // Calculate the Y offset required to "zero" the instantiatedText to the roof's Y position
-            // Assuming the instantiatedText should have a local Y position of 0 relative to the roof
 
-            // Construct the new position by modifying the Y coordinate to align with the roof
-            Vector3 newPosition = new Vector3(originalPosition.x, roofWorldY, originalPosition.z);
-
-            // Apply the new position to the instantiatedText
-            instantiatedText.transform.position = newPosition;
-
-        }
-
-        // public void ShowWrongSidelap()
-        // {
-
-        // }
 
 
         public TileObject TileToCompare;
@@ -400,6 +394,7 @@ namespace RoofTileVR
         public void YesButtonPressed()
         {
             int numOfTile = 9999;
+            currentTilePrefab.transform.SetParent(null);
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -446,6 +441,8 @@ namespace RoofTileVR
 
             }
 
+
+
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
             currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
             tileSpanWidth -= currentTileWidth;
@@ -454,6 +451,7 @@ namespace RoofTileVR
             {
                 print("Called once right to left");
                 rightToLeft = !rightToLeft;
+
             }
             TilesPlaced.Add(currentTilePrefab.gameObject);
             if (currentTilePrefab.GetComponent<TileObject>().isStarter)
@@ -481,6 +479,7 @@ namespace RoofTileVR
             if (tileSpanWidth <= 0)
             {
                 linesOfTileTobePlaced++;
+                BoardPosition = boardPositionsToSnap[linesOfTileTobePlaced - 1];
             }
             if (linesOfTileTobePlaced == markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade + 2)
             {
@@ -576,6 +575,13 @@ namespace RoofTileVR
                 foreach (GameObject stand in TileStands)
                 {
                     stand.SetActive(true);
+                }
+            }
+            else
+            {
+                foreach (GameObject stand in TileStands)
+                {
+                    stand.SetActive(false);
                 }
             }
             // currentTilePrefab.ShowShakeTIleErrors(true);

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7191324453474391954}
   - component: {fileID: 7505694533867174665}
   - component: {fileID: 6189938217211524388}
+  - component: {fileID: -411037005733821653}
   m_Layer: 0
   m_Name: Measure Tag starter
   m_TagString: Untagged
@@ -105,3 +106,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-411037005733821653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6077662630228997260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83ec1829597e17540b375015d7d141b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  redmaterial: {fileID: 2100000, guid: f4bd047468aec474eb8a9a94d0e99fa5, type: 2}

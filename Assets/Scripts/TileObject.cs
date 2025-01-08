@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+// using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -61,6 +62,7 @@ namespace RoofTileVR
         public bool isPlacedCorrectlyAfterConfirmedPlacement = false;
         public TMP_Text distanceChecks;
         public List<GameObject> measurements;
+        public List<GameObject> Errormeasurements;
 
         public GameObject MeasurementTags;
 
@@ -159,6 +161,7 @@ namespace RoofTileVR
         {
 
             // spawner.TileSelectText("Tile Picked");
+            removeErrorPLacements();
             spawner.OnTilePick();
             spawner.currentTilePrefab = this;
             this.transform.rotation = Quaternion.Euler(-45, 0, 0);
@@ -166,6 +169,7 @@ namespace RoofTileVR
             DistanceErrorCubeRL.gameObject.SetActive(false);
             DistanceErrorCubeTB.gameObject.SetActive(false);
             CorrectTileIndicator.gameObject.SetActive(false);
+            this.GetComponent<Rigidbody>().useGravity = true;
             this.GetComponent<Rigidbody>().isKinematic = false;
             if (!spawner.tilesPickedUp.Contains(gameObject)) // Check if the object is already in the list
             {
@@ -189,7 +193,35 @@ namespace RoofTileVR
             // {
 
             // }
+
+
+            if (isTileAbove && !isPlaced)
+            {
+                this.GetComponent<Rigidbody>().isKinematic = true;
+                this.GetComponent<Rigidbody>().useGravity = false;
+                this.transform.SetParent(spawner.BoardPosition);
+                if (isStarter)
+                {
+
+                    this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
+
+                }
+                else
+                {
+                    //Convert from inches to unity measurements
+                    print(spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] + " Row number");
+                    this.transform.localPosition = new Vector3((11 - spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 2) * 0.0254f + (0.07f * spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 10), 0, this.transform.localPosition.z);
+                }
+
+                ShowErrorsWhenDropped();
+            }
+            else
+            {
+                this.GetComponent<Rigidbody>().isKinematic = false;
+                this.GetComponent<Rigidbody>().useGravity = true;
+            }
             StoreStatistics();
+
 
 
         }
@@ -268,7 +300,7 @@ namespace RoofTileVR
                         // print("TIle size incorrect");
                         spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                 }
@@ -282,7 +314,7 @@ namespace RoofTileVR
                         // print("TIle size incorrect");
                         spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                     else
@@ -342,7 +374,7 @@ namespace RoofTileVR
                     else
                     {
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                 }
@@ -381,7 +413,7 @@ namespace RoofTileVR
                     else
                     {
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                 }
@@ -431,7 +463,7 @@ namespace RoofTileVR
                     else
                     {
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                 }
@@ -472,7 +504,7 @@ namespace RoofTileVR
                     else
                     {
                         IncorrectSidelap++;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         return false;
                     }
                 }
@@ -480,7 +512,7 @@ namespace RoofTileVR
             }
             else
             {
-                CorrectTileIndicator.SetActive(true);
+                // CorrectTileIndicator.SetActive(true);
                 return false;
             }
             // return false;
@@ -493,19 +525,49 @@ namespace RoofTileVR
             return int.Parse(numberString);
         }
 
+        void removeErrorPLacements()
+        {
+            if (measurements.Count != 0)
+            {
+                foreach (var measure in measurements)
+                {
+                    Destroy(measure.gameObject);
+                }
+            }
+
+        }
+
+        public void DestroyErrors()
+        {
+            if (Errormeasurements.Count != 0)
+            {
+                foreach (var measure in Errormeasurements)
+                {
+                    Destroy(measure.gameObject);
+                }
+            }
+        }
+
         void Update()
         {
             if (isFirstBoltPlaced && isSecondBoltPlaced)
             {
                 foreach (var measure in measurements)
                 {
-                    measure.gameObject.SetActive(false);
+                    if (measure)
+                    {
+                        measure.gameObject.SetActive(false);
+                    }
                     this.GetComponent<XRGrabInteractable>().enabled = false;
                 }
             }
             if (!isPlaced)
             {
                 rowNumber = spawner.linesOfTileTobePlaced;
+            }
+            else
+            {
+                this.transform.SetParent(null);
             }
 
 
@@ -718,6 +780,8 @@ namespace RoofTileVR
             }
         }
 
+
+
         public bool ShowStarterErrors()
         {
             print("Showing starter tile errors");
@@ -742,48 +806,48 @@ namespace RoofTileVR
                     if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                     {
 
-                        DistanceErrorCubeRL.SetActive(true);
-                        DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
+                        // DistanceErrorCubeRL.SetActive(true);
+                        // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                         // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is on right by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
                         // tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
-                        LeftRightTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeRight.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
-                        LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.03f, sideEdgeRight.localPosition.z);
+                        // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeRight.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
+                        // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.03f, sideEdgeRight.localPosition.z);
 
 
                     }
                     if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                     {
                         // Debug.Log("Target is to the Left.");
-                        DistanceErrorCubeRL.SetActive(true);
-                        DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
+                        // DistanceErrorCubeRL.SetActive(true);
+                        // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                         // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile  is on left by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
                         // tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
-                        LeftRightTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeLeft.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
-                        LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.03f, sideEdgeLeft.localPosition.z);
+                        // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeLeft.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
+                        // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.03f, sideEdgeLeft.localPosition.z);
                     }
                     if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
                         // Debug.Log("Target is Above (Forward).");
-                        DistanceErrorCubeTB.SetActive(true);
-                        DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
+                        // DistanceErrorCubeTB.SetActive(true);
+                        // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                         // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
                         // tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
-                        bottomTopTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeTop.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
-                        bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.03f, sideEdgeTop.localPosition.z);
+                        // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeTop.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
+                        // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.03f, sideEdgeTop.localPosition.z);
                     }
                     if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                     {
                         // Debug.Log("Target is Below (Backward).");
-                        DistanceErrorCubeTB.SetActive(true);
-                        DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                        // DistanceErrorCubeTB.SetActive(true);
+                        // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                         // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37 + "inches";
                         spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) + " inches");
                         // tileNameText.text = ((float)Math.Round(Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2)).ToString();
-                        bottomTopTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeBottom.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
-                        bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.03f, sideEdgeBottom.localPosition.z);
+                        // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(sideEdgeBottom.transform.position, spawner.currentTileRegion.transform.position) * 39.37, 2) - 6 + "\"";
+                        // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.03f, sideEdgeBottom.localPosition.z);
                     }
                     return false;
                 }
@@ -791,7 +855,7 @@ namespace RoofTileVR
                 {
 
                     isPlacedCorrectlyAfterConfirmedPlacement = true;
-                    CorrectTileIndicator.SetActive(true);
+                    // CorrectTileIndicator.SetActive(true);
                     // this.transform.localPosition = new Vector3(0, 0, 0.24f);
                     this.transform.position = spawner.currentTileRegion.transform.position;
                     DistanceErrorCubeRL.SetActive(false);
@@ -800,13 +864,13 @@ namespace RoofTileVR
                     LeftRightTextError.gameObject.SetActive(false);
                     spawner.WriteOnHandMenu("Tile Placed Correctly");
                     GetComponent<Rigidbody>().isKinematic = true;
-                    SpawnTileMeasurements(sideEdgeBottom, "1/2\" eave overhang", Color.white, 0.03f);
+                    SpawnTileMeasurements(sideEdgeBottom, "1/2\" eave overhang", Color.green, 0.03f, false);
                     PlaceTheMeasurementTag(true, new Vector3(-0.55f, 0, 0), new Vector3(0, 0, 0.07f), sideEdgeBottom);
 
                     if (spawner.TilesPlaced.Count == 0)
                     {
                         //First starter tile Being Placed
-                        SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.white, 0.03f);
+                        SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.green, 0.03f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-0.12f, 0, 0), sideEdgeRight);
 
                     }
@@ -815,9 +879,9 @@ namespace RoofTileVR
                         if (spawner.TilesPlaced.Count == spawner.starterColliderHolder.GetComponentsInChildren<BoxCollider>().Length - 1)
                         {
                             //Last starter being placed
-                            SpawnTileMeasurements(sideEdgeLeft, "1\" rake overhang", Color.white, 0.03f);
+                            SpawnTileMeasurements(sideEdgeLeft, "1\" rake overhang", Color.green, 0.03f, false);
                             PlaceTheMeasurementTag(false, new Vector3(0.03f, 0, 0.55f), new Vector3(0.12f, 0, 0), sideEdgeLeft);
-                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.white, 0.03f);
+                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.green, 0.03f, false);
                             PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.08f, 0, 0), sideEdgeRight);
 
                         }
@@ -825,7 +889,7 @@ namespace RoofTileVR
                         {
                             //0.49 0.532
                             //all other starter being placed
-                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.white, 0.03f);
+                            SpawnTileMeasurements(sideEdgeRight, "3/8\" keyway spacing", Color.green, 0.03f, false);
                             PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.08f, 0, 0), sideEdgeRight);
 
 
@@ -852,19 +916,24 @@ namespace RoofTileVR
         GameObject measureTag1;
         GameObject measureTag2;
         TMP_Text Text;
-        void SpawnTileMeasurements(Transform side, string measurementToWrite, Color color, float textHeight)
+        void SpawnTileMeasurements(Transform side, string measurementToWrite, Color color, float textHeight, bool isTemporary)
         {
             Text = Instantiate(distanceChecks, this.transform);
             measureTag1 = Instantiate(MeasurementTags, this.transform);
             measureTag2 = Instantiate(MeasurementTags, this.transform);
+            if (color == Color.red)
+            {
+                measureTag1.GetComponent<MeasureTag>().ChangeMaterial();
+                measureTag2.GetComponent<MeasureTag>().ChangeMaterial();
+            }
 
             // Add a LineRenderer for the measurement line
             LineRenderer measureLine = measureTag1.gameObject.AddComponent<LineRenderer>();
             measureLine.startWidth = 0.005f;
             measureLine.endWidth = 0.005f;
             measureLine.material = new Material(Shader.Find("Sprites/Default")); // Use a default material
-            measureLine.startColor = Color.green;
-            measureLine.endColor = Color.green;
+            measureLine.startColor = color;
+            measureLine.endColor = color;
             measureLine.positionCount = 2; // Line connects two points
 
             // Set up the text position and content
@@ -876,7 +945,15 @@ namespace RoofTileVR
             measurements.Add(Text.gameObject);
             measurements.Add(measureTag1);
             measurements.Add(measureTag2);
+            if (isTemporary)
+            {
+                Errormeasurements.Add(Text.gameObject);
+                Errormeasurements.Add(measureTag1);
+                Errormeasurements.Add(measureTag2);
+            }
         }
+
+
 
         void PlaceTheMeasurementTag(bool isSideways, Vector3 edge, Vector3 distance, Transform PositionOfEdge)
         {
@@ -908,6 +985,7 @@ namespace RoofTileVR
 
         public bool isTileAbove = true;
         public bool isValidTile = false;
+        public GameObject currentTileCollider;
         public void SetTileAboveRoof(bool isAbove, bool isTileValid, TileDropCollisionCheck regionTileDropped)
         {
             // ShowPlacementPrompt();
@@ -974,41 +1052,41 @@ namespace RoofTileVR
                         if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                         {
                             // Debug.Log("Target is to the Right.");
-                            DistanceErrorCubeRL.SetActive(true);
-                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
+                            // DistanceErrorCubeRL.SetActive(true);
+                            // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                             spawner.WriteOnHandMenu("Tile is on right by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
                             // tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
-                            LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
-                            LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.5f, sideEdgeRight.localPosition.z);
+                            // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
+                            // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.5f, sideEdgeRight.localPosition.z);
 
                         }
                         if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                         {
                             // Debug.Log("Target is to the Left.");
-                            DistanceErrorCubeRL.SetActive(true);
-                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
+                            // DistanceErrorCubeRL.SetActive(true);
+                            // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                             spawner.WriteOnHandMenu("Tile is on left by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
                             // tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2)).ToString();
-                            LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
-                            LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.5f, sideEdgeLeft.localPosition.z);
+                            // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
+                            // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.5f, sideEdgeLeft.localPosition.z);
                         }
                         if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                         {
                             // Debug.Log("Target is Above (Forward).");
-                            DistanceErrorCubeTB.SetActive(true);
-                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
+                            // DistanceErrorCubeTB.SetActive(true);
+                            // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                             spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
-                            bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
-                            bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.5f, sideEdgeTop.localPosition.z);
+                            // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
+                            // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.5f, sideEdgeTop.localPosition.z);
                         }
                         if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                         {
                             // Debug.Log("Target is Below (Backward).");
-                            DistanceErrorCubeTB.SetActive(true);
-                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                            // DistanceErrorCubeTB.SetActive(true);
+                            // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                             spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + " inches");
-                            bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
-                            bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.5f, sideEdgeBottom.localPosition.z);
+                            // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37, 2) + "\"";
+                            // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.5f, sideEdgeBottom.localPosition.z);
                         }
                         return false;
                     }
@@ -1037,15 +1115,15 @@ namespace RoofTileVR
 
                         // Apply the offset to the parent to snap it
                         transform.position += offset;
-                        CorrectTileIndicator.SetActive(true);
+                        // CorrectTileIndicator.SetActive(true);
                         DistanceErrorCubeRL.SetActive(false);
                         DistanceErrorCubeTB.SetActive(false);
                         spawner.WriteOnHandMenu("Tile Placed Correctly");
                         isPlacedCorrectlyAfterConfirmedPlacement = true;
                         GetComponent<Rigidbody>().isKinematic = true;
-                        SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.white, 0.5f);
+                        SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-1 / tileSize, 0, 0), sideEdgeRight);
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + " Sidelap left", Color.white, 0.5f);
+                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + " Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.55f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         bottomTopTextError.gameObject.SetActive(false);
                         LeftRightTextError.gameObject.SetActive(false);
@@ -1091,7 +1169,7 @@ namespace RoofTileVR
 
             if (spawner.reverseTheLine)
             {
-                print("Going right to left");
+
                 objectToCheck = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.gameObject;
 
                 if (spawner.tileSpanWidth <= 0)
@@ -1125,46 +1203,46 @@ namespace RoofTileVR
                 if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                 {
                     // Debug.Log("Target is to the Right.");
-                    DistanceErrorCubeRL.SetActive(true);
-                    DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
+                    // DistanceErrorCubeRL.SetActive(true);
+                    // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
                     // DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right (Bad keyway spacing) " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is on right by (Bad keyway spacing) " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
-                    LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
-                    LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.5f, sideEdgeRight.localPosition.z);
+                    // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
+                    // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, 0.5f, sideEdgeRight.localPosition.z);
 
                 }
                 if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
                 {
                     // Debug.Log("Target is to the Left.");
-                    DistanceErrorCubeRL.SetActive(true);
-                    DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
+                    // DistanceErrorCubeRL.SetActive(true);
+                    // DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
                     spawner.WriteOnHandMenu("Tile is on left by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
                     // tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
-                    LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
-                    LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.5f, sideEdgeLeft.localPosition.z);
+                    // LeftRightTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
+                    // LeftRightTextError.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, 0.5f, sideEdgeLeft.localPosition.z);
 
                 }
                 if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
                     // Debug.Log("Target is Above (Forward).");
-                    DistanceErrorCubeTB.SetActive(true);
-                    DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
+                    // DistanceErrorCubeTB.SetActive(true);
+                    // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is above by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
                     // tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
-                    bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
-                    bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.5f, sideEdgeTop.localPosition.z);
+                    // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
+                    // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, 0.5f, sideEdgeTop.localPosition.z);
                 }
                 if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
                 {
                     // Debug.Log("Target is Below (Backward).");
-                    DistanceErrorCubeTB.SetActive(true);
-                    DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
+                    // DistanceErrorCubeTB.SetActive(true);
+                    // DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
                     // DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37 + "inches";
                     spawner.WriteOnHandMenu("Tile is down by " + (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + " inches");
                     // tileNameText.text = ((float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2)).ToString();
-                    bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
-                    bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.5f, sideEdgeBottom.localPosition.z);
+                    // bottomTopTextError.text = (float)Math.Round(Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) * 39.37, 2) + "\"";
+                    // bottomTopTextError.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, 0.5f, sideEdgeBottom.localPosition.z);
                 }
                 return false;
             }
@@ -1201,19 +1279,19 @@ namespace RoofTileVR
 
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
-                    SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
+                    SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
                     print(spawner.rightToLeft + " Right to left");
                     if (spawner.rightToLeft)
                     {
 
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.white, 0.5f);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeRight);
                     }
                     else
                     {
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.white, 0.5f);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeLeft);
                         // PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
 
@@ -1237,9 +1315,9 @@ namespace RoofTileVR
                         print("Going left to right");
                         direction = (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
+                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.white, 0.5f);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
                     }
                     else
@@ -1247,9 +1325,9 @@ namespace RoofTileVR
                         direction = (-objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         print("Going right to left");
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.white, 0.5f);
+                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.white, 0.5f);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
                     }
                     newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
@@ -1266,6 +1344,498 @@ namespace RoofTileVR
                 DistanceErrorCubeTB.SetActive(false);
                 CorrectTileIndicator.SetActive(true);
                 return true;
+            }
+        }
+
+
+
+
+
+        public void ShowErrorsWhenDropped()
+        {
+            if (isStarter)
+            {
+
+                SpawnTileMeasurements(sideEdgeBottom, "1/2\" eave overhang", Color.green, 0.03f, true);
+                PlaceTheMeasurementTag(true, new Vector3(-0.55f, 0, 0), new Vector3(0, 0, 0.07f), sideEdgeBottom);
+
+
+                if (spawner.TilesPlaced.Count == 0)
+                {
+                    // first starter being placed
+                    float rakeOverHang = Vector3.Distance(this.transform.InverseTransformPoint(this.transform.position), this.transform.InverseTransformPoint(spawner.currentTileRegion.transform.position));
+                    SpawnTileMeasurements(sideEdgeRight, rakeOverHang * 39.7f + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
+                    PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(rakeOverHang, 0, 0), sideEdgeRight);
+
+                }
+                else if (spawner.TilesPlaced.Count == spawner.starterColliderHolder.GetComponentsInChildren<BoxCollider>().Length - 1)
+                {
+                    //last starter being placed
+                    // float rakeOverHang = Vector3.Distance(this.transform.InverseTransformPoint(this.transform.position), this.transform.InverseTransformPoint(spawner.currentTileRegion.transform.position));
+                    // SpawnTileMeasurements(sideEdgeLeft, rakeOverHang * 39.7f + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
+                    // PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-rakeOverHang, 0, 0), sideEdgeLeft);
+
+                    float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
+                    print("keywayerror" + keywayError);
+                    SpawnTileMeasurements(sideEdgeRight, keywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
+
+                }
+                else
+                {
+                    //rest of starters
+
+                    float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
+                    print("keywayerror" + keywayError);
+                    SpawnTileMeasurements(sideEdgeRight, keywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
+
+                }
+            }
+            else
+            {
+
+
+
+
+
+                ////////////////////////////////////////////////////////Sidelap Errors/////////////////////////////////////////////////////////////////
+
+                if (tilesUnderneath.Count == 1)
+                {
+
+                    // print("1 number of tile");
+                    if (tilesUnderneath[0].areaCoveredByTileAbove == 0)
+                    {
+
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                        float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                        float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                        float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                        Color tagcolor;
+                        if (actualDistanceLeft * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeLeft, actualDistanceLeft * 39.7f + "\"", tagcolor, 0.03f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+
+
+
+                        if (actualDistanceRight * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\"", tagcolor, 0.03f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+
+                    }
+                    else
+                    {
+                        if (spawner.reverseTheLine)
+                        {
+                            //left to right
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                            float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                            float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                            // float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                            Color tagcolor;
+
+                            if (actualDistanceRight * 39.7f >= Sidelap)
+                            {
+                                tagcolor = Color.green;
+                            }
+                            else
+                            {
+                                tagcolor = Color.red;
+                            }
+                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                        }
+                        else
+                        {
+                            Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                            float distanceLeft = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                            // float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                            float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                            Color tagcolor;
+                            if (actualDistanceLeft * 39.7f >= Sidelap)
+                            {
+                                tagcolor = Color.green;
+                            }
+                            else
+                            {
+                                tagcolor = Color.red;
+                            }
+                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceLeft * 39.7f + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+
+                        }
+                    }
+                }
+
+                // if 2 are there
+                if (tilesUnderneath.Count == 2)
+                {
+
+
+                    if (!spawner.reverseTheLine)
+                    {
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+                        //right to left
+
+
+                        Vector3 localLeft = -this.transform.right;
+
+
+                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+
+
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                        Color tagcolor;
+                        if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
+
+                        if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
+
+
+                    }
+                    else
+                    {
+                        //left to right
+                        // Correct the local left direction
+
+
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+
+                        Vector3 localLeft = -this.transform.right;
+
+                        // Calculate the vector distances
+                        Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+
+                        // Project the world direction vector onto the local left vector
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+
+                        Color tagcolor;
+                        if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
+
+                        if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
+
+                    }
+
+
+
+                }
+
+                if (tilesUnderneath.Count == 3)
+                {
+
+                    if (!spawner.reverseTheLine)
+                    {
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeRight.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+                        //right to left
+
+
+                        Vector3 localLeft = -this.transform.right;
+
+
+                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+
+
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                        Color tagcolor;
+                        if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
+
+                        if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
+
+
+                    }
+                    else
+                    {
+                        //left to right
+                        // Correct the local left direction
+
+
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+
+                        Vector3 localLeft = -this.transform.right;
+
+                        // Calculate the vector distances
+                        Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+
+                        // Project the world direction vector onto the local left vector
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+
+                        Color tagcolor;
+                        if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
+
+                        if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
+
+                    }
+
+
+                }
+
+
+                /////////////////////////////////////////Keyway Errors///////////////////////////////////////////////
+                ///
+
+                if (!spawner.isFirstShakePlaced)
+                {
+                    // first shake being placed
+
+                    Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                    Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[0].GetComponent<TileObject>().sideEdgeRight.transform.position);
+                    float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                    float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[0].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
+
+                    SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
+                    PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                }
+                else
+                {
+
+
+
+
+                    if (!spawner.reverseTheLine)
+                    {
+                        //left to right
+                        if (spawner.tileSpanWidth <= 0)
+                        {
+                            //////////////Line ended place the tile above///////////////////
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position);
+                            float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                            float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
+
+                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                        }
+                        else
+                        {
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
+                            float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                            float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
+
+                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" keyway error", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                        }
+
+                    }
+                    else
+                    {
+                        //right to left
+                        if (spawner.tileSpanWidth <= 0)
+                        {
+                            //////////////Line ended place the tile above///////////////////
+                            ///
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
+                            float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                            float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
+
+                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+
+                        }
+                        else
+                        {
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position);
+                            float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                            float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
+
+                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+                        }
+
+                    }
+                }
+
+
+
+
+
+
+
+
             }
         }
 
@@ -1290,96 +1860,9 @@ namespace RoofTileVR
         ///////////////////////////////////////Just for testing//////////////////////////////////////
 
 
-        public void ShowShakeTIleErrorsTesting()
-        {
-
-            print("Distance Checking");
-            GameObject objectToCheck = spawner.TilesPlaced[0];
-            GameObject objectToCheckFrom;
-            if (true)
-            {
-                objectToCheckFrom = this.sideEdgeRight.gameObject;
-                objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
-                if (/*objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove*/isTileAbove)
-                {
-                    // this.transform.position = spawner.currentTileRegion.transform.position;
-                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 2.3f)
-                    {
-
-                        // DistanceErrorCube.SetActive(true);
-                        Vector3 direction = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
-                        direction.y = 0; // Ignore the Y-axis
-
-
-                        print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) + "Direction" + direction);
-
-                        // Determine the relative position
-                        if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-                        {
-                            // Debug.Log("Target is to the Right.");
-                            DistanceErrorCubeRL.SetActive(true);
-                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeRight.localPosition.x, sideEdgeRight.localPosition.y, sideEdgeRight.localPosition.z);
-                            DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on right " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
-                        }
-                        else if (direction.x < 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-                        {
-                            // Debug.Log("Target is to the Left.");
-                            DistanceErrorCubeRL.SetActive(true);
-                            DistanceErrorCubeRL.transform.localPosition = new Vector3(sideEdgeLeft.localPosition.x, sideEdgeLeft.localPosition.y, sideEdgeLeft.localPosition.z);
-                            DistanceErrorCubeRL.GetComponentInChildren<TMP_Text>().text = "Tile is on left " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
-                        }
-                        else if (direction.z > 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
-                        {
-                            // Debug.Log("Target is Above (Forward).");
-                            DistanceErrorCubeTB.SetActive(true);
-                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeTop.localPosition.x, sideEdgeTop.localPosition.y, sideEdgeTop.localPosition.z);
-                            DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is above " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
-                        }
-                        else if (direction.z < 0 && Mathf.Abs(direction.z) > Mathf.Abs(direction.x))
-                        {
-                            // Debug.Log("Target is Below (Backward).");
-                            DistanceErrorCubeTB.SetActive(true);
-                            DistanceErrorCubeTB.transform.localPosition = new Vector3(sideEdgeBottom.localPosition.x, sideEdgeBottom.localPosition.y, sideEdgeBottom.localPosition.z);
-                            DistanceErrorCubeTB.GetComponentInChildren<TMP_Text>().text = "Tile is down " + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 + "inches";
-                        }
-                    }
-                    else
-                    {
-                        DistanceErrorCubeRL.SetActive(false);
-                        DistanceErrorCubeTB.SetActive(false);
-                    }
-                }
 
 
 
-
-
-            }
-        }
-
-
-        // public float lineLength = 0.1f; // Default line length
-
-        // private LineRenderer lineRenderer;
-
-
-
-        // void DrawLine()
-        // {
-        //     lineRenderer = GetComponent<LineRenderer>();
-        //     if (lineRenderer == null)
-        //     {
-        //         lineRenderer = gameObject.AddComponent<LineRenderer>();
-        //     }
-        //     // Initialize line positions array
-        //     lineRenderer.positionCount = 2; // Two points for each line, 4 lines total
-
-        //     // Draw right edge line
-        //     lineRenderer.SetPosition(0, sideEdgeRight.position);
-        //     lineRenderer.SetPosition(1, sideEdgeRight.position + Vector3.forward * lineLength);
-
-
-        // }
     }
 
 

@@ -76,6 +76,7 @@ public class Whiteboard : MonoBehaviour
             // Draw a vertical line or mark
             DrawVerticalLine(x);
             SnapTheText(n);
+            tileCasting.exposureConvertedToUnityfromInches.Add(exposureButton.exposureSelected);
 
             // Move to the next mark position
             currentWidthInches += subsequentMarkDistanceInches;
@@ -86,6 +87,7 @@ public class Whiteboard : MonoBehaviour
         // Apply texture changes
         texture.Apply();
         print("Draw Marks");
+        tileCasting.BoardPosition = tileCasting.boardPositionsToSnap[0];
     }
 
 
@@ -94,13 +96,11 @@ public class Whiteboard : MonoBehaviour
         //from =text
         // Get the current world position of the child object
         TMP_Text instantiatedText = Instantiate(exposureMeasurements);
+
         Vector3 childWorldPosition = instantiatedText.transform.position;
 
         // Get the target position from the side edge
         Vector3 targetPosition = MeasuretextL.transform.position;
-
-        // Calculate the direction from the target point to the child's current position
-        Vector3 direction = (childWorldPosition - targetPosition).normalized;
 
         // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
         Vector3 localYDirection = MeasuretextL.transform.right; // This gets the local 'up' direction which corresponds to the local +Y axis
@@ -122,6 +122,32 @@ public class Whiteboard : MonoBehaviour
         }
         // Apply the offset to the parent to snap it
         instantiatedText.transform.position += offset;
+        SnapThePositions(num);
+    }
+
+    void SnapThePositions(int num)
+    {
+        Transform pos = Instantiate(tileCasting.BoardPosition);
+
+        Vector3 childWorldPosition = pos.transform.position;
+
+        // Get the target position from the side edge
+        Vector3 targetPosition = MeasuretextL.transform.position;
+
+        // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
+        Vector3 localYDirection = MeasuretextL.transform.right; // This gets the local 'up' direction which corresponds to the local +Y axis
+
+        // Combine the Y-direction offset with the original directional offset
+        Vector3 combinedDirection = (localYDirection.normalized * num) + new Vector3(0.5f, 0, 0);
+        Vector3 newChildWorldPosition = targetPosition + combinedDirection * exposureButton.exposureSelected * 0.0254f;
+
+        // Calculate the required offset for the parent
+        Vector3 offset = newChildWorldPosition - childWorldPosition;
+        // Apply the offset to the parent to snap it
+        pos.transform.position += offset;
+        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.025f * num) + 0.05f, pos.transform.position.z);
+        tileCasting.boardPositionsToSnap.Add(pos);
+
     }
 
     public void DrawVerticalLine(int x)
@@ -168,20 +194,6 @@ public class Whiteboard : MonoBehaviour
 
     }
 
-    public bool isFirstLineMade()
-    {
-        int i = 0;
-        foreach (var caller in LineTraceCaller)
-        {
-            if (caller.GetComponent<MeshRenderer>().enabled)
-            {
-                print(i + " Number of callers");
-                i++;
-            }
-        }
-
-        return i == LineTraceCaller.Count;
-    }
 
 
 
