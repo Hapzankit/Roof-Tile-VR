@@ -32,7 +32,7 @@ public class BoltMachine : MonoBehaviour
     public void SpawnAnotherBolt()
     {
         print("Spawn bolt");
-        tileCasting.WriteOnHandMenu("Fastener placed.");
+        // tileCasting.WriteOnHandMenu("Fastener placed.");
         tileCasting.statisticsManager.boltsPlaced++;
         currentBolt = Instantiate(bolts, BoltPosition);
     }

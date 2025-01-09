@@ -637,6 +637,7 @@ MonoBehaviour:
   isPlacedCorrectlyAfterConfirmedPlacement: 0
   distanceChecks: {fileID: 4094713862620745179, guid: 0179ee55bc107e649b2940d1517d73fb, type: 3}
   measurements: []
+  Errormeasurements: []
   MeasurementTags: {fileID: 3848278187394554662, guid: a5823261186322f45a4b205df9f5b360, type: 3}
   checkKeywayFlag: 0
   areaCoveredByTileAbove: 0

@@ -7,21 +7,7 @@ using UnityEngine;
 
 public class WhiteboardMarker : MonoBehaviour
 {
-    // [SerializeField] private Transform _tip;
-    // [SerializeField] private int _penSize = 15;
-    // [SerializeField] GameObject markerBall;
-    // public GameObject Scale;
-
-    // private Renderer _renderer;
-    // private Color[] _colors;
-    // private float _tipHeight;
-
-    // private RaycastHit _touch;
-    // private Whiteboard _whiteboard;
-    // private Vector2 _touchPos, _lastTouchPos;
-    // private bool _touchedLastFrame;
-    // private Quaternion _lastTouchRot;
-
+   
     public Whiteboard whiteboard;
 
     public bool isLineMade = false;
@@ -47,9 +33,7 @@ public class WhiteboardMarker : MonoBehaviour
     void Start()
     {
         pickedObject = this.transform;
-        // _renderer = _tip.GetComponent<Renderer>();
-        // _colors = Enumerable.Repeat(_renderer.material.color, _penSize * _penSize).ToArray();
-        // _tipHeight = _tip.localScale.y;
+   
 
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.startWidth = 0.005f;
@@ -64,9 +48,6 @@ public class WhiteboardMarker : MonoBehaviour
     {
         secondObjectShake.transform.gameObject.SetActive(true);
         thirdObjectShake.transform.gameObject.SetActive(true);
-        // secondObject = secondObjectShake;
-        // thirdObject = thirdObjectShake;
-        // isSecondLine = true;
         markerBody.SetActive(false);
         isLineDrawnForStarter = false;
         DrawLineAtDistance = 21.5f;

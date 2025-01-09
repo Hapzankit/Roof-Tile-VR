@@ -53,11 +53,7 @@ public class Whiteboard : MonoBehaviour
         lengthInInches = planeLengthUnits * 39.37f;
 
         Debug.Log($"Plane Dimensions in Inches: Width = {widthInInches:F2} inches, Length = {lengthInInches:F2} inches");
-        // DrawVerticalAtDistance(8);
-        // DrawVerticalAtDistance(9);
-        // DrawVerticalAtDistance(10);
-        // Draw marks
-        // DrawMarks();
+
     }
 
     public void DrawMarks()
@@ -145,7 +141,7 @@ public class Whiteboard : MonoBehaviour
         Vector3 offset = newChildWorldPosition - childWorldPosition;
         // Apply the offset to the parent to snap it
         pos.transform.position += offset;
-        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.025f * num) + 0.05f, pos.transform.position.z);
+        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.03f * num) + 0.05f, pos.transform.position.z);
         tileCasting.boardPositionsToSnap.Add(pos);
 
     }

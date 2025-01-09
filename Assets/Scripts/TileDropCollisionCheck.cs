@@ -107,12 +107,5 @@ namespace RoofTileVR
         {
             return isTileNearRoof;
         }
-        void Update()
-        {
-
-
-            // GetComponent<MeshRenderer>().enabled = isStarterRegion;
-
-        }
     }
 }

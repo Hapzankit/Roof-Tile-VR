@@ -23,9 +23,8 @@ namespace RoofTileVR
         private TileCasting spawner;
 
         [SerializeField] private Color failColor;
-        public Color ColorFail => failColor;
         [SerializeField] private Color passColor;
-        public Color ColorTrue => passColor;
+
 
         [Header("Edge points")]
         [SerializeField] private Transform sideEdgeRight;
@@ -68,7 +67,7 @@ namespace RoofTileVR
 
 
         public bool checkKeywayFlag = false;
-        private LineRenderer measureLine;
+
 
 
         /// //////////////////////SideLap Checks///////////////////////////       
@@ -182,17 +181,9 @@ namespace RoofTileVR
 
         public void OnTileDropped()
         {
-            //ShowPlacementPrompt();
-            // spawner.TileSelectText("Tile Dropped" + isTileAbove + isValidTile);
-            print("Tile Dropped" + isTileAbove + isValidTile);
-            // if (CalculateSidelapCheck())
-            // {
-            //     spawner.OnTileDropped();
-            // }
-            // else
-            // {
 
-            // }
+            print("Tile Dropped" + isTileAbove + isValidTile);
+
 
 
             if (isTileAbove && !isPlaced)
@@ -263,7 +254,7 @@ namespace RoofTileVR
                 if (collider.GetComponent<TileObject>())
                 {
                     Debug.Log("Detected object underneath: " + collider.gameObject.name);
-                    if (collider.GetComponent<TileObject>().isStarter)
+                    if (collider.GetComponent<TileObject>().isStarter && rowNumber == 1)
                     {
                         tilesUnderneath.Add(collider.GetComponent<TileObject>());
                     }
@@ -274,7 +265,7 @@ namespace RoofTileVR
                 }
             }
             if (tilesUnderneath.Count == 0) return false;
-            // print("Tiles Underneath Count : " + tilesUnderneath.Count);
+
             // if 1 tile is under
             if (tilesUnderneath.Count == 1)
             {
@@ -286,8 +277,6 @@ namespace RoofTileVR
                     if (tilesUnderneath[0].tileSize > tileSize)
                     {
                         print("TIle size correct");
-                        // tilesUnderneath[0].areaCoveredByTileAbove = tileSize;
-                        // tilesUnderneath[0].areaLeftByTileAbove = tilesUnderneath[0].tileSize - tileSize;
                         areaToBeCovered = tileSize;
                         areaLeftByTile = tilesUnderneath[0].tileSize - tileSize;
                         print("area left by tile " + areaLeftByTile);
@@ -320,8 +309,7 @@ namespace RoofTileVR
                     else
                     {
                         print("TIle size correct");
-                        // tilesUnderneath[0].areaCoveredByTileAbove += tileSize;
-                        // tilesUnderneath[0].areaLeftByTileAbove = tilesUnderneath[0].areaCoveredByTileAbove - tileSize;
+
                         areaToBeCovered = tilesUnderneath[0].areaCoveredByTileAbove + tileSize;
                         areaLeftByTile = areaLeft;
                         // print("tilesUnderneath[0].areaCoveredByTileAbove "+tilesUnderneath[0].areaCoveredByTileAbove+" "+"tile size "+ tileSize + "area left"+areaLeftByTile);
@@ -361,8 +349,7 @@ namespace RoofTileVR
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
 
-                        // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
-                        // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
+
 
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
@@ -402,8 +389,6 @@ namespace RoofTileVR
                     spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
-                        // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
-                        // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
                         tileNum = 0;
@@ -449,10 +434,6 @@ namespace RoofTileVR
                     // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
-
-                        // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
-                        // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
-
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[2].tileSize - leftwardDistanceLocal2 * 39.37f;
                         tileNum = 2;
@@ -493,8 +474,7 @@ namespace RoofTileVR
                     spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
-                        // tilesUnderneath[1].areaCoveredByTileAbove = leftwardDistanceLocal2 * 39.37f;
-                        // tilesUnderneath[1].areaLeftByTileAbove = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
+
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
                         tileNum = 0;
@@ -561,7 +541,7 @@ namespace RoofTileVR
                     this.GetComponent<XRGrabInteractable>().enabled = false;
                 }
             }
-            if (!isPlaced)
+            if (!isPlaced && !isStarter)
             {
                 rowNumber = spawner.linesOfTileTobePlaced;
             }
@@ -571,19 +551,7 @@ namespace RoofTileVR
             }
 
 
-            // ShowStarterErrors();
-            // if (!isStarter)
-            // {
 
-            //     ShowShakeTIleErrorsTesting();
-            // }
-
-
-            //JUST FOR DEBUG
-            // if (isTileAbove && isValidTile)
-            // {
-            //     ShowStarterErrors();
-            // }
         }
 
         public void StoreStatistics()
@@ -675,7 +643,7 @@ namespace RoofTileVR
                     if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile /*true*/)
                     {
                         // this.transform.position = spawner.currentTileRegion.transform.position;
-                        if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
+                        if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 1f)
                         {
                             Vector3 distanceFromPoint = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
                             float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
@@ -985,7 +953,7 @@ namespace RoofTileVR
 
         public bool isTileAbove = true;
         public bool isValidTile = false;
-        public GameObject currentTileCollider;
+
         public void SetTileAboveRoof(bool isAbove, bool isTileValid, TileDropCollisionCheck regionTileDropped)
         {
             // ShowPlacementPrompt();
@@ -1037,8 +1005,18 @@ namespace RoofTileVR
                 // objectToCheck.GetComponent<TileObject>().CorrectTileIndicator.SetActive(true);
                 if (objectToCheck.GetComponent<TileObject>().sideEdgeRight && isValidTile && isTileAbove/*true*/)
                 {
+                    Vector3 localdirectionup = -objectToCheckFrom.transform.forward;
+                    Vector3 localdirectionright = -objectToCheckFrom.transform.right;
+
+
+                    Vector3 distanceMeasured = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
+                    float distanceMeasuredInDirection = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionup));
+                    float distanceMeasuredInDirectionSideways = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionright));
+
+                    print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
+
                     // this.transform.position = spawner.currentTileRegion.transform.position;
-                    if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) * 39.37 > 5.3f)
+                    if (distanceMeasuredInDirection * 39.37 > 5f || distanceMeasuredInDirectionSideways * 39.37 > 0.1f)
                     {
                         isPlacedCorrectlyAfterConfirmedPlacement = false;
                         // DistanceErrorCube.SetActive(true);
@@ -1188,8 +1166,18 @@ namespace RoofTileVR
 
             }
 
-            if (Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck
-            .transform.position) * 39.37 > distanceInInches)
+            Vector3 localdirectionup = -objectToCheckFrom.transform.forward;
+            Vector3 localdirectionright = -objectToCheckFrom.transform.right;
+
+
+            Vector3 distanceMeasured = objectToCheckFrom.transform.position - objectToCheck.transform.position;
+            float distanceMeasuredInDirection = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionup));
+            float distanceMeasuredInDirectionSideways = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionright));
+
+            print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
+
+            // this.transform.position = spawner.currentTileRegion.transform.position;
+            if (distanceMeasuredInDirection * 39.37 > distanceInInches || distanceMeasuredInDirectionSideways * 39.37 > 0.1f)
             {
 
                 // DistanceErrorCube.SetActive(true);
@@ -1507,13 +1495,30 @@ namespace RoofTileVR
                     if (!spawner.reverseTheLine)
                     {
                         //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
-                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
-                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
-                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+                        ///
+                        float distanceRight;
+                        float distanceLeft;
+                        if (tilesUnderneath[0].isStarter)
+                        {
 
-                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
-                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
-                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                            Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                            distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                            distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        }
+                        else
+                        {
+                            Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeLeft.transform.position);
+                            distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                            distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        }
                         //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
 
 
@@ -1630,14 +1635,30 @@ namespace RoofTileVR
 
                     if (!spawner.reverseTheLine)
                     {
+                        float distanceRight;
+                        float distanceLeft;
                         //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
-                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
-                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
-                        float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+                        if (tilesUnderneath[0].isStarter)
+                        {
 
-                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
-                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeRight.transform.position);
-                        float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                            Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                            distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeRight.transform.position);
+                            distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        }
+                        else
+                        {
+                            Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeLeft.transform.position);
+                            distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                            distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                        }
                         //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
 
 
@@ -1773,19 +1794,28 @@ namespace RoofTileVR
 
                     if (!spawner.reverseTheLine)
                     {
+                        print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
                         //left to right
                         if (spawner.tileSpanWidth <= 0)
                         {
                             //////////////Line ended place the tile above///////////////////
 
-                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
-                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position);
-                            float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
-                            float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
+                            float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
-                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                            float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
+
+                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+
+
+
+
+
+
+
                         }
                         else
                         {
@@ -1802,20 +1832,20 @@ namespace RoofTileVR
                     }
                     else
                     {
+                        print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
                         //right to left
                         if (spawner.tileSpanWidth <= 0)
                         {
                             //////////////Line ended place the tile above///////////////////
                             ///
-                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
-                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
-                            float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                            Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                            Vector3 localPosRightTarget = this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position);
+                            float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
-                            float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
+                            float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
 
-                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
-
+                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
                         }
                         else
                         {

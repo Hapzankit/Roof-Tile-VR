@@ -17,8 +17,6 @@ namespace RoofTileVR
     public class TileCasting : MonoBehaviour
     {
         public Transform rightController; // Reference to the right controller transform
-        public GameObject placeholderPrefab; // The placeholder object to show
-        public GameObject prefabToPlace; // The prefab to place when the trigger is pressed
         public float boxCastSize = 0.1f; // Size of the box cast
         public LayerMask layerMask; // Layer mask to define what to hit
 
@@ -31,7 +29,6 @@ namespace RoofTileVR
         private Vector3 prevRot;
         [SerializeField] private RoofObject m_RoofObject;
 
-        [SerializeField] private float thresholdDistance;
         public bool isCastingActive = false;
 
         public static Action<string> tilePlacedMsg;
@@ -39,7 +36,7 @@ namespace RoofTileVR
 
         public List<BoxCollider> starterColliders;
         public GameObject markerCube;
-        public GameObject Marker;
+ 
 
         [SerializeField] public List<GameObject> TileStands;
         public float tileSpanWidthConstant;
@@ -51,7 +48,7 @@ namespace RoofTileVR
 
         public List<HandMenu> handMenu;
         bool isTilePicked = false;
-        public GameObject BoardArea;
+
         public Transform BoardPosition;
         public List<Transform> boardPositionsToSnap;
         public List<float> exposureConvertedToUnityfromInches;
@@ -77,15 +74,7 @@ namespace RoofTileVR
             inputActionReference.action.Enable();
         }
 
-        public void RightTriggerPressed(InputAction.CallbackContext obj)
-        {
-            // if (currentPlaceholder.activeSelf)
-            // {
-            //     PlaceObject(prevPos, prevRot);
-            //     tilePlacedMsg?.Invoke("Tile placed success");
-            // }
-        }
-
+       
         // Start is called before the first frame update
 
         public void WriteOnHandMenu(String textToWrite)
@@ -119,9 +108,7 @@ namespace RoofTileVR
             tileSpanWidthConstant = tileSpanWidth;
             print("Width of roof" + tileSpanWidthConstant);
             starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
-            //currentPlaceholder = Instantiate(placeholderPrefab);
-            // currentPlaceholder.SetActive(false);
-            // triggerTMP.SetActive(false);
+         
             if (m_RoofObject != null)
             {
                 TryGetComponent(out m_RoofObject);
@@ -170,11 +157,6 @@ namespace RoofTileVR
 
 
         [SerializeField] public TileObject currentTilePrefab;
-
-        private TileObject prevTilePrefab;
-
-
-
 
         public void SetActiveTileStateToPlaced(int state = 1)
         {
@@ -256,8 +238,6 @@ namespace RoofTileVR
             placementPrompt.SetActive(false);
             wrongRegionPlacementPrompt.SetActive(false);
             isTilePicked = true;
-
-            // currentTilePrefab.transform.SetParent(currentTileRegion.transform);
         }
 
 
@@ -266,80 +246,19 @@ namespace RoofTileVR
         /// 
         /// </summary>
         /// <param name="right"> for right= 1, for left= -1</param>
-        public void HighlightIncorrectTilePlacement(int right)
-        {
-            m_TileSelectPanelUI.BGColorChange(Color.red);
-
-
-            Transform _transform = tileSideEdge_Effect.transform;
-            _transform.SetParent(currentTilePrefab.transform);
-            _transform.localRotation = Quaternion.Euler(Vector3.zero);
-            _transform.localScale = currentTilePrefab.EffectSideEdgeScale;
-
-            tileSideEdge_Effect.material.color = currentTilePrefab.ColorFail;
-
-            if (right == 1)
-            {
-                _transform.position = currentTilePrefab.SideEdgeRight.position;
-            }
-            else if (right == -1)
-            {
-                _transform.position = currentTilePrefab.SideEdgeLeft.position;
-            }
-
-            _transform.gameObject.SetActive(true);
-
-            if (!currentTilePrefab.OffsetUI.Equals(Vector3.zero))
-            {
-                m_TilePlacementUI.ShowTileFailUI(currentTilePrefab.tileCanvasUI.transform, currentTilePrefab.OffsetUI);
-            }
-            else
-            {
-                m_TilePlacementUI.ShowTileFailUI(currentTilePrefab.tileCanvasUI.transform);
-            }
-        }
-
+      
         [SerializeField] private TilePlacementUI m_TilePlacementUI;
-        public void HighlightCorrectTilePlacement()
-        {
-            m_TileSelectPanelUI.BGColorChange(Color.green);
-
-            Transform _transform = tileSideEdge_Effect.transform;
-            _transform.SetParent(currentTilePrefab.transform);
-            _transform.localRotation = Quaternion.Euler(Vector3.zero);
-            _transform.localScale = new Vector3(1f, currentTilePrefab.EffectSideEdgeScale.y, 1f);
-            _transform.localPosition = Vector3.zero;
-
-            tileSideEdge_Effect.material.color = currentTilePrefab.ColorTrue;
-
-            _transform.gameObject.SetActive(true);
-
-            if (!currentTilePrefab.OffsetUI.Equals(Vector3.zero))
-            {
-                m_TilePlacementUI.ShowTilePassUI(currentTilePrefab.tileCanvasUI.transform, currentTilePrefab.OffsetUI);
-            }
-            else
-            {
-                m_TilePlacementUI.ShowTilePassUI(currentTilePrefab.tileCanvasUI.transform);
-            }
-        }
+       
 
 
 
-        public void DisableTileGrab()
-        {
-            currentTilePrefab.DisableInteraction();
-        }
+       
 
         public GameObject placementPrompt;
         public GameObject wrongRegionPlacementPrompt;
         public void ShowPlacementPrompt()
         {
-            // placementPrompt.gameObject.SetActive(true);
-            // placementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
-            // placementPrompt.transform.localPosition = Vector3.zero;
-            // placementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
-            // currentTilePrefab.YesButtonPressed();
+           
 
 
             YesButtonPressed();
@@ -351,15 +270,7 @@ namespace RoofTileVR
 
         }
 
-        public void ShowWrongRegionPlacementPrompt()
-        {
-            // wrongRegionPlacementPrompt.SetActive(true);
-            // wrongRegionPlacementPrompt.transform.SetParent(currentTilePrefab.ConfirmTileUIRoot);
-            // wrongRegionPlacementPrompt.transform.localPosition = Vector3.zero;
-            // wrongRegionPlacementPrompt.transform.localRotation = Quaternion.Euler(Vector3.zero);
-
-            WriteOnHandMenu("Tile placed in wrong region!");
-        }
+      
 
 
         public void OnTileDropped()
@@ -445,7 +356,7 @@ namespace RoofTileVR
                     starterColliders[starterColliders.Count - 1].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
 
                     print("All tiles placed");
-                    WriteOnHandMenu("All Starter tiles placed, Now select Exposure and draw chalk line");
+                    WriteOnHandMenu("All Starter tiles placed, Now select Exposure.");
 
                     numOfTile = num;
                 }
@@ -636,8 +547,6 @@ namespace RoofTileVR
             }
             else
             {
-                // Hide the placeholder if no hit
-                // currentPlaceholder.SetActive(false);
                 SetLog($"No Object detected in front {rightController.name}");
             }
 
@@ -645,37 +554,16 @@ namespace RoofTileVR
 
 
 
-        public void QuitApp()
-        {
-            Application.Quit();
-        }
+      
 
-        private int currentTile;
+       
 
-        public void ToggleCasting(int tileIndex)
-        {
-            if (tileIndex == currentTile)
-            {
-                isCastingActive = !isCastingActive;
-            }
-            else
-            {
-                isCastingActive = true;
-            }
-
-            currentTile = tileIndex;
-            ToggleCastingUI();
-        }
-
+      
 
 
         [SerializeField] private TileSelectPanelUI m_TileSelectPanelUI;
 
-        public void ToggleCastingUI()
-        {
-            m_TileSelectPanelUI.OnPanelSelect(isCastingActive, currentTile);
-        }
-
+        
         public void SetLog(string log)
         {
             logTMP.text = log;

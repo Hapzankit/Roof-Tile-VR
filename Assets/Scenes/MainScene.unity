@@ -12554,15 +12554,15 @@ PrefabInstance:
       objectReference: {fileID: 2000961826}
     - target: {fileID: 4672444328434065524, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.02
+      value: 1.21
       objectReference: {fileID: 0}
     - target: {fileID: 4672444328434065524, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.111
+      value: 0.828
       objectReference: {fileID: 0}
     - target: {fileID: 4672444328434065524, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.36
+      value: 1.69
       objectReference: {fileID: 0}
     - target: {fileID: 4672444328434065524, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13385,7 +13385,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4883618392811374921, guid: 70c8bee4d2168fb4881d624d23cfedba, type: 3}
   m_PrefabInstance: {fileID: 8333087833797812708}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2089882764}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccb23e245ce04924ab212dd383fd7238, type: 3}
@@ -19021,7 +19021,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1603255937}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19029,7 +19029,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.09, y: 0.305}
+  m_AnchoredPosition: {x: 0, y: 0.305}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1603255939
@@ -25239,20 +25239,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rightController: {fileID: 0}
-  placeholderPrefab: {fileID: 0}
-  prefabToPlace: {fileID: 6929181492235089998, guid: 7c696011d44334e498a050ed67287a2c, type: 3}
   boxCastSize: 0.05
   layerMask:
     serializedVersion: 2
     m_Bits: 16
   logTMP: {fileID: 0}
   m_RoofObject: {fileID: 2000961829}
-  thresholdDistance: 0
   isCastingActive: 0
   starterColliderHolder: {fileID: 2017035123}
   starterColliders: []
   markerCube: {fileID: 1606362034655411956}
-  Marker: {fileID: 1606362034655411956}
   TileStands:
   - {fileID: 1232605133}
   - {fileID: 1119469479}
@@ -25264,10 +25260,10 @@ MonoBehaviour:
   overlapSpanAccordingtoExposure: 11
   handMenu:
   - {fileID: 1285852107}
-  BoardArea: {fileID: 2089882764}
   BoardPosition: {fileID: 347481909}
   boardPositionsToSnap: []
   exposureConvertedToUnityfromInches: []
+  TileStandGroup: {fileID: 91924505}
   currentTilePrefab: {fileID: 0}
   currentTileRegion: {fileID: 0}
   tilesPickedUp: []
@@ -26781,11 +26777,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8727765562456717546, guid: ff34efef45ff78b4c85549634166e8d0, type: 3}
   m_PrefabInstance: {fileID: 1242522270}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2089882764 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9154180254436557414, guid: 70c8bee4d2168fb4881d624d23cfedba, type: 3}
-  m_PrefabInstance: {fileID: 8333087833797812708}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2091693003
 GameObject:
@@ -58933,7 +58924,6 @@ MonoBehaviour:
   tilesUnderneath: []
   isTileAbove: 0
   isValidTile: 0
-  currentTileCollider: {fileID: 0}
   distanceToCheckAccordingToExposure: 0
   bottomTopTextError: {fileID: 0}
   LeftRightTextError: {fileID: 0}

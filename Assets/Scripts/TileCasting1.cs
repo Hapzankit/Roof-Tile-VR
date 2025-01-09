@@ -123,55 +123,6 @@ namespace RoofTileVR
 
         public float proximityThreshold = 0.5f; // Set your desired proximity threshold
 
-        // Call this function whenever an object is placed or moved
-        // Checking for key way spacing (space between tiles placed horizontally(3/8-3/16)) and sidelap(1-1/2), distance between overlapped tiles.
-        // public void CheckProximity(GameObject placedObject)
-        // {
-        //     foreach (GameObject obj in objectsToCheck)
-        //     {
-        //         if (obj != placedObject) // Skip the object itself
-        //         {
-        //             float distance = Vector3.Distance(placedObject.transform.position, obj.transform.position);
-
-        //             if (distance <= proximityThreshold)
-        //             {
-        //                 Debug.Log("Distance between " + placedObject.name + " and " + obj.name + ": " + distance);
-
-        //                 // Calculate gap if within a close enough distance
-        //                 float gap = CalculateGap(placedObject, obj);
-
-        //                 float overlapGap = CalculateGap(placedObject.GetComponentInChildren<OverlapArea>().gameObject, obj.GetComponentInChildren<OverlapArea>().gameObject);
-
-        //                 if (overlapGap < 0)
-        //                 {
-        //                     Debug.Log("Overlapped gap" + overlapGap);
-        //                     distanceOverlapText.text += "Overlap between" + placedObject.name + " and " + obj.name + ": " + overlapGap;
-        //                 }
-
-        //                 if (gap < 0.02f)
-        //                 {
-        //                     // Handle case where objects are very close or overlapping
-        //                     // Example: Snap them together or perform other actions
-        //                     placedObject.GetComponentInChildren<TMP_Text>().color = Color.red;
-        //                     obj.GetComponentInChildren<TMP_Text>().color = Color.red;
-        //                     Instantiate(indicator, errorpoint, Quaternion.identity);
-        //                     Debug.Log("Gap between " + placedObject.name + " and " + obj.name + ": " + gap);
-        //                     distanceErrorText.text += "Gap between " + placedObject.name + " and " + obj.name + ": " + gap;
-        //                 }
-        //                 else
-        //                 {
-
-        //                     placedObject.GetComponentInChildren<TMP_Text>().color = Color.green;
-        //                     obj.GetComponentInChildren<TMP_Text>().color = Color.green;
-        //                 }
-
-        //             }
-        //         }
-        //     }
-        // }
-
-
-
 
 
         private Vector3[] GetCorners(GameObject obj)

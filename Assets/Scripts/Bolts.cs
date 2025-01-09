@@ -123,28 +123,7 @@ public class Bolts : MonoBehaviour
         double distanceInInches = Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37;
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 > .5f)
         {
-            // textToShowErrors.gameObject.SetActive(true);
-            // if (direction.z > 0 || direction.z < 0)
-            // {
-            //     textToShowErrors.text = "Bolt is not deep enough " + distanceInInches;
-            // }
-            // else if (direction.x > 0)
-            // {
-            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the right";
-            // }
-            // else if (direction.x < 0)
-            // {
-            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the left";
-            // }
-            // else if (direction.y < 0)
-            // {
-            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the bottom";
-            // }
-            // else if (direction.y > 0)
-            // {
-
-            //     textToShowErrors.text = "Bolt is off by" + distanceInInches + "to the top";
-            // }
+            
         }
         else
         {
