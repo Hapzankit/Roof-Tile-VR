@@ -57,11 +57,11 @@ namespace RoofTileVR
         public List<float> exposureConvertedToUnityfromInches;
 
         public GameObject TileStandGroup;
-// XRGrabInteractable[]
+        XRGrabInteractable[] TileGrabInteractables;
 
         void Awake()
         {
-
+            TileGrabInteractables = TileStandGroup.GetComponentsInChildren<XRGrabInteractable>();
         }
 
 
@@ -128,6 +128,24 @@ namespace RoofTileVR
             }
 
 
+        }
+
+        public void EnableDisableTileGrab(bool shouldBeGrabbed)
+        {
+            if (shouldBeGrabbed)
+            {
+                foreach (XRGrabInteractable tile in TileGrabInteractables)
+                {
+                    tile.enabled = true;
+                }
+            }
+            else
+            {
+                foreach (XRGrabInteractable tile in TileGrabInteractables)
+                {
+                    tile.enabled = false;
+                }
+            }
         }
 
         /// <summary>
@@ -395,6 +413,7 @@ namespace RoofTileVR
         {
             int numOfTile = 9999;
             currentTilePrefab.transform.SetParent(null);
+            EnableDisableTileGrab(false);
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -516,7 +535,7 @@ namespace RoofTileVR
                                 ShowPlacementPrompt();
                                 currentTilePrefab.tileNameText.text = "";
                                 currentTilePrefab.checkKeywayFlag = true;
-                                currentTilePrefab = null;
+                                // currentTilePrefab = null;
                                 // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
                             }
                         }
@@ -531,7 +550,7 @@ namespace RoofTileVR
                                 ShowPlacementPrompt();
                                 currentTilePrefab.tileNameText.text = "";
                                 currentTilePrefab.checkKeywayFlag = true;
-                                currentTilePrefab = null;
+                                // currentTilePrefab = null;
                                 // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
 
                             }
@@ -548,7 +567,7 @@ namespace RoofTileVR
                             ShowPlacementPrompt();
                             currentTilePrefab.tileNameText.text = "";
                             currentTilePrefab.checkKeywayFlag = true;
-                            currentTilePrefab = null;
+                            // currentTilePrefab = null;
                             // currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
 
                         }
@@ -583,6 +602,10 @@ namespace RoofTileVR
                 {
                     stand.SetActive(false);
                 }
+            }
+            if (currentTilePrefab && currentTilePrefab.isFirstBoltPlaced && currentTilePrefab.isSecondBoltPlaced)
+            {
+                EnableDisableTileGrab(true);
             }
             // currentTilePrefab.ShowShakeTIleErrors(true);
             if (isCastingActive == false) return;

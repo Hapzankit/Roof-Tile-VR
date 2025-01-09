@@ -1364,7 +1364,8 @@ namespace RoofTileVR
                 {
                     // first starter being placed
                     float rakeOverHang = Vector3.Distance(this.transform.InverseTransformPoint(this.transform.position), this.transform.InverseTransformPoint(spawner.currentTileRegion.transform.position));
-                    SpawnTileMeasurements(sideEdgeRight, rakeOverHang * 39.7f + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
+                    float ActualDistanceOverhang = Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position);
+                    SpawnTileMeasurements(sideEdgeRight, ActualDistanceOverhang * 39.7f + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(rakeOverHang, 0, 0), sideEdgeRight);
 
                 }
@@ -1376,8 +1377,9 @@ namespace RoofTileVR
                     // PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-rakeOverHang, 0, 0), sideEdgeLeft);
 
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
+                    float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
                     print("keywayerror" + keywayError);
-                    SpawnTileMeasurements(sideEdgeRight, keywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    SpawnTileMeasurements(sideEdgeRight, ActualkeywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
@@ -1386,8 +1388,9 @@ namespace RoofTileVR
                     //rest of starters
 
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
+                    float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
                     print("keywayerror" + keywayError);
-                    SpawnTileMeasurements(sideEdgeRight, keywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    SpawnTileMeasurements(sideEdgeRight, ActualkeywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
