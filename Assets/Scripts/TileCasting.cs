@@ -36,7 +36,7 @@ namespace RoofTileVR
 
         public List<BoxCollider> starterColliders;
         public GameObject markerCube;
- 
+
 
         [SerializeField] public List<GameObject> TileStands;
         public float tileSpanWidthConstant;
@@ -74,7 +74,7 @@ namespace RoofTileVR
             inputActionReference.action.Enable();
         }
 
-       
+
         // Start is called before the first frame update
 
         public void WriteOnHandMenu(String textToWrite)
@@ -108,7 +108,7 @@ namespace RoofTileVR
             tileSpanWidthConstant = tileSpanWidth;
             print("Width of roof" + tileSpanWidthConstant);
             starterColliders[0].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = true;
-         
+
             if (m_RoofObject != null)
             {
                 TryGetComponent(out m_RoofObject);
@@ -246,31 +246,31 @@ namespace RoofTileVR
         /// 
         /// </summary>
         /// <param name="right"> for right= 1, for left= -1</param>
-      
+
         [SerializeField] private TilePlacementUI m_TilePlacementUI;
-       
 
 
 
-       
+
+
 
         public GameObject placementPrompt;
         public GameObject wrongRegionPlacementPrompt;
         public void ShowPlacementPrompt()
         {
-           
 
 
+
+            currentTilePrefab.GetComponent<Rigidbody>().isKinematic = true;
+            currentTilePrefab.GetComponent<Rigidbody>().useGravity = false;
             YesButtonPressed();
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
-            currentTilePrefab.GetComponent<Rigidbody>().isKinematic = true;
-            currentTilePrefab.GetComponent<Rigidbody>().useGravity = false;
             currentTilePrefab.GetComponent<TileObject>().DestroyErrors();
 
         }
 
-      
+
 
 
         public void OnTileDropped()
@@ -349,7 +349,7 @@ namespace RoofTileVR
                     starterTilesPlaced = true;
                     // foreach (var tiles in TilesPlaced)
                     // {
-                    //     tiles.GetComponent<TileObject>().tileSize = 12;
+                    //     tiles.GetComponent<l>().tileSize = 12;
                     // }
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
@@ -554,16 +554,16 @@ namespace RoofTileVR
 
 
 
-      
 
-       
 
-      
+
+
+
 
 
         [SerializeField] private TileSelectPanelUI m_TileSelectPanelUI;
 
-        
+
         public void SetLog(string log)
         {
             logTMP.text = log;

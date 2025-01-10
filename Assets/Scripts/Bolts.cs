@@ -92,6 +92,7 @@ public class Bolts : MonoBehaviour
             if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 < 4f && tileToCheckFrom.BoltPlaceHolders[tileNum].gameObject.activeInHierarchy)
             {
                 this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
+                tileToCheckFrom.BoltPlaceHolders[tileNum].GetComponentInChildren<MeshRenderer>().enabled = false;
                 // Vector3 ogSize = this.transform.localScale;
                 this.transform.SetParent(tileToCheckFrom.BoltPlaceHolders[tileNum], false);
                 // this.transform.localScale = ogSize;
@@ -123,12 +124,13 @@ public class Bolts : MonoBehaviour
         double distanceInInches = Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37;
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 > .5f)
         {
-            
+
         }
         else
         {
             print("Bolt placed");
             this.transform.position = tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position;
+
             // textToShowErrors.gameObject.SetActive(false);
             if (tileNum == 0)
             {

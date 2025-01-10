@@ -168,6 +168,7 @@ public class Whiteboard : MonoBehaviour
     public void DrawVerticalAtDistance(float dist)
     {
         float pixelsPerInch = textureSize.x / widthInInches;
+        print(pixelsPerInch + "PIXEL PER INCH");
         int x = Mathf.RoundToInt(dist * pixelsPerInch);
 
         // x=x * textureSize.x / widthInInches
