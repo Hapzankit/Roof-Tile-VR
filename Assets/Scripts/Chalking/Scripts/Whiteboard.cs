@@ -141,7 +141,7 @@ public class Whiteboard : MonoBehaviour
         Vector3 offset = newChildWorldPosition - childWorldPosition;
         // Apply the offset to the parent to snap it
         pos.transform.position += offset;
-        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.01f * num) + 0.05f, pos.transform.position.z);
+        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.035f * num) + 0.05f, pos.transform.position.z);
         tileCasting.boardPositionsToSnap.Add(pos);
 
     }

@@ -266,7 +266,7 @@ namespace RoofTileVR
                     {
                         tilesUnderneath.Add(collider.GetComponent<TileObject>());
                     }
-                    else if (collider.GetComponent<TileObject>().rowNumber != rowNumber && !collider.GetComponent<TileObject>().isStarter)
+                    else if (collider.GetComponent<TileObject>().rowNumber == rowNumber - 1 && !collider.GetComponent<TileObject>().isStarter)
                     {
                         tilesUnderneath.Add(collider.GetComponent<TileObject>());
                     }
@@ -341,8 +341,8 @@ namespace RoofTileVR
                     Vector3 localLeft = -this.transform.right;
 
 
-                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
-                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
 
 
                     float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
@@ -361,7 +361,7 @@ namespace RoofTileVR
 
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
-                        tileNum = 1;
+                        tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
                         return true;
 
@@ -1422,7 +1422,7 @@ namespace RoofTileVR
 
                         Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
                         Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
-                        float distanceRight = (localPosRightSource.x - localPosRightTarget.x);//sHOULD BE NEGATIVE
+                        float distanceRight = (localPosRightSource.x - localPosRightTarget.x);//SHOULD BE -VE
                         print(distanceLeft + " distance left " + distanceRight + " distance right ");
                         float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
                         float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
