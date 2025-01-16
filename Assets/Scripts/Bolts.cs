@@ -135,6 +135,7 @@ public class Bolts : MonoBehaviour
             if (tileNum == 0)
             {
                 tileToCheckFrom.isFirstBoltPlaced = true;
+     
             }
             if (tileNum == 1)
             {

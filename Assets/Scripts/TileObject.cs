@@ -48,6 +48,9 @@ namespace RoofTileVR
 
         public int rowNumber = 0;
 
+        /// ///////////////////////////////Tile bending/////////////////////////////////////
+        public Bend tileBend;
+
 
 
 
@@ -532,7 +535,7 @@ namespace RoofTileVR
                 }
             }
         }
-
+        bool callOnceBend = true;
         void Update()
         {
             if (isFirstBoltPlaced && isSecondBoltPlaced)
@@ -544,6 +547,12 @@ namespace RoofTileVR
                         measure.gameObject.SetActive(false);
                     }
                     this.GetComponent<XRGrabInteractable>().enabled = false;
+                }
+
+                if (callOnceBend && !isStarter)
+                {
+                    tileBend.BendTheTile(rowNumber);
+                    callOnceBend = false;
                 }
             }
             if (!isPlaced && !isStarter)
@@ -1167,7 +1176,7 @@ namespace RoofTileVR
                 else
                 {
                     objectToCheckFrom = this.sideEdgeLeft.gameObject;
-                    distanceToCheckAccordingToExposure = 0.25f * 0.0254f;
+                    distanceToCheckAccordingToExposure = 0.25f * 0.0254f * 2;
                     distanceInInches = 0.6f;
                 }
 
@@ -1263,7 +1272,7 @@ namespace RoofTileVR
                     Vector3 targetPosition = objectToCheck.transform.position;
 
                     // Calculate the new world position for the child in the local positive Y direction of the objectToCheck
-                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.16f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
+                    Vector3 localYDirection = objectToCheck.transform.forward + new Vector3(0, 0.1f, 0); // This gets the local 'up' direction which corresponds to the local +Y axis
 
                     // Combine the Y-direction offset with the original directional offset
                     Vector3 combinedDirection = localYDirection.normalized;
