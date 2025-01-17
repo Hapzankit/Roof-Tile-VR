@@ -333,45 +333,91 @@ namespace RoofTileVR
             {
                 numberoftilesunderneath = 2;
                 // bool isTileCovered = true;
+
                 tilesUnderneath = tilesUnderneath.OrderBy(go => ExtractNumber(go.name)).ToList();
 
-                if (!spawner.reverseTheLine)
+
+
+                if (spawner.rightToLeft)
                 {
+
+
                     //right to left
-                    Vector3 localLeft = -this.transform.right;
-
-
-                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
-                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
-
-
-                    float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
-                    float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
-
-                    // If you want the magnitude of this projection as a positive number
-                    leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
-                    leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
-                    print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
-                    spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
-                    // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
-                    if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
+                    if (tilesUnderneath[0].isStarter)
                     {
+                        Vector3 localLeft = -this.transform.right;
+
+
+                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+
+
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                        print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
+                        // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
+                        {
 
 
 
-                        areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
-                        tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
-                        return true;
+                            areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
+                            areaLeftByTile = tilesUnderneath[1].tileSize - leftwardDistanceLocal2 * 39.37f;
+                            tileNum = 1;
+                            CorrectTileIndicator.SetActive(false);
+                            return true;
 
+                        }
+                        else
+                        {
+                            IncorrectSidelap++;
+                            // CorrectTileIndicator.SetActive(true);
+                            return false;
+                        }
                     }
                     else
                     {
-                        IncorrectSidelap++;
-                        // CorrectTileIndicator.SetActive(true);
-                        return false;
+                        Vector3 localLeft = -this.transform.right;
+
+
+                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
+
+
+                        float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                        float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                        // If you want the magnitude of this projection as a positive number
+                        leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                        leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                        print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
+                        // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
+                        {
+
+
+
+                            areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
+                            areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
+                            tileNum = 0;
+                            CorrectTileIndicator.SetActive(false);
+                            return true;
+
+                        }
+                        else
+                        {
+                            IncorrectSidelap++;
+                            // CorrectTileIndicator.SetActive(true);
+                            return false;
+                        }
                     }
+
                 }
                 else
                 {
@@ -421,14 +467,14 @@ namespace RoofTileVR
                 // bool isTileCovered = true;
                 tilesUnderneath = tilesUnderneath.OrderBy(go => ExtractNumber(go.name)).ToList();
                 print("Tiles in order:- " + tilesUnderneath[0].name + " " + tilesUnderneath[1].name);
-                if (!spawner.reverseTheLine)
+                if (spawner.rightToLeft)
                 {
                     //right to left
                     Vector3 localLeft = -this.transform.right;
 
 
-                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
-                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[2].sideEdgeLeft.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
 
 
                     float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
@@ -443,8 +489,8 @@ namespace RoofTileVR
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[2].tileSize - leftwardDistanceLocal2 * 39.37f;
-                        tileNum = 2;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - leftwardDistanceLocal2 * 39.37f;
+                        tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
                         return true;
 
@@ -1315,24 +1361,17 @@ namespace RoofTileVR
                     if (spawner.reverseTheLine)
                     {
 
-
                         print("Going left to right");
                         direction = (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
-                        PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
+
                     }
                     else
                     {
                         direction = (-objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
                         print("Going right to left");
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
-                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
+
                     }
                     newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
                     // Calculate the required offset for the parent
@@ -1341,6 +1380,22 @@ namespace RoofTileVR
                     // offset = dotProduct * direction;
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
+
+                    ///////////////////////Place tags/////////////////
+                    if (spawner.reverseTheLine)
+                    {
+                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
+                    }
+                    else
+                    {
+                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
+                    }
 
                 }
                 spawner.WriteOnHandMenu("Tile Placed Correctly");
@@ -1516,7 +1571,7 @@ namespace RoofTileVR
                 {
 
 
-                    if (!spawner.reverseTheLine)
+                    if (spawner.rightToLeft)
                     {
                         //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
                         ///
@@ -1554,10 +1609,18 @@ namespace RoofTileVR
 
                         Vector3 localLeft = -this.transform.right;
 
-
-                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
-                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
-
+                        Vector3 distanceMeasured1;
+                        Vector3 distanceMeasured2;
+                        if (tilesUnderneath[0].isStarter)
+                        {
+                            distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+                            distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                        }
+                        else
+                        {
+                            distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                            distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
+                        }
 
                         float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
                         float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
@@ -1657,7 +1720,7 @@ namespace RoofTileVR
                 if (tilesUnderneath.Count == 3)
                 {
 
-                    if (!spawner.reverseTheLine)
+                    if (spawner.rightToLeft)
                     {
                         float distanceRight;
                         float distanceLeft;
@@ -1695,8 +1758,8 @@ namespace RoofTileVR
                         Vector3 localLeft = -this.transform.right;
 
 
-                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
-                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+                        Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[2].sideEdgeLeft.transform.position;
+                        Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
 
 
                         float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
