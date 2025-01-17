@@ -54,11 +54,13 @@ namespace RoofTileVR
         public List<float> exposureConvertedToUnityfromInches;
 
         public GameObject TileStandGroup;
-        XRGrabInteractable[] TileGrabInteractables;
+        TileObject[] TileGrabInteractables;
+
+        public AODPanel aODPanel;
 
         void Awake()
         {
-            TileGrabInteractables = TileStandGroup.GetComponentsInChildren<XRGrabInteractable>();
+            TileGrabInteractables = TileStandGroup.GetComponentsInChildren<TileObject>();
         }
 
 
@@ -93,6 +95,7 @@ namespace RoofTileVR
 
             WriteOnHandMenu("Draw a chalk Line");
 
+
             foreach (GameObject stands in TileStands)
             {
                 stands.SetActive(false);
@@ -117,21 +120,14 @@ namespace RoofTileVR
 
         }
 
-        public void EnableDisableTileGrab(bool shouldBeGrabbed)
+        public void EnableDisableTileGrab(bool shouldBeGrabbed, string messageToWrite, float timeToShow, Color AODcolor)
         {
-            if (shouldBeGrabbed)
+            foreach (TileObject tile in TileGrabInteractables)
             {
-                foreach (XRGrabInteractable tile in TileGrabInteractables)
-                {
-                    tile.enabled = true;
-                }
-            }
-            else
-            {
-                foreach (XRGrabInteractable tile in TileGrabInteractables)
-                {
-                    tile.enabled = false;
-                }
+                tile.isGrabbable = shouldBeGrabbed;
+                tile.messageToWrite = messageToWrite;
+                tile.timeToShow = timeToShow;
+                tile.AODcolor = AODcolor;
             }
         }
 
@@ -324,7 +320,8 @@ namespace RoofTileVR
         {
             int numOfTile = 9999;
             currentTilePrefab.transform.SetParent(null);
-            EnableDisableTileGrab(false);
+            StartCoroutine(aODPanel.WriteTextForTime(1, Color.green, "Tile placed!"));
+            EnableDisableTileGrab(false, "Fasten the previous tile first!", 3, Color.red);
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -487,6 +484,13 @@ namespace RoofTileVR
             }
 
         }
+        public void ShowHideTiles(bool shouldShow)
+        {
+            foreach (GameObject stand in TileStands)
+            {
+                stand.SetActive(shouldShow);
+            }
+        }
 
         void Update()
         {
@@ -502,21 +506,17 @@ namespace RoofTileVR
 
             if (markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
             {
-                foreach (GameObject stand in TileStands)
-                {
-                    stand.SetActive(true);
-                }
+                ShowHideTiles(true);
             }
             else
             {
-                foreach (GameObject stand in TileStands)
-                {
-                    stand.SetActive(false);
-                }
+                ShowHideTiles(false);
             }
             if (currentTilePrefab && currentTilePrefab.isFirstBoltPlaced && currentTilePrefab.isSecondBoltPlaced)
             {
-                EnableDisableTileGrab(true);
+                EnableDisableTileGrab(true, "", 3, Color.white);
+                StartCoroutine(aODPanel.WriteTextForTime(1, Color.green, "Fastened!"));
+                currentTilePrefab = null;
             }
             // currentTilePrefab.ShowShakeTIleErrors(true);
             if (isCastingActive == false) return;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class WhiteboardMarker : MonoBehaviour
 {
-   
+
     public Whiteboard whiteboard;
 
     public bool isLineMade = false;
@@ -33,7 +33,7 @@ public class WhiteboardMarker : MonoBehaviour
     void Start()
     {
         pickedObject = this.transform;
-   
+
 
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.startWidth = 0.005f;
@@ -51,6 +51,7 @@ public class WhiteboardMarker : MonoBehaviour
         markerBody.SetActive(false);
         isLineDrawnForStarter = false;
         DrawLineAtDistance = 21.5f;
+        StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(6, Color.red, "Select Exposure to place shakes"));
     }
 
     public void InstantiateLines()
@@ -60,6 +61,7 @@ public class WhiteboardMarker : MonoBehaviour
         lineRenderer.enabled = false; // Hide the line
         whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
         whiteboard.tileCasting.WriteOnHandMenu("Now start placing shakes over starter tiles from bottom right.");
+        // StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(3, Color.red, "Select Exposure to place shakes"));
         pickedObject.gameObject.SetActive(false);
         secondObjectShake.gameObject.SetActive(false);
         thirdObjectShake.gameObject.SetActive(false);
@@ -114,6 +116,7 @@ public class WhiteboardMarker : MonoBehaviour
                 lineRenderer.SetPosition(1, secondObject.position);
                 this.transform.position = new Vector3(secondObjectShake.position.x, secondObjectShake.position.y, secondObjectShake.position.z);
                 whiteboard.tileCasting.WriteOnHandMenu("Now Place Starter tiles on correct place (starting from bottom right) until its border turns green");
+                // StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(3, Color.green, "Chalk line drawn!"));
                 pickedObject.gameObject.SetActive(false);
                 secondObject.gameObject.SetActive(false);
                 thirdObject.gameObject.SetActive(false);

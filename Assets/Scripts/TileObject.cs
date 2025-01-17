@@ -5,6 +5,7 @@ using TMPro;
 // using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 
@@ -67,6 +68,8 @@ namespace RoofTileVR
         public List<GameObject> Errormeasurements;
 
         public GameObject MeasurementTags;
+
+        public bool isGrabbable = true;
 
 
         public bool checkKeywayFlag = false;
@@ -158,26 +161,38 @@ namespace RoofTileVR
 
 
         }
-
+        public string messageToWrite;
+        public float timeToShow;
+        public Color AODcolor;
         public void OnTilePicked()
         {
 
             // spawner.TileSelectText("Tile Picked");
-            removeErrorPLacements();
-            spawner.OnTilePick();
-            spawner.currentTilePrefab = this;
-            this.transform.rotation = Quaternion.Euler(-45, 0, 0);
-            spawner.currentTileWidth = tileSize;
-            DistanceErrorCubeRL.gameObject.SetActive(false);
-            DistanceErrorCubeTB.gameObject.SetActive(false);
-            CorrectTileIndicator.gameObject.SetActive(false);
-            this.GetComponent<Rigidbody>().useGravity = true;
-            this.GetComponent<Rigidbody>().isKinematic = false;
-            if (!spawner.tilesPickedUp.Contains(gameObject)) // Check if the object is already in the list
+            if (isGrabbable)
             {
-                spawner.tilesPickedUp.Add(gameObject);
+                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default"); ;
+                removeErrorPLacements();
+                spawner.OnTilePick();
+                spawner.currentTilePrefab = this;
+                this.transform.rotation = Quaternion.Euler(-45, 0, 0);
+                spawner.currentTileWidth = tileSize;
+                DistanceErrorCubeRL.gameObject.SetActive(false);
+                DistanceErrorCubeTB.gameObject.SetActive(false);
+                CorrectTileIndicator.gameObject.SetActive(false);
+                this.GetComponent<Rigidbody>().useGravity = true;
+                this.GetComponent<Rigidbody>().isKinematic = false;
+                if (!spawner.tilesPickedUp.Contains(gameObject)) // Check if the object is already in the list
+                {
+                    spawner.tilesPickedUp.Add(gameObject);
+                }
+                tileNameText.text = "";
+
             }
-            tileNameText.text = "";
+            else
+            {
+                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Nothing"); ;
+                StartCoroutine(spawner.aODPanel.WriteTextForTime(timeToShow, AODcolor, messageToWrite));
+            }
 
 
         }

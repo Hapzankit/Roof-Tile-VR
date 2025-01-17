@@ -544,6 +544,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5042947376474290254, guid: 0590d56c213fd1e47a2f868307274af5, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8401369912531896610, guid: 0590d56c213fd1e47a2f868307274af5, type: 3}
       propertyPath: m_Name
       value: Rusty_Nail
