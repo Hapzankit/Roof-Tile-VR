@@ -24,6 +24,7 @@ public class WhiteboardMarker : MonoBehaviour
     public Transform secondObjectShake;
     public Transform thirdObjectShake;
     public bool isLineDrawnForStarter = false;
+    public bool isExposureButtonActive = false;
     public GameObject markerBody;
 
 
@@ -49,9 +50,10 @@ public class WhiteboardMarker : MonoBehaviour
         secondObjectShake.transform.gameObject.SetActive(true);
         thirdObjectShake.transform.gameObject.SetActive(true);
         markerBody.SetActive(false);
-        isLineDrawnForStarter = false;
+        isExposureButtonActive = true;
         DrawLineAtDistance = 21.5f;
-        StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(6, Color.red, "Select Exposure to place shakes"));
+        // StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(6, Color.red, "Select Exposure to place shakes"));
+        whiteboard.tileCasting.EnableDisableTileGrab(false, "First select the exposure!", 2, Color.red);
     }
 
     public void InstantiateLines()
@@ -65,7 +67,8 @@ public class WhiteboardMarker : MonoBehaviour
         pickedObject.gameObject.SetActive(false);
         secondObjectShake.gameObject.SetActive(false);
         thirdObjectShake.gameObject.SetActive(false);
-        isLineDrawnForStarter = true;
+        // isLineDrawnAfterExposure = true;
+        whiteboard.tileCasting.EnableDisableTileGrab(true, "", 3, Color.white);
         // Destroy(this);
     }
 
@@ -88,6 +91,7 @@ public class WhiteboardMarker : MonoBehaviour
                 whiteboard.DrawVerticalAtDistance(DrawLineAtDistance);
                 lineRenderer.SetPosition(0, thirdObjectShake.position);
                 lineRenderer.SetPosition(1, secondObjectShake.position);
+
                 whiteboard.tileCasting.WriteOnHandMenu("Now start placing normal shakes over starter tiles from bottom right");
                 pickedObject.gameObject.SetActive(false);
                 secondObjectShake.gameObject.SetActive(false);
@@ -98,6 +102,7 @@ public class WhiteboardMarker : MonoBehaviour
             }
             else
             {
+
                 lineRenderer.SetPosition(0, pickedObject.position);
                 lineRenderer.SetPosition(1, secondObjectShake.position);
             }

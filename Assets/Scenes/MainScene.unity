@@ -7503,6 +7503,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
+      objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -8562,6 +8566,10 @@ PrefabInstance:
     - target: {fileID: 2545468126471420696, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
@@ -9670,6 +9678,10 @@ PrefabInstance:
     - target: {fileID: 2545468126471420696, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
@@ -12025,6 +12037,10 @@ PrefabInstance:
     - target: {fileID: 2545468126471420696, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
@@ -15188,6 +15204,10 @@ PrefabInstance:
     - target: {fileID: 2545468126471420696, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
@@ -18445,9 +18465,17 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
+      objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5005622949292743072, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_InteractionLayers.m_Bits
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5205835326362999605, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_LocalPosition.x
@@ -19804,8 +19832,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Select exposure
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5ba4ad4f2b9cf4f47a3f1434691107d8, type: 2}
-  m_sharedMaterial: {fileID: -4595331534381840801, guid: 5ba4ad4f2b9cf4f47a3f1434691107d8, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3d5db73b273dc5c4082b1b21c03d8263, type: 2}
+  m_sharedMaterial: {fileID: 1583706583992693378, guid: 3d5db73b273dc5c4082b1b21c03d8263, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -19829,18 +19857,18 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 41.3
+  m_fontSize: 9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 9
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 4096
   m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
+  m_characterSpacing: -9
+  m_wordSpacing: -1.5
   m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
@@ -27078,6 +27106,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
+      objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -27507,6 +27539,10 @@ PrefabInstance:
     - target: {fileID: 2545468126471420696, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3784779197846726515, guid: 5dce108130b10844f98689e911664627, type: 3}
+      propertyPath: m_Constraints
+      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 4523408797830944750, guid: 5dce108130b10844f98689e911664627, type: 3}
       propertyPath: m_Mesh
@@ -54662,6 +54698,7 @@ MonoBehaviour:
   secondObjectShake: {fileID: 1208891783}
   thirdObjectShake: {fileID: 102692831}
   isLineDrawnForStarter: 0
+  isExposureButtonActive: 0
   markerBody: {fileID: 90044691180851252}
   DrawLineAtDistance: 11.5
 --- !u!222 &7094921472088264530

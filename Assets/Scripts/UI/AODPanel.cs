@@ -19,17 +19,28 @@ public class AODPanel : MonoBehaviour
         writingText.text = "";
     }
 
+    private bool isCoroutineRunning = false;
 
     public IEnumerator WriteTextForTime(float timeToShow, Color imageColor, string textToWrite)
     {
+        if (isCoroutineRunning)
+        {
+            Debug.Log("Coroutine is already running.");
+            yield break; // Exit the coroutine early if it's already running
+        }
+
+        isCoroutineRunning = true;
         print("Show panel");
         image.enabled = true;
         image.color = imageColor;
         writingText.text = textToWrite;
         writingText.color = imageColor;
+
         yield return new WaitForSeconds(timeToShow);
+
         image.enabled = false;
         writingText.text = "";
+        isCoroutineRunning = false;
     }
 
 

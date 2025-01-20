@@ -170,7 +170,7 @@ namespace RoofTileVR
             // spawner.TileSelectText("Tile Picked");
             if (isGrabbable)
             {
-                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default"); ;
+                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default");
                 removeErrorPLacements();
                 spawner.OnTilePick();
                 spawner.currentTilePrefab = this;
@@ -190,7 +190,7 @@ namespace RoofTileVR
             }
             else
             {
-                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Nothing"); ;
+                this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Nothing");
                 StartCoroutine(spawner.aODPanel.WriteTextForTime(timeToShow, AODcolor, messageToWrite));
             }
 
@@ -601,6 +601,8 @@ namespace RoofTileVR
         {
             if (isFirstBoltPlaced && isSecondBoltPlaced)
             {
+
+
                 foreach (var measure in measurements)
                 {
                     if (measure)
@@ -613,6 +615,10 @@ namespace RoofTileVR
                 if (callOnceBend && !isStarter)
                 {
                     tileBend.BendTheTile(rowNumber);
+                    foreach (Transform boltplaceholder in BoltPlaceHolders)
+                    {
+                        boltplaceholder.localPosition = new Vector3(boltplaceholder.localPosition.x, boltplaceholder.localPosition.y - 0.12f * rowNumber, boltplaceholder.localPosition.z);
+                    }
                     callOnceBend = false;
                 }
             }
@@ -1377,13 +1383,13 @@ namespace RoofTileVR
                     {
 
                         print("Going left to right");
-                        direction = (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
+                        direction = (objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
 
                     }
                     else
                     {
-                        direction = (-objectToCheck.transform.right + new Vector3(0, 0.2f, 0)).normalized;
+                        direction = (-objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
                         print("Going right to left");
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
 

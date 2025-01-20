@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace RoofTileVR
@@ -122,12 +123,18 @@ namespace RoofTileVR
 
         public void EnableDisableTileGrab(bool shouldBeGrabbed, string messageToWrite, float timeToShow, Color AODcolor)
         {
+            print("Change tile grab" + shouldBeGrabbed);
             foreach (TileObject tile in TileGrabInteractables)
             {
                 tile.isGrabbable = shouldBeGrabbed;
                 tile.messageToWrite = messageToWrite;
                 tile.timeToShow = timeToShow;
                 tile.AODcolor = AODcolor;
+
+                if (shouldBeGrabbed)
+                {
+                    tile.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default");
+                }
             }
         }
 
@@ -514,9 +521,18 @@ namespace RoofTileVR
             }
             if (currentTilePrefab && currentTilePrefab.isFirstBoltPlaced && currentTilePrefab.isSecondBoltPlaced)
             {
-                EnableDisableTileGrab(true, "", 3, Color.white);
-                StartCoroutine(aODPanel.WriteTextForTime(1, Color.green, "Fastened!"));
-                currentTilePrefab = null;
+                // Should not be called if we are placing the last starter
+                if (currentTilePrefab.isStarter && markerCube.GetComponent<WhiteboardMarker>().isExposureButtonActive)
+                {
+                    currentTilePrefab = null;
+
+                }
+                else
+                {
+                    EnableDisableTileGrab(true, "", 3, Color.white);
+                    StartCoroutine(aODPanel.WriteTextForTime(1, Color.green, "Fastened!"));
+                    currentTilePrefab = null;
+                }
             }
             // currentTilePrefab.ShowShakeTIleErrors(true);
             if (isCastingActive == false) return;
