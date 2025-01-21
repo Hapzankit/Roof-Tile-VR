@@ -617,7 +617,7 @@ namespace RoofTileVR
                     tileBend.BendTheTile(rowNumber);
                     foreach (Transform boltplaceholder in BoltPlaceHolders)
                     {
-                        boltplaceholder.localPosition = new Vector3(boltplaceholder.localPosition.x, boltplaceholder.localPosition.y - 0.12f * rowNumber, boltplaceholder.localPosition.z);
+                        boltplaceholder.localPosition = new Vector3(boltplaceholder.localPosition.x, boltplaceholder.localPosition.y - 0.15f * rowNumber, boltplaceholder.localPosition.z);
                     }
                     callOnceBend = false;
                 }
@@ -1184,7 +1184,8 @@ namespace RoofTileVR
                         GetComponent<Rigidbody>().isKinematic = true;
                         SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-1 / tileSize, 0, 0), sideEdgeRight);
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + " Sidelap left", Color.green, 0.5f, false);
+                        string convertTodecimal = areaLeftByTile.ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + " Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.55f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         bottomTopTextError.gameObject.SetActive(false);
                         LeftRightTextError.gameObject.SetActive(false);
@@ -1350,19 +1351,22 @@ namespace RoofTileVR
 
                     // Apply the offset to the parent to snap it
                     transform.position += offset;
-                    SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
+                    string convertTodecimal = areaLeftByTile.ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" Sidelap left", Color.green, 0.5f, false);
                     print(spawner.rightToLeft + " Right to left");
                     if (spawner.rightToLeft)
                     {
 
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.green, 0.5f, false);
+                        string convertTodec = areaLeftByTile.ToString("F2");
+                        SpawnTileMeasurements(objectToCheckFrom.transform, convertTodec + " rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeRight);
                     }
                     else
                     {
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, areaLeftByTile + " rake overhang", Color.green, 0.5f, false);
+                        string convertTodec = areaLeftByTile.ToString("F2");
+                        SpawnTileMeasurements(objectToCheckFrom.transform, convertTodec + " rake overhang", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(0.13f, 0, 0), sideEdgeLeft);
                         // PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
 
@@ -1405,14 +1409,16 @@ namespace RoofTileVR
                     ///////////////////////Place tags/////////////////
                     if (spawner.reverseTheLine)
                     {
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
+                        string convertTodec = areaLeftByTile.ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
                     }
                     else
                     {
-                        SpawnTileMeasurements(sideEdgeBottom, areaLeftByTile + "\" Sidelap left", Color.green, 0.5f, false);
+                        string convertTodec = areaLeftByTile.ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
                         SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
@@ -1420,10 +1426,421 @@ namespace RoofTileVR
 
                 }
                 spawner.WriteOnHandMenu("Tile Placed Correctly");
+                ShowSidelapOnTile();
                 DistanceErrorCubeRL.SetActive(false);
                 DistanceErrorCubeTB.SetActive(false);
                 CorrectTileIndicator.SetActive(true);
                 return true;
+            }
+        }
+
+
+
+
+
+        void ShowSidelapOnTile()
+        {
+            if (tilesUnderneath.Count == 1)
+            {
+
+                // print("1 number of tile");
+                if (tilesUnderneath[0].areaCoveredByTileAbove == 0)
+                {
+
+                    Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                    Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                    float distanceLeft = (localPosLeftSource.x - localPosLeftTarget.x); //SHOULD BE +VE
+
+                    Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                    Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                    float distanceRight = (localPosRightSource.x - localPosRightTarget.x);//SHOULD BE -VE
+                    print(distanceLeft + " distance left " + distanceRight + " distance right ");
+                    float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                    float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                    Color tagcolor;
+                    if (actualDistanceLeft * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    if (distanceLeft > 0)
+                    {
+                        string convertTodec = (actualDistanceLeft * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", tagcolor, 0.03f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+                    }
+
+
+
+                    if (actualDistanceRight * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    if (distanceRight < 0)
+                    {
+                        string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeRight, convertTodec + "\"", tagcolor, 0.03f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceRight, 0, 0), sideEdgeRight);
+                    }
+
+                }
+                else
+                {
+                    if (spawner.reverseTheLine)
+                    {
+                        //left to right
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                        float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+
+                        float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                        // float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                        Color tagcolor;
+
+                        if (actualDistanceRight * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeRight, convertTodec + "\"", tagcolor, 0.03f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                    }
+                    else
+                    {
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        float distanceLeft = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        // float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
+                        float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
+
+                        Color tagcolor;
+                        if (actualDistanceLeft * 39.7f >= Sidelap)
+                        {
+                            tagcolor = Color.green;
+                        }
+                        else
+                        {
+                            tagcolor = Color.red;
+                        }
+                        string convertTodec = (actualDistanceLeft * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", tagcolor, 0.03f, false);
+                        PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+
+                    }
+                }
+            }
+
+            // if 2 are there
+            if (tilesUnderneath.Count == 2)
+            {
+
+
+                if (spawner.rightToLeft)
+                {
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                    ///
+                    float distanceRight;
+                    float distanceLeft;
+                    if (tilesUnderneath[0].isStarter)
+                    {
+
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                        distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    }
+                    else
+                    {
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeLeft.transform.position);
+                        distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                        distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    }
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+                    //right to left
+
+
+                    Vector3 localLeft = -this.transform.right;
+
+                    Vector3 distanceMeasured1;
+                    Vector3 distanceMeasured2;
+                    if (tilesUnderneath[0].isStarter)
+                    {
+                        distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+                        distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                    }
+                    else
+                    {
+                        distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[1].sideEdgeLeft.transform.position;
+                        distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
+                    }
+
+                    float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                    float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                    // If you want the magnitude of this projection as a positive number
+                    leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                    leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                    Color tagcolor;
+                    if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
+
+                    if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
+
+
+                }
+                else
+                {
+                    //left to right
+                    // Correct the local left direction
+
+
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                    Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                    Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                    float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                    Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                    Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                    float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+
+                    Vector3 localLeft = -this.transform.right;
+
+                    // Calculate the vector distances
+                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[1].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+
+                    // Project the world direction vector onto the local left vector
+                    float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                    float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                    // If you want the magnitude of this projection as a positive number
+                    leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                    leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+
+                    Color tagcolor;
+                    if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
+
+                    if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
+
+                }
+
+
+
+            }
+
+            if (tilesUnderneath.Count == 3)
+            {
+
+                if (spawner.rightToLeft)
+                {
+                    float distanceRight;
+                    float distanceLeft;
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                    if (tilesUnderneath[0].isStarter)
+                    {
+
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                        distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeRight.transform.position);
+                        distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    }
+                    else
+                    {
+                        Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                        Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[2].sideEdgeLeft.transform.position);
+                        distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                        Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                        Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
+                        distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    }
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+                    //right to left
+
+
+                    Vector3 localLeft = -this.transform.right;
+
+
+                    Vector3 distanceMeasured1 = sideEdgeRight.transform.position - tilesUnderneath[2].sideEdgeLeft.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeLeft.transform.position - tilesUnderneath[0].sideEdgeRight.transform.position;
+
+
+                    float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                    float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                    // If you want the magnitude of this projection as a positive number
+                    leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                    leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+                    Color tagcolor;
+                    if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
+
+                    if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
+
+
+                }
+                else
+                {
+                    //left to right
+                    // Correct the local left direction
+
+
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+                    Vector3 localPosLeftSource = this.transform.InverseTransformPoint(sideEdgeLeft.transform.position);
+                    Vector3 localPosLeftTarget = this.transform.InverseTransformPoint(tilesUnderneath[1].sideEdgeRight.transform.position);
+                    float distanceRight = Mathf.Abs(localPosLeftSource.x - localPosLeftTarget.x);
+
+                    Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
+                    Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeLeft.transform.position);
+                    float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
+                    //////////////////////////////////////////Get distance for local tags//////////////////////////////////////////////////
+
+
+
+
+
+
+                    Vector3 localLeft = -this.transform.right;
+
+                    // Calculate the vector distances
+                    Vector3 distanceMeasured1 = sideEdgeLeft.transform.position - tilesUnderneath[2].sideEdgeRight.transform.position;
+                    Vector3 distanceMeasured2 = sideEdgeRight.transform.position - tilesUnderneath[0].sideEdgeLeft.transform.position;
+
+                    // Project the world direction vector onto the local left vector
+                    float leftwardDistanceLocal1 = Vector3.Dot(distanceMeasured1, localLeft);
+                    float leftwardDistanceLocal2 = Vector3.Dot(distanceMeasured2, localLeft);
+
+                    // If you want the magnitude of this projection as a positive number
+                    leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
+                    leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
+
+                    Color tagcolor;
+                    if (leftwardDistanceLocal1 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
+
+                    if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
+                    {
+                        tagcolor = Color.green;
+                    }
+                    else
+                    {
+                        tagcolor = Color.red;
+                    }
+                    string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, false);
+                    PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
+
+                }
+
+
             }
         }
 
@@ -1446,7 +1863,8 @@ namespace RoofTileVR
                     // first starter being placed
                     float rakeOverHang = Vector3.Distance(this.transform.InverseTransformPoint(this.transform.position), this.transform.InverseTransformPoint(spawner.currentTileRegion.transform.position));
                     float ActualDistanceOverhang = Vector3.Distance(this.transform.position, spawner.currentTileRegion.transform.position);
-                    SpawnTileMeasurements(sideEdgeRight, ActualDistanceOverhang * 39.7f + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
+                    string convertTodec = (ActualDistanceOverhang * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" away from the point (0\" rake overhang)", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(rakeOverHang, 0, 0), sideEdgeRight);
 
                 }
@@ -1460,7 +1878,8 @@ namespace RoofTileVR
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
                     float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
                     print("keywayerror" + keywayError);
-                    SpawnTileMeasurements(sideEdgeRight, ActualkeywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    string convertTodec = (ActualkeywayError * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway distance", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
@@ -1471,7 +1890,8 @@ namespace RoofTileVR
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
                     float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
                     print("keywayerror" + keywayError);
-                    SpawnTileMeasurements(sideEdgeRight, ActualkeywayError * 39.7f + "\" keyway distance", Color.red, 0.03f, true);
+                    string convertTodec = (ActualkeywayError * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway distance", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
@@ -1514,9 +1934,9 @@ namespace RoofTileVR
                         }
                         if (distanceLeft > 0)
                         {
-
-                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceLeft * 39.7f + "\"", tagcolor, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+                            string convertTodec = (actualDistanceLeft * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(-0.5f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
                         }
 
 
@@ -1531,8 +1951,9 @@ namespace RoofTileVR
                         }
                         if (distanceRight < 0)
                         {
-                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\"", tagcolor, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceRight, 0, 0), sideEdgeRight);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeRight, convertTodec + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0.5f, 0, 0f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
                         }
 
                     }
@@ -1559,8 +1980,9 @@ namespace RoofTileVR
                             {
                                 tagcolor = Color.red;
                             }
-                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\"", tagcolor, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeRight, convertTodec + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(0.5f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
                         }
                         else
                         {
@@ -1580,8 +2002,9 @@ namespace RoofTileVR
                             {
                                 tagcolor = Color.red;
                             }
-                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceLeft * 39.7f + "\"", tagcolor, 0.03f, true);
-                            PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
+                            string convertTodec = (actualDistanceLeft * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", tagcolor, 0.03f, true);
+                            PlaceTheMeasurementTag(false, new Vector3(-0.5f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
 
                         }
                     }
@@ -1658,7 +2081,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
 
                         if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
@@ -1669,7 +2093,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
 
 
@@ -1718,7 +2143,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
 
                         if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
@@ -1729,7 +2155,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
 
                     }
@@ -1798,7 +2225,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceRight, 0, 0), sideEdgeBottom);
 
                         if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
@@ -1809,7 +2237,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceLeft, 0, 0), sideEdgeBottom);
 
 
@@ -1858,7 +2287,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal1 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(-0.5f, -0.03f, -0.03f), new Vector3(distanceRight, 0, 0), sideEdgeBottom);
 
                         if (leftwardDistanceLocal2 * 39.7f >= Sidelap)
@@ -1869,7 +2299,8 @@ namespace RoofTileVR
                         {
                             tagcolor = Color.red;
                         }
-                        SpawnTileMeasurements(sideEdgeBottom, leftwardDistanceLocal2 * 39.7f + "\" ", tagcolor, 0.52f, true);
+                        string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
+                        SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
                         PlaceTheMeasurementTag(false, new Vector3(0.5f, -0.03f, -0.03f), new Vector3(-distanceLeft, 0, 0), sideEdgeBottom);
 
                     }
@@ -1890,8 +2321,8 @@ namespace RoofTileVR
                     float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
                     float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[0].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
-
-                    SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
+                    string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                    SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" away from position", Color.red, 0.03f, true);
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
                 }
                 else
@@ -1914,8 +2345,8 @@ namespace RoofTileVR
                             float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
                             float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
-
-                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", Color.red, 0.03f, true);
                             PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
 
 
@@ -1932,8 +2363,8 @@ namespace RoofTileVR
                             float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
                             float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
-
-                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" keyway error", Color.red, 0.03f, true);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway error", Color.red, 0.03f, true);
                             PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
                         }
 
@@ -1951,8 +2382,8 @@ namespace RoofTileVR
                             float distanceRight = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
                             float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
-
-                            SpawnTileMeasurements(sideEdgeRight, actualDistanceRight * 39.7f + "\" away from position", Color.red, 0.03f, true);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" away from position", Color.red, 0.03f, true);
                             PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0.5f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
                         }
                         else
@@ -1962,8 +2393,8 @@ namespace RoofTileVR
                             float distanceLeft = Mathf.Abs(localPosRightSource.x - localPosRightTarget.x);
 
                             float actualDistanceRight = Mathf.Abs(sideEdgeLeft.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.transform.position.x);
-
-                            SpawnTileMeasurements(sideEdgeLeft, actualDistanceRight * 39.7f + "\"", Color.red, 0.03f, true);
+                            string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
+                            SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", Color.red, 0.03f, true);
                             PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(-distanceLeft, 0, 0), sideEdgeLeft);
                         }
 

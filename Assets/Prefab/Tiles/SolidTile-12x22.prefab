@@ -153,8 +153,8 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380091406732185531}
-  m_Enabled: 1
-  m_CastShadows: 1
+  m_Enabled: 0
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -545,10 +545,14 @@ MonoBehaviour:
   measurements: []
   Errormeasurements: []
   MeasurementTags: {fileID: 4269669476490922796, guid: cfdff1a8f91d09d43a5235c9ed52d2f0, type: 3}
+  isGrabbable: 1
   checkKeywayFlag: 0
   areaCoveredByTileAbove: 0
   areaLeftByTileAbove: 0
   tilesUnderneath: []
+  messageToWrite: 
+  timeToShow: 0
+  AODcolor: {r: 0, g: 0, b: 0, a: 0}
   isTileAbove: 0
   isValidTile: 0
   distanceToCheckAccordingToExposure: 0
@@ -2406,8 +2410,8 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6723819247530530870}
-  m_Enabled: 1
-  m_CastShadows: 1
+  m_Enabled: 0
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
