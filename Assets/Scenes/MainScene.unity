@@ -8954,15 +8954,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8727765562456717546, guid: 88920e9f15c07e74a93ed1854c223a57, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.24
+      value: -1.177
       objectReference: {fileID: 0}
     - target: {fileID: 8727765562456717546, guid: 88920e9f15c07e74a93ed1854c223a57, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.73
+      value: 0.621
       objectReference: {fileID: 0}
     - target: {fileID: 8727765562456717546, guid: 88920e9f15c07e74a93ed1854c223a57, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.591
+      value: 1.144
       objectReference: {fileID: 0}
     - target: {fileID: 8727765562456717546, guid: 88920e9f15c07e74a93ed1854c223a57, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12607,8 +12607,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 732782938473343133, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2071988219305097186, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2071988219305097186, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2836478020972075075, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3616807528713529938, guid: 0173a1689abfd694996de952dac8800c, type: 3}
@@ -12622,6 +12634,10 @@ PrefabInstance:
     - target: {fileID: 3616807528713529938, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_Constraints
       value: 112
+      objectReference: {fileID: 0}
+    - target: {fileID: 3616807528713529938, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_ImplicitCom
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4392068467959074968, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: tileCasting
@@ -12667,9 +12683,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5535835862183700823, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_InteractionLayers.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 6799137181714136013, guid: 0173a1689abfd694996de952dac8800c, type: 3}
       propertyPath: m_Name
       value: NailMachine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6799137181714136013, guid: 0173a1689abfd694996de952dac8800c, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25829,6 +25853,7 @@ MonoBehaviour:
   aODPanel: {fileID: 1733645196}
   cutter: {fileID: 1964520852}
   currentTilePrefab: {fileID: 0}
+  previousTilePrefab: {fileID: 0}
   currentTileRegion: {fileID: 0}
   tilesPickedUp: []
   tileSideEdge_Effect: {fileID: 0}
@@ -59625,6 +59650,7 @@ MonoBehaviour:
   areaLeftByTileAbove: 0
   tilesUnderneath: []
   isLastTile: 0
+  yesbuttonPressed: 0
   messageToWrite: 
   timeToShow: 0
   AODcolor: {r: 0, g: 0, b: 0, a: 0}

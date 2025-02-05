@@ -744,7 +744,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -815,6 +815,7 @@ MonoBehaviour:
   areaLeftByTileAbove: 0
   tilesUnderneath: []
   isLastTile: 0
+  yesbuttonPressed: 0
   messageToWrite: 
   timeToShow: 0
   AODcolor: {r: 0, g: 0, b: 0, a: 0}
@@ -1083,7 +1084,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2969124232066217095}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1135,7 +1136,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
@@ -1240,7 +1241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f73f5236a993f4142ae264db8c2d0b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotate: 2.5
+  rotate: 2.3
   fromPosition: 0.8
   axis: 1
 --- !u!114 &1223617951176531587
@@ -1273,7 +1274,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0

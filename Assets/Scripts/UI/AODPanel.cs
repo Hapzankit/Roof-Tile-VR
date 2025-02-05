@@ -42,6 +42,7 @@ public class AODPanel : MonoBehaviour
         writingText.text = "";
         isCoroutineRunning = false;
     }
+    
 
 
 }

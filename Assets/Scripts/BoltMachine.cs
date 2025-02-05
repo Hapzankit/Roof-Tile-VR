@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using RoofTileVR;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BoltMachine : MonoBehaviour
 {
@@ -35,5 +36,16 @@ public class BoltMachine : MonoBehaviour
         // tileCasting.WriteOnHandMenu("Fastener placed.");
         tileCasting.statisticsManager.boltsPlaced++;
         currentBolt = Instantiate(bolts, BoltPosition);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+
+        gameObject.layer = LayerMask.NameToLayer("NailMachine");
+
+    }
+    void OnCollisionExit(Collision collision)
+    {
+        gameObject.layer = LayerMask.NameToLayer("Default");
     }
 }

@@ -114,6 +114,10 @@ public class Bolts : MonoBehaviour
                 this.GetComponent<XRGrabInteractable>().enabled = false;
                 this.enabled = false;
             }
+            else
+            {
+                this.transform.localPosition = Vector3.zero;
+            }
         }
     }
 
@@ -135,7 +139,7 @@ public class Bolts : MonoBehaviour
             if (tileNum == 0)
             {
                 tileToCheckFrom.isFirstBoltPlaced = true;
-     
+
             }
             if (tileNum == 1)
             {

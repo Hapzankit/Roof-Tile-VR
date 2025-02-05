@@ -5,16 +5,14 @@ using System.Text;
 using DG.Tweening;
 using RoofTileVR.UI;
 using TMPro;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace RoofTileVR
 {
+
     public class TileCasting : MonoBehaviour
     {
         public Transform rightController; // Reference to the right controller transform
@@ -25,7 +23,7 @@ namespace RoofTileVR
         [SerializeField] private TextMeshProUGUI logTMP;
 
 
-        private System.Nullable<Vector3> prevHitPoint = null;
+        private Vector3? prevHitPoint = null;
         private Vector3 prevPos;
         private Vector3 prevRot;
         [SerializeField] private RoofObject m_RoofObject;
@@ -107,7 +105,7 @@ namespace RoofTileVR
             foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
             {
                 starterColliders.Add(coll);
-                tileSpanWidth += 12.18f;
+                tileSpanWidth += 12.15f;
                 coll.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
             }
 
@@ -128,14 +126,18 @@ namespace RoofTileVR
             print("Change tile grab" + shouldBeGrabbed);
             foreach (TileObject tile in TileGrabInteractables)
             {
-                tile.isGrabbable = shouldBeGrabbed;
-                tile.messageToWrite = messageToWrite;
-                tile.timeToShow = timeToShow;
-                tile.AODcolor = AODcolor;
-
-                if (shouldBeGrabbed)
+                if (!tile.isPlaced)
                 {
-                    tile.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default");
+
+                    tile.isGrabbable = shouldBeGrabbed;
+                    tile.messageToWrite = messageToWrite;
+                    tile.timeToShow = timeToShow;
+                    tile.AODcolor = AODcolor;
+
+                    if (shouldBeGrabbed)
+                    {
+                        tile.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Default");
+                    }
                 }
             }
         }
@@ -162,6 +164,7 @@ namespace RoofTileVR
 
 
         [SerializeField] public TileObject currentTilePrefab;
+        public TileObject previousTilePrefab;
 
         public void SetActiveTileStateToPlaced(int state = 1)
         {
@@ -268,9 +271,13 @@ namespace RoofTileVR
 
             currentTilePrefab.GetComponent<Rigidbody>().isKinematic = true;
             currentTilePrefab.GetComponent<Rigidbody>().useGravity = false;
-            YesButtonPressed();
+            if (currentTilePrefab.isStarter || tileSpanWidth - currentTilePrefab.tileSize < 0.5f)
+            {
+                YesButtonPressed();
+            }
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
+            EnableDisableTileGrab(false, "Fasten the previous tile first!", 3, Color.red);
             currentTilePrefab.GetComponent<TileObject>().DestroyErrors();
 
         }
@@ -327,10 +334,11 @@ namespace RoofTileVR
         public int linesOfTileTobePlaced = 1;
         public void YesButtonPressed()
         {
+            currentTilePrefab = previousTilePrefab;
             int numOfTile = 9999;
             currentTilePrefab.transform.SetParent(null);
             StartCoroutine(aODPanel.WriteTextForTime(1, Color.green, "Tile placed!"));
-            EnableDisableTileGrab(false, "Fasten the previous tile first!", 3, Color.red);
+
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
@@ -356,6 +364,7 @@ namespace RoofTileVR
                     // foreach (var tiles in TilesPlaced)
                     // {
                     //     tiles.GetComponent<l>().tileSize = 12;
+
                     // }
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
@@ -373,8 +382,6 @@ namespace RoofTileVR
             {
                 tileSpanWidth = tileSpanWidthConstant;
                 reverseTheLine = !reverseTheLine;
-
-
             }
 
 
@@ -383,7 +390,7 @@ namespace RoofTileVR
             currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
             tileSpanWidth -= currentTileWidth;
 
-            if (tileSpanWidth < 0 && currentTilePrefab)
+            if (tileSpanWidth <= 0 && currentTilePrefab)
             {
                 // cutter.transform.SetParent(currentTilePrefab.cutPosition.transform);
                 // cutter.MoveTheCutter(currentTilePrefab.cutPosition.Top.transform, currentTilePrefab.cutPosition.Bottom.transform);
@@ -418,26 +425,23 @@ namespace RoofTileVR
                 WriteOnHandMenu("Now fasten the fasteners to the tile (it should be atleast 3/4\" inches deep).");
             }
 
-            print(linesOfTileTobePlaced + "Number of lines of tile placed " + markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade);
+
             if (tileSpanWidth <= 0)
             {
-                float percentageToCut = -(tileSpanWidth + 1) / currentTilePrefab.tileSize;
+                float percentageToCut = -tileSpanWidth / currentTilePrefab.tileSize;
                 print("Percentage to cut" + percentageToCut);
                 if (!rightToLeft)
                 {
                     currentTilePrefab.MoveTheCutPosition(percentageToCut - 0.5f);
-                    StartCoroutine(cutTheLastTile(percentageToCut));
+                    StartCoroutine(cutTheLastTile(percentageToCut, currentTilePrefab));
                     currentTilePrefab.isLastTile = true;
                     currentTilePrefab.tileSize = currentTilePrefab.tileSize * (1 - percentageToCut);
                     currentTilePrefab.removeErrorPLacements();
                 }
                 else
-
-
-
                 {
                     currentTilePrefab.MoveTheCutPosition(-(percentageToCut - 0.5f));
-                    StartCoroutine(cutTheLastTile(percentageToCut));
+                    StartCoroutine(cutTheLastTile(percentageToCut, currentTilePrefab));
                     currentTilePrefab.isLastTile = true;
                     currentTilePrefab.tileSize = currentTilePrefab.tileSize * (1 - percentageToCut);
                     currentTilePrefab.removeErrorPLacements();
@@ -451,7 +455,7 @@ namespace RoofTileVR
             {
                 if (!currentTilePrefab.isStarter)
                 {
-                     Destroy(currentTilePrefab.actualTile.GetComponent<Sliceable>());
+                    Destroy(currentTilePrefab.actualTile.GetComponent<Sliceable>());
                 }
             }
             if (linesOfTileTobePlaced == markerCube.GetComponent<WhiteboardMarker>().whiteboard.numberOfLinesOftileTobeMade + 2)
@@ -459,31 +463,47 @@ namespace RoofTileVR
                 statisticsManager.SaveStatistics(tilesPickedUp, TilesPlaced);
                 statisticsManager.ShowStatsTable();
             }
-
+            currentTilePrefab.yesbuttonPressed = true;
 
             // placementPrompt.gameObject.SetActive(true);
         }
 
 
-        IEnumerator cutTheLastTile(float percentageCut)
+        IEnumerator cutTheLastTile(float percentageCut, TileObject tile)
         {
             cutter.gameObject.SetActive(true);
-            Transform initialTransform = currentTilePrefab.transform;
+            Transform initialTransform = tile.transform;
 
-            // currentTilePrefab.transform.DOMove(new Vector3(initialTransform.position.x, initialTransform.position.y + 0.1f, initialTransform.position.z), 3);
-            currentTilePrefab.transform.DORotate(new Vector3(currentTilePrefab.transform.rotation.x, currentTilePrefab.transform.rotation.y, currentTilePrefab.transform.rotation.z - 180), 3);
+            // tile.transform.DOMove(new Vector3(initialTransform.position.x, initialTransform.position.y + 0.1f, initialTransform.position.z), 3);
+            tile.transform.DORotate(new Vector3(tile.transform.rotation.x, tile.transform.rotation.y, tile.transform.rotation.z - 180), 3);
             yield return new WaitForSeconds(4);
 
-            cutter.transform.SetParent(currentTilePrefab.cutPosition.transform);
-            cutter.MoveTheCutter(currentTilePrefab.cutPosition.Top.transform, currentTilePrefab.cutPosition.Bottom.transform);
-            yield return new WaitForSeconds(1.01f);
+            cutter.transform.SetParent(tile.cutPosition.transform);
+            cutter.MoveTheCutter(tile.cutPosition.Top.transform, tile.cutPosition.Bottom.transform);
+            yield return new WaitForSeconds(1.1f);
             cutter.gameObject.SetActive(false);
-            currentTilePrefab.transform.DORotate(new Vector3(-45, initialTransform.transform.rotation.y, initialTransform.transform.rotation.z), 3);
-            currentTilePrefab.actualTile.gameObject.SetActive(true);
-            currentTilePrefab.transform.localScale = new Vector3(currentTilePrefab.transform.localScale.x * (1 - percentageCut), currentTilePrefab.transform.localScale.y, currentTilePrefab.transform.localScale.z);
-            yield return new WaitForSeconds(3.2f);
-            currentTilePrefab.SnapTileAccordingToKeyway();
-            Destroy(currentTilePrefab.actualTile.GetComponent<Sliceable>());
+            tile.transform.DORotate(new Vector3(-45, initialTransform.transform.rotation.y, initialTransform.transform.rotation.z), 3);
+            tile.actualTile.gameObject.SetActive(true);
+            tile.transform.localScale = new Vector3(tile.transform.localScale.x * (1 - percentageCut), tile.transform.localScale.y, tile.transform.localScale.z);
+            yield return new WaitForSeconds(3.6f);
+            tile.SnapTileAccordingToKeyway();
+            Destroy(tile.actualTile.GetComponent<Sliceable>());
+            if (!rightToLeft)
+            {
+                print("showing measurements right to left");
+                tile.SpawnTileMeasurements(tile.SideEdgeLeft, "1\" rake overhang", Color.green, 0.03f, false);
+                tile.PlaceTheMeasurementTag(false, new Vector3(0.03f, 0, 0.55f), new Vector3(0.12f * (1 + percentageCut), 0, 0), tile.SideEdgeLeft);
+                tile.SpawnTileMeasurements(tile.SideEdgeRight.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                tile.PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f * (1 + percentageCut), 0, 0), tile.SideEdgeRight);
+            }
+            else
+            {
+                print("showing measurements left to right");
+                tile.SpawnTileMeasurements(tile.SideEdgeRight, "1\" rake overhang", Color.green, 0.03f, false);
+                tile.PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-0.12f * (1 + percentageCut), 0, 0), tile.SideEdgeRight);
+                tile.SpawnTileMeasurements(tile.SideEdgeLeft.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                tile.PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f * (1 + percentageCut), 0, 0), tile.SideEdgeLeft);
+            }
         }
 
 
@@ -491,10 +511,12 @@ namespace RoofTileVR
 
         public void SnapBackCuttedTile()
         {
-            Destroy(cutter.cutParts[0].GetComponent<Sliceable>());
-            Destroy(cutter.cutParts[1].GetComponent<Sliceable>());
+
             GameObject cuttedTile = cutter.cutParts[1];
-            Destroy(cuttedTile);
+            if (cuttedTile)
+            {
+                Destroy(cuttedTile);
+            }
 
         }
 
@@ -584,7 +606,8 @@ namespace RoofTileVR
                     if (TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().isFirstBoltPlaced && TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().isSecondBoltPlaced)
                     {
 
-                        int num = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
+                        int num = TilesPlaced.Count - 1;
+
                         if (num < starterColliders.Count - 1)
                         {
 
