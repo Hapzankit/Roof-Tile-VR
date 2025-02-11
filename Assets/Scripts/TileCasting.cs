@@ -5,6 +5,7 @@ using System.Text;
 using DG.Tweening;
 using RoofTileVR.UI;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -105,7 +106,7 @@ namespace RoofTileVR
             foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
             {
                 starterColliders.Add(coll);
-                tileSpanWidth += 12.15f;
+                tileSpanWidth += 12f;
                 coll.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
             }
 
@@ -271,9 +272,29 @@ namespace RoofTileVR
 
             currentTilePrefab.GetComponent<Rigidbody>().isKinematic = true;
             currentTilePrefab.GetComponent<Rigidbody>().useGravity = false;
-            if (currentTilePrefab.isStarter || tileSpanWidth - currentTilePrefab.tileSize < 0.5f)
+            bool checkForLastTile = false;
+            if (currentTilePrefab.tilesUnderneath.Count > 0)
             {
-                YesButtonPressed();
+                if (currentTilePrefab.tilesUnderneath.Count > 1)
+                {
+                    checkForLastTile = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + currentTilePrefab.areaLeftByTile < currentTilePrefab.tileSize;
+                }
+                else
+                {
+                    checkForLastTile = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().areaLeftByTile < currentTilePrefab.tileSize;
+                }
+            }
+            if (currentTilePrefab.isStarter)
+            {
+                checkForLastTile = false;
+            }
+            if (currentTilePrefab.isStarter || (tileSpanWidth - currentTilePrefab.tileSize < 0.5f && checkForLastTile))
+            {
+                if (!currentTilePrefab.yesbuttonPressed)
+                {
+
+                    YesButtonPressed();
+                }
             }
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
@@ -334,6 +355,7 @@ namespace RoofTileVR
         public int linesOfTileTobePlaced = 1;
         public void YesButtonPressed()
         {
+
             currentTilePrefab = previousTilePrefab;
             int numOfTile = 9999;
             currentTilePrefab.transform.SetParent(null);
@@ -375,6 +397,7 @@ namespace RoofTileVR
 
                 }
             }
+
 
 
 
@@ -424,27 +447,60 @@ namespace RoofTileVR
             {
                 WriteOnHandMenu("Now fasten the fasteners to the tile (it should be atleast 3/4\" inches deep).");
             }
-
-
-            if (tileSpanWidth <= 0)
+            float arealeft;
+            bool cutTheTile = false;
+            if (currentTilePrefab.tilesUnderneath.Count > 0)
             {
-                float percentageToCut = -tileSpanWidth / currentTilePrefab.tileSize;
+                if (currentTilePrefab.tilesUnderneath.Count > 1)
+                {
+                    cutTheTile = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile < currentTilePrefab.tileSize;
+                }
+                else
+                {
+                    cutTheTile = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile < currentTilePrefab.tileSize;
+                }
+            }
+            if (tileSpanWidth < 12)
+            {
+                //     if (currentTilePrefab.tilesUnderneath.Count > 1)
+                //     {
+                //         tileSpanWidth = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+                //     }
+                // else
+                // {
+                tileSpanWidth = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().areaLeftByTile;
+                // }
+            }
+
+            ////////////////////////////WORK from here///////////////////////////
+            if (tileSpanWidth <= 0 && cutTheTile)
+            {
+                currentTilePrefab.isGrabbable = false;
+                if (currentTilePrefab.tilesUnderneath.Count > 1)
+                {
+                    arealeft = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+                }
+                else
+                {
+                    arealeft = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+                }
+                float percentageToCut = (currentTilePrefab.tileSize - arealeft) / currentTilePrefab.tileSize;
                 print("Percentage to cut" + percentageToCut);
                 if (!rightToLeft)
                 {
+                    currentTilePrefab.removeErrorPLacements();
                     currentTilePrefab.MoveTheCutPosition(percentageToCut - 0.5f);
                     StartCoroutine(cutTheLastTile(percentageToCut, currentTilePrefab));
                     currentTilePrefab.isLastTile = true;
                     currentTilePrefab.tileSize = currentTilePrefab.tileSize * (1 - percentageToCut);
-                    currentTilePrefab.removeErrorPLacements();
                 }
                 else
                 {
+                    currentTilePrefab.removeErrorPLacements();
                     currentTilePrefab.MoveTheCutPosition(-(percentageToCut - 0.5f));
                     StartCoroutine(cutTheLastTile(percentageToCut, currentTilePrefab));
                     currentTilePrefab.isLastTile = true;
                     currentTilePrefab.tileSize = currentTilePrefab.tileSize * (1 - percentageToCut);
-                    currentTilePrefab.removeErrorPLacements();
                 }
                 // cutter.transform.SetParent(currentTilePrefab.cutPosition.transform);
                 // cutter.MoveTheCutter(currentTilePrefab.cutPosition.Top.transform, currentTilePrefab.cutPosition.Bottom.transform);
@@ -471,21 +527,23 @@ namespace RoofTileVR
 
         IEnumerator cutTheLastTile(float percentageCut, TileObject tile)
         {
+
             cutter.gameObject.SetActive(true);
             Transform initialTransform = tile.transform;
 
-            // tile.transform.DOMove(new Vector3(initialTransform.position.x, initialTransform.position.y + 0.1f, initialTransform.position.z), 3);
-            tile.transform.DORotate(new Vector3(tile.transform.rotation.x, tile.transform.rotation.y, tile.transform.rotation.z - 180), 3);
-            yield return new WaitForSeconds(4);
+            tile.transform.DOMove(new Vector3(initialTransform.position.x, initialTransform.position.y + 0.3f, initialTransform.position.z), 2);
+            tile.transform.DOLocalRotate(new Vector3(tile.transform.rotation.x, tile.transform.rotation.y, tile.transform.rotation.z - 180), 2);
+            yield return new WaitForSeconds(2);
 
             cutter.transform.SetParent(tile.cutPosition.transform);
             cutter.MoveTheCutter(tile.cutPosition.Top.transform, tile.cutPosition.Bottom.transform);
             yield return new WaitForSeconds(1.1f);
+
             cutter.gameObject.SetActive(false);
-            tile.transform.DORotate(new Vector3(-45, initialTransform.transform.rotation.y, initialTransform.transform.rotation.z), 3);
+            tile.transform.DORotate(new Vector3(-45, initialTransform.transform.rotation.y, initialTransform.transform.rotation.z), 2);
             tile.actualTile.gameObject.SetActive(true);
             tile.transform.localScale = new Vector3(tile.transform.localScale.x * (1 - percentageCut), tile.transform.localScale.y, tile.transform.localScale.z);
-            yield return new WaitForSeconds(3.6f);
+            yield return new WaitForSeconds(2.6f);
             tile.SnapTileAccordingToKeyway();
             Destroy(tile.actualTile.GetComponent<Sliceable>());
             if (!rightToLeft)
@@ -526,7 +584,7 @@ namespace RoofTileVR
         // Update is called once per frame
         void SnapTilesAndShowErrors()
         {
-            if (currentTilePrefab.isValidTile && !currentTilePrefab.checkKeywayFlag)
+            if (currentTilePrefab.isValidTile && !currentTilePrefab.checkKeywayFlag && !currentTilePrefab.yesbuttonPressed)
             {
 
                 if (starterTilesPlaced)

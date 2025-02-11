@@ -139,7 +139,7 @@ namespace RoofTileVR
             spawner = FindObjectOfType<TileCasting>();
             YesButton?.onClick.AddListener(YesButtonPressed);
             areaCoveredByTileAbove = 0;
-            areaLeftByTileAbove = tileSize - 0.127f;
+            areaLeftByTileAbove = tileSize;
             BoltPlaceHolders[0].gameObject.SetActive(false);
             BoltPlaceHolders[1].gameObject.SetActive(false);
             TileCutParent = actualTile.transform.parent.gameObject;
@@ -247,7 +247,14 @@ namespace RoofTileVR
         }
         IEnumerator KeywayflagReset()
         {
-            yield return new WaitForSeconds(1.1f);
+            if (isStarter)
+            {
+                yield return new WaitForSeconds(0f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(2.1f);
+            }
             checkKeywayFlag = false;
         }
 
@@ -301,7 +308,7 @@ namespace RoofTileVR
 
         float Sidelap = 1.5f;
         float areaToBeCovered;
-        float areaLeftByTile;
+        public float areaLeftByTile;
         int tileNum;
         int numberoftilesunderneath;
         public void ReduceTileArea()
@@ -358,7 +365,7 @@ namespace RoofTileVR
                     {
                         print("TIle size correct");
                         areaToBeCovered = tileSize;
-                        areaLeftByTile = tilesUnderneath[0].tileSize - 0.127f - tileSize;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - tileSize;
                         print("area left by tile " + areaLeftByTile);
                         tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
@@ -439,7 +446,7 @@ namespace RoofTileVR
 
 
                             areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                            areaLeftByTile = tilesUnderneath[1].tileSize - 0.127f - areaToBeCovered;
+                            areaLeftByTile = tilesUnderneath[1].tileSize - areaToBeCovered;
                             tileNum = 1;
                             CorrectTileIndicator.SetActive(false);
                             if (areaLeftByTile < Sidelap + 0.52f)
@@ -480,7 +487,7 @@ namespace RoofTileVR
 
 
                             areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                            areaLeftByTile = tilesUnderneath[0].tileSize - 0.127f - areaToBeCovered;
+                            areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                             tileNum = 0;
                             CorrectTileIndicator.SetActive(false);
                             if (areaLeftByTile < Sidelap + 0.52f)
@@ -522,7 +529,7 @@ namespace RoofTileVR
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[0].tileSize - 0.127f - areaToBeCovered;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
                         if (areaLeftByTile < Sidelap + 0.52)
@@ -569,7 +576,7 @@ namespace RoofTileVR
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[0].tileSize - 0.127f - areaToBeCovered;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
                         if (areaLeftByTile < Sidelap + 0.52f)
@@ -612,7 +619,7 @@ namespace RoofTileVR
                     {
 
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
-                        areaLeftByTile = tilesUnderneath[0].tileSize - 0.127f - areaToBeCovered;
+                        areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
                         CorrectTileIndicator.SetActive(false);
                         if (areaLeftByTile < Sidelap + 0.52f)
@@ -989,26 +996,42 @@ namespace RoofTileVR
                     isPlacedCorrectlyAfterConfirmedPlacement = true;
                     // CorrectTileIndicator.SetActive(true);
                     // this.transform.localPosition = new Vector3(0, 0, 0.24f);
-                    // this.transform.position = spawner.currentTileRegion.transform.position;
+
+                    // Calculate the direction from the target point to the child's current position
+                    if (spawner.TilesPlaced.Count == 0)
+                    {
+                        this.transform.position = spawner.currentTileRegion.transform.position;
+                    }
+                    else
+                    {
 
 
-                //    Vector3 direction = (-objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
-                //     print("Going right to left");
-                //     // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
+                        Vector3 newChildWorldPosition;
+
+                        GameObject objectToCheck = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.gameObject;
+
+                        GameObject objectToCheckFrom = this.sideEdgeRight.gameObject;
+
+                        Vector3 childWorldPosition = objectToCheckFrom.transform.position;
+                        Vector3 targetPosition = objectToCheck.transform.position;
+                        Vector3 direction = (-objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
+                        print("Going right to left");
+                        // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
 
 
-                //     newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
-                //     Vector3 offset = newChildWorldPosition - childWorldPosition;
+                        newChildWorldPosition = targetPosition + direction * 0.23f * 0.0254f * 2;
+                        Vector3 offset = newChildWorldPosition - childWorldPosition;
 
-                //     transform.position += offset;
-                    DistanceErrorCubeRL.SetActive(false);
-                    DistanceErrorCubeTB.SetActive(false);
-                    bottomTopTextError.gameObject.SetActive(false);
-                    LeftRightTextError.gameObject.SetActive(false);
-                    spawner.WriteOnHandMenu("Tile Placed Correctly");
-                    GetComponent<Rigidbody>().isKinematic = true;
-                    SpawnTileMeasurements(sideEdgeBottom, "1/2\" eave overhang", Color.green, 0.03f, false);
-                    PlaceTheMeasurementTag(true, new Vector3(-0.55f, 0, 0), new Vector3(0, 0, 0.07f), sideEdgeBottom);
+                        transform.position += offset;
+                        DistanceErrorCubeRL.SetActive(false);
+                        DistanceErrorCubeTB.SetActive(false);
+                        bottomTopTextError.gameObject.SetActive(false);
+                        LeftRightTextError.gameObject.SetActive(false);
+                        spawner.WriteOnHandMenu("Tile Placed Correctly");
+                        GetComponent<Rigidbody>().isKinematic = true;
+                        SpawnTileMeasurements(sideEdgeBottom, "1/2\" eave overhang", Color.green, 0.03f, false);
+                        PlaceTheMeasurementTag(true, new Vector3(-0.55f, 0, 0), new Vector3(0, 0, 0.07f), sideEdgeBottom);
+                    }
 
                     if (spawner.TilesPlaced.Count == 0)
                     {

@@ -787,7 +787,7 @@ MonoBehaviour:
   - {fileID: 8460143414860404497}
   isFirstBoltPlaced: 0
   isSecondBoltPlaced: 0
-  tileSize: 7.18
+  tileSize: 7
   isPlaced: 0
   isInStarterRegion: 0
   rowNumber: 0

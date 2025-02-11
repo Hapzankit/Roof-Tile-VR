@@ -380,7 +380,7 @@ Transform:
   m_GameObject: {fileID: 1380091406732185531}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.487, y: -0.17, z: 0}
+  m_LocalPosition: {x: -0.487, y: -0.23, z: 0}
   m_LocalScale: {x: -0.02, y: -0.25, z: -0.025}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -1158,7 +1158,7 @@ MonoBehaviour:
   - {fileID: 3327808575274694861}
   isFirstBoltPlaced: 0
   isSecondBoltPlaced: 0
-  tileSize: 5.18
+  tileSize: 5
   isPlaced: 0
   isInStarterRegion: 0
   rowNumber: 0
@@ -1190,6 +1190,7 @@ MonoBehaviour:
   messageToWrite: 
   timeToShow: 0
   AODcolor: {r: 0, g: 0, b: 0, a: 0}
+  areaLeftByTile: 0
   isTileAbove: 0
   isValidTile: 0
   distanceToCheckAccordingToExposure: 0
@@ -3015,7 +3016,7 @@ Transform:
   m_GameObject: {fileID: 6723819247530530870}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.484, y: -0.17, z: 0}
+  m_LocalPosition: {x: 0.484, y: -0.23, z: 0}
   m_LocalScale: {x: -0.02, y: -0.25, z: -0.025}
   m_ConstrainProportionsScale: 1
   m_Children:
