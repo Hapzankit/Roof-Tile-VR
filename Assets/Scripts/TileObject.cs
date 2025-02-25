@@ -85,7 +85,11 @@ namespace RoofTileVR
 
 
         public bool checkKeywayFlag = false;
+        //Audio
+        AudioHandler audioHandler;
 
+        public bool isFirstStarter = false;
+        public bool isSecondStarter = false;
 
 
         /// //////////////////////SideLap Checks///////////////////////////       
@@ -96,6 +100,8 @@ namespace RoofTileVR
         public List<TileObject> tilesUnderneath;
 
         public bool isLastTile = false;
+
+        public bool isTileGrabbed = false;
 
 
         // Example method for resetting the flag when leaving regions
@@ -132,9 +138,14 @@ namespace RoofTileVR
         public bool yesbuttonPressed = false;
 
 
+        public TutorialHandler tutorialHandler;
+
+
 
         private void Start()
         {
+            audioHandler = AudioHandler.Instance;
+            tutorialHandler = GetComponent<TutorialHandler>();
             // mHCutter = FindObjectOfType<MHCutter>();
             spawner = FindObjectOfType<TileCasting>();
             YesButton?.onClick.AddListener(YesButtonPressed);
@@ -150,6 +161,8 @@ namespace RoofTileVR
             downArrow.gameObject.SetActive(false);
             leftArrow.gameObject.SetActive(false);
             rightArrow.gameObject.SetActive(false);
+
+
             // CutTheTile(BoltPlaceHolders[0].transform.position);
             // CutTheTile();
         }
@@ -204,7 +217,7 @@ namespace RoofTileVR
         public Color AODcolor;
         public void OnTilePicked()
         {
-
+            isTileGrabbed = true;
             // spawner.TileSelectText("Tile Picked");
             if (isGrabbable)
             {
@@ -241,6 +254,7 @@ namespace RoofTileVR
             {
                 this.GetComponent<XRGrabInteractable>().interactionLayers = InteractionLayerMask.GetMask("Nothing");
                 StartCoroutine(spawner.aODPanel.WriteTextForTime(timeToShow, AODcolor, messageToWrite));
+                AudioHandler.Instance.PlaySound(AudioHandler.Sound.CheckFastener);
             }
 
 
@@ -260,8 +274,8 @@ namespace RoofTileVR
 
         public void OnTileDropped()
         {
-
-            print("Tile Dropped" + isTileAbove + isValidTile + isPlaced);
+            isTileGrabbed = false;
+            // print("Tile Dropped" + isTileAbove + isValidTile + isPlaced);
 
 
 
@@ -279,8 +293,8 @@ namespace RoofTileVR
                 else
                 {
                     //Convert from inches to unity measurements
-                    print(spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] + " Row number");
-                    this.transform.localPosition = new Vector3((11 - spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 2) * 0.0254f + (0.07f * spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 10), 0, this.transform.localPosition.z);
+                    // print(spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] + " Row number");
+                    this.transform.localPosition = new Vector3((11 - spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 2) * 0.0254f + (0.041f * spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] / 10), 0, this.transform.localPosition.z);
                 }
 
                 ShowErrorsWhenDropped();
@@ -306,6 +320,8 @@ namespace RoofTileVR
 
 
 
+
+
         float Sidelap = 1.5f;
         float areaToBeCovered;
         public float areaLeftByTile;
@@ -321,11 +337,12 @@ namespace RoofTileVR
         public bool CalculateSidelapCheck()
 
         {
-            print("Calculate Side Lap");
+
 
             if (isStarter) return true;
 
-            //GEt all the tiles underneath this tile;
+
+            //Get all the tiles underneath this tile;
             tilesUnderneath.Clear();
             float checkDepth = 0.04f;  // Adjust depth to the needed value
             Vector3 planeSize = GetComponent<Renderer>().bounds.size;
@@ -340,7 +357,7 @@ namespace RoofTileVR
             {
                 if (collider.GetComponent<TileObject>())
                 {
-                    Debug.Log("Detected object underneath: " + collider.gameObject.name);
+
                     if (collider.GetComponent<TileObject>().isStarter && rowNumber == 1)
                     {
                         tilesUnderneath.Add(collider.GetComponent<TileObject>());
@@ -357,18 +374,19 @@ namespace RoofTileVR
             if (tilesUnderneath.Count == 1)
             {
                 numberoftilesunderneath = 1;
-                // print("1 number of tile");
+
                 if (tilesUnderneath[0].areaCoveredByTileAbove == 0)
                 {
-                    // print("1 number of tile and area covered 0");
+
                     if (tilesUnderneath[0].tileSize > tileSize)
                     {
-                        print("TIle size correct");
+
                         areaToBeCovered = tileSize;
                         areaLeftByTile = tilesUnderneath[0].tileSize - tileSize;
-                        print("area left by tile " + areaLeftByTile);
+
                         tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
+                        // CorrectTileIndicator.SetActive(false);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return true;
                     }
                     else
@@ -377,6 +395,7 @@ namespace RoofTileVR
                         spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
                         // CorrectTileIndicator.SetActive(true);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return false;
                     }
                 }
@@ -384,24 +403,26 @@ namespace RoofTileVR
                 {
                     float areaLeft = tileSize - tilesUnderneath[0].areaLeftByTileAbove;
                     areaLeft = Math.Abs(areaLeft);
-                    print("Area left " + areaLeft);
+                    // print("Area left " + areaLeft);
                     if (areaLeft < Sidelap + 0.52f)
                     {
                         // print("TIle size incorrect");
                         spawner.WriteOnHandMenu("Incorrect sidelap (tile size doesnt fit the sidelap criteria choose tile of different size).");
                         IncorrectSidelap++;
                         // CorrectTileIndicator.SetActive(true);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return false;
                     }
                     else
                     {
-                        print("TIle size correct");
+                        // print("TIle size correct");
 
                         areaToBeCovered = tilesUnderneath[0].areaCoveredByTileAbove + tileSize;
                         areaLeftByTile = areaLeft;
                         // print("tilesUnderneath[0].areaCoveredByTileAbove "+tilesUnderneath[0].areaCoveredByTileAbove+" "+"tile size "+ tileSize + "area left"+areaLeftByTile);
                         tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
+                        // CorrectTileIndicator.SetActive(false);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return true;
                     }
                 }
@@ -437,7 +458,7 @@ namespace RoofTileVR
                         // If you want the magnitude of this projection as a positive number
                         leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
                         leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
-                        print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        // print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                         spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                         // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                         if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
@@ -448,7 +469,8 @@ namespace RoofTileVR
                             areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                             areaLeftByTile = tilesUnderneath[1].tileSize - areaToBeCovered;
                             tileNum = 1;
-                            CorrectTileIndicator.SetActive(false);
+                            // CorrectTileIndicator.SetActive(false);
+                            if (spawner.tileSpanWidth - tileSize < 0) return true;
                             if (areaLeftByTile < Sidelap + 0.52f)
                             { return false; }
                             else { return true; }
@@ -460,6 +482,7 @@ namespace RoofTileVR
                         {
                             IncorrectSidelap++;
                             // CorrectTileIndicator.SetActive(true);
+                            if (spawner.tileSpanWidth - tileSize < 0) return true;
                             return false;
                         }
                     }
@@ -478,7 +501,7 @@ namespace RoofTileVR
                         // If you want the magnitude of this projection as a positive number
                         leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
                         leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
-                        print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                        // print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                         spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                         // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                         if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
@@ -489,7 +512,8 @@ namespace RoofTileVR
                             areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                             areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                             tileNum = 0;
-                            CorrectTileIndicator.SetActive(false);
+                            // CorrectTileIndicator.SetActive(false);
+                            if (spawner.tileSpanWidth - tileSize < 0) return true;
                             if (areaLeftByTile < Sidelap + 0.52f)
                             { return false; }
                             else { return true; }
@@ -499,6 +523,7 @@ namespace RoofTileVR
                         {
                             IncorrectSidelap++;
                             // CorrectTileIndicator.SetActive(true);
+                            if (spawner.tileSpanWidth - tileSize < 0) return true;
                             return false;
                         }
                     }
@@ -524,14 +549,15 @@ namespace RoofTileVR
 
 
 
-                    print("Going left to right Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                    // print("Going left to right Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                     spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
+                        // CorrectTileIndicator.SetActive(false);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         if (areaLeftByTile < Sidelap + 0.52)
                         { return false; }
                         else { return true; }
@@ -540,6 +566,7 @@ namespace RoofTileVR
                     {
                         IncorrectSidelap++;
                         // CorrectTileIndicator.SetActive(true);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return false;
                     }
                 }
@@ -553,7 +580,7 @@ namespace RoofTileVR
                 numberoftilesunderneath = 3;
                 // bool isTileCovered = true;
                 tilesUnderneath = tilesUnderneath.OrderBy(go => ExtractNumber(go.name)).ToList();
-                print("Tiles in order:- " + tilesUnderneath[0].name + " " + tilesUnderneath[1].name);
+                // print("Tiles in order:- " + tilesUnderneath[0].name + " " + tilesUnderneath[1].name);s
                 if (spawner.rightToLeft)
                 {
                     //right to left
@@ -570,7 +597,7 @@ namespace RoofTileVR
                     // If you want the magnitude of this projection as a positive number
                     leftwardDistanceLocal1 = Mathf.Abs(leftwardDistanceLocal1);
                     leftwardDistanceLocal2 = Mathf.Abs(leftwardDistanceLocal2);
-                    print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
+                    // print(" Going right to left Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                     spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                     // print("Distances:-" + distanceMeasured1 + " " + distanceMeasured2 + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[1].name);
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
@@ -578,7 +605,8 @@ namespace RoofTileVR
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
+                        // CorrectTileIndicator.SetActive(false);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         if (areaLeftByTile < Sidelap + 0.52f)
                         { return false; }
                         else { return true; }
@@ -588,6 +616,7 @@ namespace RoofTileVR
                     {
                         IncorrectSidelap++;
                         // CorrectTileIndicator.SetActive(true);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return false;
                     }
                 }
@@ -613,7 +642,7 @@ namespace RoofTileVR
 
 
 
-                    print("Going left to right Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[2].name);
+                    // print("Going left to right Distances:-" + leftwardDistanceLocal1 * 39.37f + " " + leftwardDistanceLocal2 * 39.37f + "names 0 " + tilesUnderneath[0].name + "1:- " + tilesUnderneath[2].name);
                     spawner.WriteOnHandMenu("Sidelap from left tile " + (float)Math.Round(leftwardDistanceLocal1 * 39.37f, 2) + " Sidelap from right tile " + (float)Math.Round(leftwardDistanceLocal2 * 39.37f, 2) + " Sidelap must be atleast 1.5 inches on both sides");
                     if (leftwardDistanceLocal1 * 39.37 > Sidelap && leftwardDistanceLocal2 * 39.37 > Sidelap)
                     {
@@ -621,7 +650,8 @@ namespace RoofTileVR
                         areaToBeCovered = leftwardDistanceLocal2 * 39.37f;
                         areaLeftByTile = tilesUnderneath[0].tileSize - areaToBeCovered;
                         tileNum = 0;
-                        CorrectTileIndicator.SetActive(false);
+                        // CorrectTileIndicator.SetActive(false);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         if (areaLeftByTile < Sidelap + 0.52f)
                         { return false; }
                         else { return true; }
@@ -630,6 +660,7 @@ namespace RoofTileVR
                     {
                         IncorrectSidelap++;
                         // CorrectTileIndicator.SetActive(true);
+                        if (spawner.tileSpanWidth - tileSize < 0) return true;
                         return false;
                     }
                 }
@@ -638,6 +669,7 @@ namespace RoofTileVR
             else
             {
                 // CorrectTileIndicator.SetActive(true);
+                if (spawner.tileSpanWidth - tileSize < 0) return true;
                 return false;
             }
             // return false;
@@ -681,13 +713,15 @@ namespace RoofTileVR
             leftArrow.gameObject.SetActive(false);
             rightArrow.gameObject.SetActive(false);
         }
+        bool starterCallOnce = true;
+        bool secondStarterCallOnce = true;
         void Update()
         {
 
             if (isFirstBoltPlaced && isSecondBoltPlaced)
             {
 
-
+                isBothFastnersplaced = true;
                 foreach (var measure in measurements)
                 {
                     if (measure)
@@ -695,6 +729,22 @@ namespace RoofTileVR
                         measure.gameObject.SetActive(false);
                     }
                     this.GetComponent<XRGrabInteractable>().enabled = false;
+                }
+
+                if (isFirstStarter && starterCallOnce)
+                {
+                    StartCoroutine(MakeTileTransparent(this.actualTile.GetComponent<Renderer>()));
+                    audioHandler.DoBeforeSound += ShowSecondStarter;
+                    audioHandler.DoAfterSound += HideSecondStarter;
+                    AudioHandler.Instance.PlaySound(AudioHandler.Sound.ContinueinstallingStarters);
+                    starterCallOnce = false;
+                }
+                if (isSecondStarter && secondStarterCallOnce)
+                {
+                    audioHandler.DoBeforeSound += ShowSecondStarter;
+                    audioHandler.DoAfterSound += HideSecondGhostStarterSeconfTime;
+                    AudioHandler.Instance.PlaySound(AudioHandler.Sound.A316gaporkeyway);
+                    secondStarterCallOnce = false;
                 }
 
                 if (callOnceBend && !isStarter)
@@ -720,8 +770,63 @@ namespace RoofTileVR
                 this.transform.SetParent(null);
             }
 
+            if (isPlaced && !yesbuttonPressed && showFillImage)
+            {
+                CorrectTileIndicator.gameObject.SetActive(true);
+            }
 
+            // if (isTileAbove && !isPlaced && isTileGrabbed)
+            // {
+            //     this.transform.SetParent(spawner.BoardPosition);
+            //     if (isStarter)
+            //     {
 
+            //         // this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
+
+            //     }
+            //     else
+            //     {
+            //         //Convert from inches to unity measurements
+            //         // print(spawner.exposureConvertedToUnityfromInches[spawner.linesOfTileTobePlaced - 1] + " Row number");
+            //         this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
+            //     }
+
+            // }
+
+            if (isPlayedAudio)
+            {
+                timeElapsed += Time.deltaTime;
+                if (timeElapsed > 30)
+                {
+                    timeElapsed = 0;
+                    isPlayedAudio = false;
+                }
+            }
+            else
+            {
+                timeElapsed = 0;
+            }
+
+        }
+
+        public void ShowSecondStarter()
+        {
+            spawner.starterColliders[1].GetComponent<TileDropCollisionCheck>().ghostTile.ShowTiles();
+            audioHandler.DoBeforeSound -= ShowSecondStarter;
+        }
+        public void HideSecondStarter()
+        {
+            spawner.starterColliders[1].GetComponent<TileDropCollisionCheck>().ghostTile.HideTiles();
+
+            audioHandler.DoAfterSound -= HideSecondStarter;
+        }
+
+        public void HideSecondGhostStarterSeconfTime()
+        {
+            spawner.starterColliders[1].GetComponent<TileDropCollisionCheck>().ghostTile.HideTiles();
+            audioHandler.PlaySound(AudioHandler.Sound.CutShakesLeaving);
+            spawner.CuttingTutorial.SetActive(true);
+            audioHandler.DoAfterSound -= HideSecondGhostStarterSeconfTime;
         }
 
         public void StoreStatistics()
@@ -740,7 +845,7 @@ namespace RoofTileVR
 
                         float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
                         float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
-                        print(" Distance measured for starters" + sideWaysDistance + " " + verticalDistance);
+                        // print(" Distance measured for starters" + sideWaysDistance + " " + verticalDistance);
                         if (spawner.TilesPlaced.Count == 0 || spawner.TilesPlaced.Count == spawner.starterColliders.Count - 1)
                         {
                             //Placing First Tile starter 
@@ -818,7 +923,7 @@ namespace RoofTileVR
                             Vector3 distanceFromPoint = objectToCheckFrom.transform.position - objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position;
                             float sideWaysDistance = Math.Abs(Vector3.Dot(distanceFromPoint, rightDirection) * 39.37f);
                             float verticalDistance = Math.Abs(Vector3.Dot(distanceFromPoint, forwardDirection) * 39.37f);
-                            print(" Distance measured for shakes" + sideWaysDistance + " " + verticalDistance);
+                            // print(" Distance measured for shakes" + sideWaysDistance + " " + verticalDistance);
                             if (verticalDistance > 1)
                             {
                                 IncorrectExposure++;
@@ -849,7 +954,7 @@ namespace RoofTileVR
 
                     GameObject objectToCheckNormal;
                     GameObject objectToCheckFromNormal;
-                    print("Checking keyway distance");
+                    // print("Checking keyway distance");
                     objectToCheckNormal = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.gameObject;
                     float distanceInInches;
                     if (spawner.tileSpanWidth <= 0)
@@ -857,7 +962,7 @@ namespace RoofTileVR
                         objectToCheckFromNormal = this.sideEdgeLeft.gameObject;
                         distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
                         distanceInInches = spawner.overlapSpanAccordingtoExposure;
-                        print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                        // print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
                     }
                     else
                     {
@@ -868,7 +973,7 @@ namespace RoofTileVR
 
                     if (spawner.reverseTheLine)
                     {
-                        print("Going right to left");
+                        // print("Going right to left");
                         objectToCheckNormal = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.gameObject;
 
                         if (spawner.tileSpanWidth <= 0)
@@ -876,7 +981,7 @@ namespace RoofTileVR
                             objectToCheckFromNormal = this.sideEdgeRight.gameObject;
                             distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
                             distanceInInches = spawner.overlapSpanAccordingtoExposure;
-                            print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                            // print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
                         }
                         else
                         {
@@ -922,7 +1027,7 @@ namespace RoofTileVR
 
         public bool ShowStarterErrors()
         {
-            print("Showing starter tile errors");
+            // print("Showing starter tile errors");
             if (spawner.currentTileRegion && isValidTile)
             {
                 // this.transform.position = spawner.currentTileRegion.transform.position;
@@ -1038,10 +1143,18 @@ namespace RoofTileVR
                         //First starter tile Being Placed
                         SpawnTileMeasurements(sideEdgeRight, "1\" rake overhang", Color.green, 0.03f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-0.12f, 0, 0), sideEdgeRight);
+                        AudioHandler.Instance.DoBeforeSound += HighlightNailer;
+                        AudioHandler.Instance.DoAfterSound += UnHilightNailer;
+                        List<AudioHandler.Sound> clips = new List<AudioHandler.Sound>();
+                        clips.Add(AudioHandler.Sound.Two1and34); clips.Add(AudioHandler.Sound.EnsureFasteners);
+                        isFirstStarter = true;
+                        AudioHandler.Instance.PlayListOfSound(clips);
 
                     }
                     else
                     {
+                        if (spawner.TilesPlaced.Count == 1)
+                        { isSecondStarter = true; }
                         if (spawner.TilesPlaced.Count == spawner.starterColliderHolder.GetComponentsInChildren<BoxCollider>().Length - 1)
                         {
                             //Last starter being placed
@@ -1078,6 +1191,26 @@ namespace RoofTileVR
             {
                 return false;
             }
+        }
+
+        IEnumerator MakeTileTransparent(Renderer tileRenderer)
+        {
+
+            tileRenderer.material.color = new Color(tileRenderer.material.color.r, tileRenderer.material.color.g, tileRenderer.material.color.b, 0.5f);
+            yield return new WaitForSeconds(AudioHandler.Instance.GetClip(AudioHandler.Sound.EnsureFasteners).length + 0.5f);
+            tileRenderer.material.color = new Color(tileRenderer.material.color.r, tileRenderer.material.color.g, tileRenderer.material.color.b, 1);
+        }
+
+        void HighlightNailer()
+        {
+            spawner.boltMachine.HighlightNailer();
+            AudioHandler.Instance.DoBeforeSound -= HighlightNailer;
+        }
+        void UnHilightNailer()
+        {
+
+            spawner.boltMachine.StopHighlight();
+            AudioHandler.Instance.DoAfterSound -= UnHilightNailer;
         }
         GameObject measureTag1;
         GameObject measureTag2;
@@ -1170,13 +1303,7 @@ namespace RoofTileVR
 
 
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent(out CollisionCheck edge))
-            {
 
-            }
-        }
 
 
         public float distanceToCheckAccordingToExposure;
@@ -1211,7 +1338,7 @@ namespace RoofTileVR
                     float distanceMeasuredInDirection = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionup));
                     float distanceMeasuredInDirectionSideways = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionright));
 
-                    print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
+                    // print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
 
                     // this.transform.position = spawner.currentTileRegion.transform.position;
                     if (distanceMeasuredInDirection * 39.37 > 5f || distanceMeasuredInDirectionSideways * 39.37 > 0.4f)
@@ -1222,7 +1349,7 @@ namespace RoofTileVR
                         direction.y = 0; // Ignore the Y-axis
 
 
-                        print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) + "Direction" + direction);
+                        // print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.GetComponent<TileObject>().sideEdgeRight.transform.position) + "Direction" + direction);
 
                         // Determine the relative position
                         if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
@@ -1284,7 +1411,7 @@ namespace RoofTileVR
 
                         // Combine the Y-direction offset with the original directional offset
                         Vector3 combinedDirection = localYDirection.normalized;
-                        print("Placing first tile");
+                        // print("Placing first tile");
                         Vector3 newChildWorldPosition = targetPosition + combinedDirection * 4.7f * 0.0254f;
 
                         // Calculate the required offset for the parent
@@ -1323,12 +1450,13 @@ namespace RoofTileVR
             }
         }
         // public bool rightToLeft = true;
+        bool showFillImage = false;
 
         public bool ShowKeywayerrors()
         {
             GameObject objectToCheck;
             GameObject objectToCheckFrom;
-            print("Checking keyway distance");
+            // print("Checking keyway distance");
             objectToCheck = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.gameObject;
             float distanceInInches;
             if (spawner.tileSpanWidth <= 0)
@@ -1336,7 +1464,7 @@ namespace RoofTileVR
                 objectToCheckFrom = this.sideEdgeLeft.gameObject;
                 distanceToCheckAccordingToExposure = spawner.overlapSpanAccordingtoExposure * 0.0254f;
                 distanceInInches = spawner.overlapSpanAccordingtoExposure;
-                print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                // print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
             }
             else
             {
@@ -1355,7 +1483,7 @@ namespace RoofTileVR
                     objectToCheckFrom = this.sideEdgeRight.gameObject;
                     distanceToCheckAccordingToExposure = (spawner.overlapSpanAccordingtoExposure) * 0.0254f;
                     distanceInInches = spawner.overlapSpanAccordingtoExposure;
-                    print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
+                    // print("A row of tiles placed now checking from the last tile to the above" + distanceToCheckAccordingToExposure);
                 }
                 else
                 {
@@ -1374,10 +1502,11 @@ namespace RoofTileVR
             float distanceMeasuredInDirection = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionup));
             float distanceMeasuredInDirectionSideways = Mathf.Abs(Vector3.Dot(distanceMeasured, localdirectionright));
 
-            print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
+            // print("First shake placing " + distanceMeasuredInDirection * 39.37 + " sideways:-" + distanceMeasuredInDirectionSideways * 39.37);
 
             // this.transform.position = spawner.currentTileRegion.transform.position;
-            if (distanceMeasuredInDirection * 39.37 > distanceInInches || distanceMeasuredInDirectionSideways * 39.37 > 0.4f)
+            print(distanceMeasuredInDirectionSideways * 39.37 + "distance measured sideways");
+            if (/*distanceMeasuredInDirection * 39.37 > distanceInInches ||*/ distanceMeasuredInDirectionSideways * 39.37 > 0.375f || distanceMeasuredInDirectionSideways * 39.37 < 0.187)
             {
 
                 // DistanceErrorCube.SetActive(true);
@@ -1385,7 +1514,7 @@ namespace RoofTileVR
                 direction.y = 0; // Ignore the Y-axis
                 isPlacedCorrectlyAfterConfirmedPlacement = false;
 
-                print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) + "Direction" + direction);
+                // print("Distance from place" + Vector3.Distance(objectToCheckFrom.transform.position, objectToCheck.transform.position) + "Direction" + direction);
 
                 // Determine the relative position
                 if (direction.x > 0 && Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
@@ -1502,18 +1631,21 @@ namespace RoofTileVR
                     if (spawner.reverseTheLine)
                     {
 
-                        print("Going left to right");
+                        distanceToCheckAccordingToExposure = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeRight.position.x - sideEdgeLeft.position.x;
+                        // print("Going left to right");
                         direction = (objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * -1 * distanceToCheckAccordingToExposure;
 
                     }
                     else
                     {
+                        distanceToCheckAccordingToExposure = spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.position.x - sideEdgeRight.position.x;
                         direction = (-objectToCheck.transform.right + new Vector3(0, 0f, 0)).normalized;
-                        print("Going right to left");
+                        // print("Going right to left");
                         // newChildWorldPosition = objectToCheck.transform.position + (objectToCheck.transform.right + new Vector3(0, 0.2f, 0)) * distanceToCheckAccordingToExposure;
 
                     }
+                    distanceToCheckAccordingToExposure = Mathf.Abs(distanceToCheckAccordingToExposure);
                     newChildWorldPosition = targetPosition + direction * distanceToCheckAccordingToExposure;
                     Vector3 offset = newChildWorldPosition - childWorldPosition;
 
@@ -1525,24 +1657,29 @@ namespace RoofTileVR
                         string convertTodec = areaLeftByTile.ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(0.52f, 0, 0), new Vector3(areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, distanceToCheckAccordingToExposure * 39.7f + " keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeLeft);
+                        CorrectTileIndicator.transform.localPosition = new Vector3(-0.5f, CorrectTileIndicator.transform.localPosition.y, CorrectTileIndicator.transform.localPosition.z);
+
                     }
                     else
                     {
                         string convertTodec = areaLeftByTile.ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" Sidelap left", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.52f, 0, 0), new Vector3(-areaLeftByTile / tileSize, 0, 0), sideEdgeBottom);
-                        SpawnTileMeasurements(objectToCheckFrom.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
+                        SpawnTileMeasurements(objectToCheckFrom.transform, distanceToCheckAccordingToExposure * 39.7f + " keyway spacing", Color.green, 0.5f, false);
                         PlaceTheMeasurementTag(false, new Vector3(-0.02f, 0, 0.55f), new Vector3(0.1f, 0, 0), sideEdgeRight);
+                        CorrectTileIndicator.transform.localPosition = new Vector3(0.5f, CorrectTileIndicator.transform.localPosition.y, CorrectTileIndicator.transform.localPosition.z);
                     }
 
                 }
                 spawner.WriteOnHandMenu("Tile Placed Correctly");
                 ShowSidelapOnTile();
+                showFillImage = true;
                 DistanceErrorCubeRL.SetActive(false);
                 DistanceErrorCubeTB.SetActive(false);
                 CorrectTileIndicator.SetActive(true);
+                // CorrectTileIndicator.GetComponent<Bend>().BendTheTile(rowNumber);
                 return true;
             }
         }
@@ -1613,7 +1750,7 @@ namespace RoofTileVR
                     Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
                     Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
                     float distanceRight = (localPosRightSource.x - localPosRightTarget.x);//SHOULD BE -VE
-                    print(distanceLeft + " distance left " + distanceRight + " distance right ");
+                    // print(distanceLeft + " distance left " + distanceRight + " distance right ");
                     float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
                     float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
 
@@ -2006,7 +2143,7 @@ namespace RoofTileVR
 
         public void MoveTheCutPosition(float position)
         {
-            print("Move the cut position" + position);
+            // print("Move the cut position" + position);
             cutPosition.transform.localPosition = new Vector3(cutPosition.transform.localPosition.x + position, cutPosition.transform.localPosition.y, cutPosition.transform.localPosition.z);
         }
 
@@ -2040,9 +2177,11 @@ namespace RoofTileVR
 
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
                     float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
-                    print("keywayerror" + keywayError);
+                    // print("keywayerror" + keywayError);
                     string convertTodec = (ActualkeywayError * 39.7f).ToString("F2");
                     SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway distance", Color.red, 0.03f, true);
+                    audioHandler.PlaySound(AudioHandler.Sound.CheckKeyway);
+                    StartCoroutine(spawner.aODPanel.WriteTextForTime(3, Color.red, "Check Keyway Spacing"));
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
@@ -2052,9 +2191,11 @@ namespace RoofTileVR
 
                     float keywayError = Vector3.Distance(this.transform.InverseTransformPoint(sideEdgeRight.transform.position), this.transform.InverseTransformPoint(spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position));
                     float ActualkeywayError = Vector3.Distance(sideEdgeRight.transform.position, spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position);
-                    print("keywayerror" + keywayError);
+                    // print("keywayerror" + keywayError);
                     string convertTodec = (ActualkeywayError * 39.7f).ToString("F2");
                     SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway distance", Color.red, 0.03f, true);
+                    audioHandler.PlaySound(AudioHandler.Sound.CheckKeyway);
+                    StartCoroutine(spawner.aODPanel.WriteTextForTime(3, Color.red, "Check Keyway Spacing"));
                     PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(keywayError, 0, 0), sideEdgeRight);
 
                 }
@@ -2085,7 +2226,7 @@ namespace RoofTileVR
                             Vector3 localPosRightSource = this.transform.InverseTransformPoint(sideEdgeRight.transform.position);
                             Vector3 localPosRightTarget = this.transform.InverseTransformPoint(tilesUnderneath[0].sideEdgeRight.transform.position);
                             float distanceRight = (localPosRightSource.x - localPosRightTarget.x);//SHOULD BE -VE
-                            print(distanceLeft + " distance left " + distanceRight + " distance right ");
+                            // print(distanceLeft + " distance left " + distanceRight + " distance right ");
                             float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - tilesUnderneath[0].sideEdgeRight.transform.position.x);
                             float actualDistanceLeft = Mathf.Abs(sideEdgeLeft.transform.position.x - tilesUnderneath[0].sideEdgeLeft.transform.position.x);
 
@@ -2097,6 +2238,7 @@ namespace RoofTileVR
                             else
                             {
                                 tagcolor = Color.red;
+                                PlaySidelapErrorSound();
                             }
                             if (distanceLeft > 0)
                             {
@@ -2114,6 +2256,7 @@ namespace RoofTileVR
                             else
                             {
                                 tagcolor = Color.red;
+                                PlaySidelapErrorSound();
                             }
                             if (distanceRight < 0)
                             {
@@ -2145,6 +2288,7 @@ namespace RoofTileVR
                                 else
                                 {
                                     tagcolor = Color.red;
+                                    PlaySidelapErrorSound();
                                 }
                                 string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
                                 SpawnTileMeasurements(sideEdgeRight, convertTodec + "\"", tagcolor, 0.03f, true);
@@ -2167,6 +2311,7 @@ namespace RoofTileVR
                                 else
                                 {
                                     tagcolor = Color.red;
+                                    PlaySidelapErrorSound();
                                 }
                                 string convertTodec = (actualDistanceLeft * 39.7f).ToString("F2");
                                 SpawnTileMeasurements(sideEdgeLeft, convertTodec + "\"", tagcolor, 0.03f, true);
@@ -2247,6 +2392,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
@@ -2259,6 +2405,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
@@ -2309,6 +2456,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
@@ -2321,6 +2469,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
@@ -2391,6 +2540,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
@@ -2403,6 +2553,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
@@ -2453,6 +2604,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodec = (leftwardDistanceLocal1 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodec + "\" ", tagcolor, 0.52f, true);
@@ -2465,6 +2617,7 @@ namespace RoofTileVR
                         else
                         {
                             tagcolor = Color.red;
+                            PlaySidelapErrorSound();
                         }
                         string convertTodecimal = (leftwardDistanceLocal2 * 39.7f).ToString("F2");
                         SpawnTileMeasurements(sideEdgeBottom, convertTodecimal + "\" ", tagcolor, 0.52f, true);
@@ -2500,7 +2653,7 @@ namespace RoofTileVR
 
                     if (!spawner.reverseTheLine)
                     {
-                        print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
+                        // print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
                         //left to right
                         if (spawner.tileSpanWidth <= 0)
                         {
@@ -2532,13 +2685,15 @@ namespace RoofTileVR
                             float actualDistanceRight = Mathf.Abs(sideEdgeRight.transform.position.x - spawner.TilesPlaced[spawner.TilesPlaced.Count - 1].GetComponent<TileObject>().sideEdgeLeft.transform.position.x);
                             string convertTodec = (actualDistanceRight * 39.7f).ToString("F2");
                             SpawnTileMeasurements(sideEdgeRight, convertTodec + "\" keyway error", Color.red, 0.03f, true);
+                            audioHandler.PlaySound(AudioHandler.Sound.CheckKeyway);
+                            StartCoroutine(spawner.aODPanel.WriteTextForTime(3, Color.red, "Check Keyway Spacing"));
                             PlaceTheMeasurementTag(false, new Vector3(0f, 0, 0f), new Vector3(distanceRight, 0, 0), sideEdgeRight);
                         }
 
                     }
                     else
                     {
-                        print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
+                        // print(!spawner.reverseTheLine + "!spawner.reverseTheLine");
                         //right to left
                         if (spawner.tileSpanWidth <= 0)
                         {
@@ -2579,6 +2734,29 @@ namespace RoofTileVR
 
 
         }
+        float timeElapsed = 0;
+        bool isPlayedAudio = false;
+        void PlaySidelapErrorSound()
+        {
+
+            if (isPlayedAudio)
+            {
+                print("playing different shake audio");
+                audioHandler.PlaySound(AudioHandler.Sound.TryDifferentShake);
+                StartCoroutine(spawner.aODPanel.WriteTextForTime(3, Color.red, "Try a different shake width"));
+            }
+            else
+            {
+                print("playing check sidelap audio");
+                audioHandler.PlaySound(AudioHandler.Sound.CheckSidelap);
+                StartCoroutine(spawner.aODPanel.WriteTextForTime(3, Color.red, "Check Sidelap"));
+                isPlayedAudio = true;
+            }
+        }
+
+
+
+
 
 
 

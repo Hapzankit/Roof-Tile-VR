@@ -14,7 +14,6 @@ public class Whiteboard : MonoBehaviour
     float widthInInches;
     float lengthInInches;
 
-    public TMP_Dropdown exposureDropdown;
 
     public TileCasting tileCasting;
 
@@ -141,7 +140,8 @@ public class Whiteboard : MonoBehaviour
         Vector3 offset = newChildWorldPosition - childWorldPosition;
         // Apply the offset to the parent to snap it
         pos.transform.position += offset;
-        pos.transform.position = new Vector3(0, (pos.transform.position.y + 0.035f * num) + 0.05f, pos.transform.position.z);
+        pos.SetParent(this.transform);
+        pos.transform.localPosition = new Vector3(pos.transform.localPosition.x, num * 0.005f + 0.0355f, pos.transform.localPosition.z);
         tileCasting.boardPositionsToSnap.Add(pos);
 
     }

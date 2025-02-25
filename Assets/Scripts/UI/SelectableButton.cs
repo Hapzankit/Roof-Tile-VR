@@ -22,6 +22,24 @@ public class SelectableButton : MonoBehaviour
         {
             button.onClick.AddListener(() => SelectButton(button));
         }
+        InvokeRepeating("FlashButtons", 0.5f, 0.5f);
+    }
+
+    void FlashButtons()
+    {
+        foreach (var button in buttons)
+        {
+            ColorBlock cb = button.colors;
+            if (cb.normalColor == Color.white)
+            {
+                cb.normalColor = Color.green;
+            }
+            else
+            {
+                cb.normalColor = Color.white;
+            }
+            button.colors=cb;
+        }
     }
 
     void Update()

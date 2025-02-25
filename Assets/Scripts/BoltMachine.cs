@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using RoofTileVR;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,11 +14,14 @@ public class BoltMachine : MonoBehaviour
     public Transform BoltPosition;
     Bolts currentBolt;
     public TileCasting tileCasting;
+    public GameObject NailerObject;
+    public Renderer nailRenderer;
 
 
     void Start()
     {
         currentBolt = Instantiate(bolts, BoltPosition);
+        nailRenderer = NailerObject.GetComponent<Renderer>();
     }
 
     // Update is called once per frame
@@ -28,6 +32,8 @@ public class BoltMachine : MonoBehaviour
             SpawnAnotherBolt();
         }
     }
+
+
 
 
     public void SpawnAnotherBolt()
@@ -47,5 +53,28 @@ public class BoltMachine : MonoBehaviour
     void OnCollisionExit(Collision collision)
     {
         gameObject.layer = LayerMask.NameToLayer("Default");
+    }
+
+    public void HighlightNailer()
+    {
+        InvokeRepeating("ChangeColor", 0.5f, 0.5f);
+    }
+
+    void ChangeColor()
+    {
+        if (nailRenderer.material.color == Color.green)
+        {
+            nailRenderer.material.color = Color.white;
+        }
+        else
+        {
+            nailRenderer.material.color = Color.green;
+        }
+    }
+    public void StopHighlight()
+    {
+
+        CancelInvoke("ChangeColor");
+        nailRenderer.material.color = Color.white;
     }
 }

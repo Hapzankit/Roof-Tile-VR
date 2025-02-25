@@ -25,12 +25,12 @@ public class AODPanel : MonoBehaviour
     {
         if (isCoroutineRunning)
         {
-            Debug.Log("Coroutine is already running.");
+            // Debug.Log("Coroutine is already running.");
             yield break; // Exit the coroutine early if it's already running
         }
 
         isCoroutineRunning = true;
-        print("Show panel");
+        // print("Show panel");
         image.enabled = true;
         image.color = imageColor;
         writingText.text = textToWrite;

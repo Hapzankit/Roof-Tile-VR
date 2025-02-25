@@ -128,7 +128,7 @@ public class Bolts : MonoBehaviour
         double distanceInInches = Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37;
         if (Vector3.Distance(this.transform.position, tileToCheckFrom.BoltPlaceHolders[tileNum].transform.position) * 39.37 > .5f)
         {
-
+                this.transform.localPosition = Vector3.zero;
         }
         else
         {

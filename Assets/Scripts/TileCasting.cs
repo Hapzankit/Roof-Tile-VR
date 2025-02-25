@@ -60,9 +60,22 @@ namespace RoofTileVR
 
         public Cutter cutter;
 
+        public GameObject rightEnd;
+        public GameObject leftEnd;
+
+        public BoltMachine boltMachine;
+
+        public GameObject CuttingTutorial;
+
+        public ExposureMeasurement exposureMeasurement;
+
         void Awake()
         {
             TileGrabInteractables = TileStandGroup.GetComponentsInChildren<TileObject>();
+            foreach (GameObject stand in TileStands)
+            {
+                stand.SetActive(true);
+            }
         }
 
 
@@ -93,15 +106,15 @@ namespace RoofTileVR
         }
         void Start()
         {
+            CuttingTutorial.SetActive(false);
+            exposureMeasurement.gameObject.SetActive(false);
             exposureConvertedToUnityfromInches.Add(10);
 
             WriteOnHandMenu("Draw a chalk Line");
 
+            AudioHandler.Instance.StartIntroductionSound();
 
-            foreach (GameObject stands in TileStands)
-            {
-                stands.SetActive(false);
-            }
+
 
             foreach (var coll in starterColliderHolder.GetComponentsInChildren<BoxCollider>())
             {
@@ -118,6 +131,8 @@ namespace RoofTileVR
             {
                 TryGetComponent(out m_RoofObject);
             }
+
+            markerCube.SetActive(false);
 
 
         }
@@ -298,7 +313,7 @@ namespace RoofTileVR
             }
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[0].gameObject.SetActive(true);
             currentTilePrefab.GetComponent<TileObject>().BoltPlaceHolders[1].gameObject.SetActive(true);
-            EnableDisableTileGrab(false, "Fasten the previous tile first!", 3, Color.red);
+            EnableDisableTileGrab(false, "Check Fasteners", 3, Color.red);
             currentTilePrefab.GetComponent<TileObject>().DestroyErrors();
 
         }
@@ -353,6 +368,8 @@ namespace RoofTileVR
         public bool reverseTheLine = false;
         public StatisticsManager statisticsManager;
         public int linesOfTileTobePlaced = 1;
+        public float ActualTileSpanWidth = 0;
+        float actualTileWidthLeft = 0;
         public void YesButtonPressed()
         {
 
@@ -364,8 +381,9 @@ namespace RoofTileVR
             // for strter tiles
             if (!currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
+
                 isFirstShakePlaced = true;
-                print("First Shake Placed");
+                // print("First Shake Placed");
             }
             // normal shakes
             else
@@ -388,10 +406,16 @@ namespace RoofTileVR
                     //     tiles.GetComponent<l>().tileSize = 12;
 
                     // }
+                    // AudioHandler.Instance.PlayListOfSound();
                     markerCube.SetActive(true);
                     markerCube.GetComponent<WhiteboardMarker>().ChangeObjects();
                     starterColliders[starterColliders.Count - 1].gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
                     print("All tiles placed");
+                    List<AudioHandler.Sound> clip = new List<AudioHandler.Sound>();
+                    clip.Add(AudioHandler.Sound.MaximumExposureis); clip.Add(AudioHandler.Sound.ChalkLineto); clip.Add(AudioHandler.Sound.SelectYourDesired);
+                    AudioHandler.Instance.DoAfterSound += HideExposure;
+                    AudioHandler.Instance.DoBeforeSound += ShowExposure;
+                    AudioHandler.Instance.PlayListOfSound(clip);
                     WriteOnHandMenu("All Starter tiles placed, Now select Exposure.");
                     numOfTile = num;
 
@@ -403,25 +427,84 @@ namespace RoofTileVR
 
             if (tileSpanWidth <= 0)
             {
+                actualTileWidthLeft = ActualTileSpanWidth;
+                ActualTileSpanWidth = 0;
                 tileSpanWidth = tileSpanWidthConstant;
                 reverseTheLine = !reverseTheLine;
+
             }
 
 
 
             currentTilePrefab.GetComponent<XRGrabInteractable>().enabled = false;
             currentTilePrefab.GetComponent<TileObject>().CorrectTileIndicator.SetActive(false);
-            tileSpanWidth -= currentTileWidth;
+
+
+            float tileSpanWidthBefore = 0;
+
+            if (!currentTilePrefab.isStarter)
+            {
+                if (rightToLeft)
+                {
+                    if (TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().rowNumber != currentTilePrefab.rowNumber)
+                    {
+                        actualTileWidthLeft -= currentTilePrefab.tileSize;
+                        tileSpanWidthBefore = tileSpanWidth;
+                        tileSpanWidth = actualTileWidthLeft;
+                    }
+                    else
+                    {
+                        rightEnd = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().SideEdgeLeft.gameObject;
+                        leftEnd = currentTilePrefab.SideEdgeLeft.gameObject;
+
+                        actualTileWidthLeft -= Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f;
+                        tileSpanWidthBefore = tileSpanWidth;
+                        tileSpanWidth = actualTileWidthLeft;
+                        print("Width to decrease" + Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f);
+                    }
+                }
+                else
+                {
+                    if (TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().rowNumber != currentTilePrefab.rowNumber)
+                    {
+                        actualTileWidthLeft -= currentTilePrefab.tileSize;
+                        tileSpanWidthBefore = tileSpanWidth;
+                        tileSpanWidth = actualTileWidthLeft;
+                    }
+                    else
+                    {
+
+                        rightEnd = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().SideEdgeRight.gameObject;
+                        leftEnd = currentTilePrefab.SideEdgeRight.gameObject;
+                        actualTileWidthLeft -= Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f;
+                        tileSpanWidthBefore = tileSpanWidth;
+                        tileSpanWidth = actualTileWidthLeft;
+                        print("Width to decrease" + Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f);
+                    }
+                }
+
+            }
+
+
+
+
+
+
+
+
+
+            // tileSpanWidth -= currentTileWidth;
 
             if (tileSpanWidth <= 0 && currentTilePrefab)
             {
                 // cutter.transform.SetParent(currentTilePrefab.cutPosition.transform);
                 // cutter.MoveTheCutter(currentTilePrefab.cutPosition.Top.transform, currentTilePrefab.cutPosition.Bottom.transform);
-                print("Called once right to left");
+                // print("Called once right to left");
                 rightToLeft = !rightToLeft;
-
             }
             TilesPlaced.Add(currentTilePrefab.gameObject);
+
+
             if (currentTilePrefab.GetComponent<TileObject>().isStarter)
             {
                 // print("apply the area covered");
@@ -453,36 +536,38 @@ namespace RoofTileVR
             {
                 if (currentTilePrefab.tilesUnderneath.Count > 1)
                 {
-                    cutTheTile = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile < currentTilePrefab.tileSize;
+                    cutTheTile = tileSpanWidthBefore < currentTilePrefab.tileSize;
                 }
                 else
                 {
                     cutTheTile = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile < currentTilePrefab.tileSize;
                 }
             }
-            if (tileSpanWidth < 12)
-            {
-                //     if (currentTilePrefab.tilesUnderneath.Count > 1)
-                //     {
-                //         tileSpanWidth = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
-                //     }
-                // else
-                // {
-                tileSpanWidth = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().areaLeftByTile;
-                // }
-            }
+            // if (tileSpanWidth < 12 && tileSpanWidth > 0)
+            // {
+            //     //     if (currentTilePrefab.tilesUnderneath.Count > 1)
+            //     //     {
+            //     //         tileSpanWidth = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+            //     //     }
+            //     // else
+            //     // {
+            //     tileSpanWidth = TilesPlaced[TilesPlaced.Count - 1].GetComponent<TileObject>().areaLeftByTile;
+            //     // }
+            // }
 
-            ////////////////////////////WORK from here///////////////////////////
+
             if (tileSpanWidth <= 0 && cutTheTile)
             {
+
+                print("Actual tile span width" + ActualTileSpanWidth);
                 currentTilePrefab.isGrabbable = false;
                 if (currentTilePrefab.tilesUnderneath.Count > 1)
                 {
-                    arealeft = currentTilePrefab.tilesUnderneath[currentTilePrefab.tilesUnderneath.Count - 1].tileSize + TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+                    arealeft = tileSpanWidthBefore;
                 }
                 else
                 {
-                    arealeft = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile;
+                    arealeft = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().areaLeftByTile - 0.37f;
                 }
                 float percentageToCut = (currentTilePrefab.tileSize - arealeft) / currentTilePrefab.tileSize;
                 print("Percentage to cut" + percentageToCut);
@@ -522,6 +607,69 @@ namespace RoofTileVR
             currentTilePrefab.yesbuttonPressed = true;
 
             // placementPrompt.gameObject.SetActive(true);
+            if (TilesPlaced.Count > 1)
+            {
+                if (rightToLeft)
+                {
+                    if (TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().rowNumber != currentTilePrefab.rowNumber)
+                    {
+                        ActualTileSpanWidth += currentTilePrefab.tileSize;
+                    }
+                    else
+                    {
+                        rightEnd = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().SideEdgeLeft.gameObject;
+                        leftEnd = currentTilePrefab.SideEdgeLeft.gameObject;
+
+                        ActualTileSpanWidth += Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f;
+                    }
+                }
+                else
+                {
+                    if (TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().rowNumber != currentTilePrefab.rowNumber)
+                    {
+                        ActualTileSpanWidth += currentTilePrefab.tileSize;
+                    }
+                    else
+                    {
+
+                        rightEnd = TilesPlaced[TilesPlaced.Count - 2].GetComponent<TileObject>().SideEdgeRight.gameObject;
+                        leftEnd = currentTilePrefab.SideEdgeRight.gameObject;
+                        ActualTileSpanWidth += Vector3.Distance(rightEnd.transform.position, leftEnd.transform.position) * 39.37f;
+                    }
+                }
+
+            }
+            else
+            {
+                ActualTileSpanWidth += currentTilePrefab.tileSize;
+            }
+            int n = starterColliders.IndexOf(currentTileRegion.GetComponent<BoxCollider>());
+            // print("Change starter tiles" + num + " " + starterColliders.Count);
+            currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isStarterRegion = false;
+            // currentTileRegion.gameObject.GetComponent<TileDropCollisionCheck>().isNormalRegion = ;
+            if (n >= starterColliders.Count - 1 && currentTilePrefab.isStarter)
+            {
+                actualTileWidthLeft = ActualTileSpanWidth;
+                print("Actual width made" + actualTileWidthLeft);
+                ActualTileSpanWidth = 0;
+            }
+
+
+            print("Actual tile span width" + ActualTileSpanWidth);
+
+        }
+
+
+        void ShowExposure()
+        {
+            exposureMeasurement.gameObject.SetActive(true);
+            StartCoroutine(exposureMeasurement.ShowTileExposure(5));
+            AudioHandler.Instance.DoBeforeSound -= ShowExposure;
+        }
+        void HideExposure()
+        {
+            exposureMeasurement.gameObject.SetActive(false);
+            AudioHandler.Instance.DoAfterSound -= HideExposure;
         }
 
 
@@ -548,7 +696,7 @@ namespace RoofTileVR
             Destroy(tile.actualTile.GetComponent<Sliceable>());
             if (!rightToLeft)
             {
-                print("showing measurements right to left");
+                // print("showing measurements right to left");
                 tile.SpawnTileMeasurements(tile.SideEdgeLeft, "1\" rake overhang", Color.green, 0.03f, false);
                 tile.PlaceTheMeasurementTag(false, new Vector3(0.03f, 0, 0.55f), new Vector3(0.12f * (1 + percentageCut), 0, 0), tile.SideEdgeLeft);
                 tile.SpawnTileMeasurements(tile.SideEdgeRight.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
@@ -556,7 +704,7 @@ namespace RoofTileVR
             }
             else
             {
-                print("showing measurements left to right");
+                // print("showing measurements left to right");
                 tile.SpawnTileMeasurements(tile.SideEdgeRight, "1\" rake overhang", Color.green, 0.03f, false);
                 tile.PlaceTheMeasurementTag(false, new Vector3(-0.03f, 0, 0.55f), new Vector3(-0.12f * (1 + percentageCut), 0, 0), tile.SideEdgeRight);
                 tile.SpawnTileMeasurements(tile.SideEdgeLeft.transform, "3/8\" keyway spacing", Color.green, 0.5f, false);
@@ -593,9 +741,10 @@ namespace RoofTileVR
                     {
                         if (currentTilePrefab.CalculateSidelapCheck())
                         {
-
+                            print("In the sidelap check true");
                             if (currentTilePrefab.ShowKeywayerrors())
                             {
+
                                 ShowPlacementPrompt();
                                 currentTilePrefab.tileNameText.text = "";
                                 currentTilePrefab.checkKeywayFlag = true;
@@ -608,6 +757,7 @@ namespace RoofTileVR
                     {
                         if (currentTilePrefab.CalculateSidelapCheck())
                         {
+                            print("In the sidelap check true");
 
                             if (currentTilePrefab.ShowShakeTIleErrors(!isFirstShakePlaced))
                             {
@@ -625,6 +775,7 @@ namespace RoofTileVR
                 {
                     if (currentTilePrefab.CalculateSidelapCheck())
                     {
+                        print("In the sidelap check true");
 
                         if (currentTilePrefab.ShowStarterErrors())
                         {
@@ -647,9 +798,19 @@ namespace RoofTileVR
                 stand.SetActive(shouldShow);
             }
         }
-
+        bool callonceEnableTile = true;
+        bool callOnceAfterIntro = true;
         void Update()
         {
+
+            if (callOnceAfterIntro)
+            {
+                if (AudioHandler.Instance.introductionDone)
+                {
+                    markerCube.SetActive(true);
+                    callOnceAfterIntro = false;
+                }
+            }
 
             ///////////////////Show directional arrows///////////////////////
             if (TilesPlaced.Count > 1)
@@ -722,14 +883,20 @@ namespace RoofTileVR
             }
 
 
-            if (markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
+            if (!markerCube.GetComponent<WhiteboardMarker>().isLineDrawnForStarter)
             {
-                ShowHideTiles(true);
+                // ShowHideTiles(true);
+                EnableDisableTileGrab(false, "Make a chalk line", 3, Color.red);
             }
             else
             {
-                ShowHideTiles(false);
+                if (callonceEnableTile)
+                {
+                    EnableDisableTileGrab(true, "", 3, Color.white);
+                    callonceEnableTile = false;
+                }
             }
+
             if (currentTilePrefab && currentTilePrefab.isFirstBoltPlaced && currentTilePrefab.isSecondBoltPlaced)
             {
                 // Should not be called if we are placing the last starter

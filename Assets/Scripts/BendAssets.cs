@@ -17,7 +17,9 @@ public class Bend : MonoBehaviour
 
         mesh = GetComponent<MeshFilter>().mesh;
         vertices = mesh.vertices;
+        BendTheTile(1);
     }
+
 
     public void BendTheTile(int rowNum)
     {

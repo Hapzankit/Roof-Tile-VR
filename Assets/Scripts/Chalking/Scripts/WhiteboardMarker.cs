@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using RoofTileVR;
 using TMPro;
 using Unity.Collections;
 using UnityEngine;
@@ -30,6 +32,7 @@ public class WhiteboardMarker : MonoBehaviour
 
 
 
+
     public float DrawLineAtDistance = 11.5f;
     void Start()
     {
@@ -43,7 +46,15 @@ public class WhiteboardMarker : MonoBehaviour
         lineRenderer.startColor = Color.black;
         lineRenderer.endColor = Color.black;
         lineRenderer.positionCount = 2;
+        AudioHandler.Instance.DoBeforeSound += MakeFirstStarterAppear;
+        AudioHandler.Instance.DoAfterSound += MakeFirstStarterDisappear;
+
+        // whiteboard.DrawVerticalAtDistance(DrawLineAtDistance + 8 + 10);
+        // whiteboard.DrawVerticalAtDistance(DrawLineAtDistance + 9 + 10);
+        // whiteboard.DrawVerticalAtDistance(DrawLineAtDistance + 10 + 10);
     }
+
+
     bool isSecondLine = false;
     public void ChangeObjects()
     {
@@ -93,6 +104,7 @@ public class WhiteboardMarker : MonoBehaviour
                 lineRenderer.SetPosition(1, secondObjectShake.position);
 
                 whiteboard.tileCasting.WriteOnHandMenu("Now start placing normal shakes over starter tiles from bottom right");
+
                 pickedObject.gameObject.SetActive(false);
                 secondObjectShake.gameObject.SetActive(false);
                 thirdObjectShake.gameObject.SetActive(false);
@@ -122,6 +134,7 @@ public class WhiteboardMarker : MonoBehaviour
                 this.transform.position = new Vector3(secondObjectShake.position.x, secondObjectShake.position.y, secondObjectShake.position.z);
                 whiteboard.tileCasting.WriteOnHandMenu("Now Place Starter tiles on correct place (starting from bottom right) until its border turns green");
                 // StartCoroutine(whiteboard.tileCasting.aODPanel.WriteTextForTime(3, Color.green, "Chalk line drawn!"));
+                AudioHandler.Instance.PlaySound(AudioHandler.Sound.PlaceAndFasten);
                 pickedObject.gameObject.SetActive(false);
                 secondObject.gameObject.SetActive(false);
                 thirdObject.gameObject.SetActive(false);
@@ -146,6 +159,19 @@ public class WhiteboardMarker : MonoBehaviour
     public void OnMarkerpicked()
     {
         this.transform.rotation = Quaternion.Euler(0, 90, 120);
+    }
+
+
+
+    void MakeFirstStarterAppear()
+    {
+        whiteboard.tileCasting.starterColliders[0].GetComponent<TileDropCollisionCheck>().ghostTile.gameObject.SetActive(true);
+        AudioHandler.Instance.DoBeforeSound -= MakeFirstStarterAppear;
+    }
+    void MakeFirstStarterDisappear()
+    {
+        whiteboard.tileCasting.starterColliders[0].GetComponent<TileDropCollisionCheck>().ghostTile.gameObject.SetActive(false);
+        AudioHandler.Instance.DoAfterSound -= MakeFirstStarterDisappear;
     }
 
 
